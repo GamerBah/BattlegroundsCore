@@ -1,0 +1,75 @@
+package com.battlegroundspvp.listeners;
+/* Created by GamerBah on 8/4/2017 */
+
+import com.battlegroundspvp.Core;
+import com.battlegroundspvp.utils.inventories.ClickEvent;
+import com.battlegroundspvp.utils.inventories.GameInventory;
+import com.battlegroundspvp.utils.inventories.InventoryBuilder;
+import com.battlegroundspvp.utils.inventories.ItemBuilder;
+import org.bukkit.GameMode;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+
+public class InventoryClickListener implements Listener {
+
+    private Core plugin = Core.getInstance();
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (!event.isCancelled()) {
+            Inventory inventory = event.getInventory();
+            final Player player = (Player) event.getWhoClicked();
+
+            if (!player.getGameMode().equals(GameMode.CREATIVE)) {
+                if (event.getSlotType() == null || event.getCurrentItem() == null
+                        || event.getCurrentItem().getType() == null || event.getCurrentItem().getItemMeta() == null) {
+                    return;
+                }
+
+                if (inventory == player.getInventory())
+                    event.setCancelled(true);
+
+                for (ItemStack itemStack : player.getInventory().getArmorContents()) {
+                    if (itemStack == null) {
+                        event.setCancelled(true);
+                    }
+                    if (event.getCurrentItem().equals(itemStack)) {
+                        event.setCancelled(true);
+                    }
+                }
+
+                if (event.getCurrentItem() != null && event.getCurrentItem().getItemMeta() != null
+                        && event.getCurrentItem().getItemMeta().getDisplayName() != null) {
+
+                    if (InventoryBuilder.getInventoryUsers().containsKey(player)) {
+                        ItemBuilder itemBuilder = null;
+                        GameInventory gameInventory = InventoryBuilder.getInventoryUsers().get(player).getGameInventory();
+                        if (gameInventory.getClickables().keySet().contains(event.getSlot()))
+                            itemBuilder = gameInventory.getClickables().get(event.getSlot());
+
+                        if (itemBuilder == null) {
+                            for (ItemBuilder items : gameInventory.getSortables()) {
+                                if (items.isSimilar(event.getCurrentItem())) {
+                                    itemBuilder = items;
+                                }
+                            }
+                        }
+                        if (itemBuilder != null) {
+                            if (itemBuilder.getClickEvents() != null && !itemBuilder.getClickEvents().isEmpty()) {
+                                for (ClickEvent clickEvent : itemBuilder.getClickEvents()) {
+                                    if (clickEvent.getType().getClickType().equals(event.getClick()) || clickEvent.getType().equals(ClickEvent.Type.ANY))
+                                        clickEvent.run();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

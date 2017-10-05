@@ -1,0 +1,16 @@
+host:
+database:
+username:
+password:
+
+essenceActive: false
+essenceIncrease:
+essenceTime:
+essenceTimeRemaining:
+essenceOwner:
+essenceThanks:
+
+developmentMode: false
+
+launchersUp: []
+launchersForward: []

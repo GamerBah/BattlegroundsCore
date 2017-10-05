@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Required Libs">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../Libraries/ProtocolLib.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../../Libraries/brettwooldridge-HikariCP-HikariCP-2.4.4-1-ga7e0d35.zip!/brettwooldridge-HikariCP-a7e0d35/src/main/java" />
+      <root url="jar://$PROJECT_DIR$/../../Libraries/brettwooldridge-HikariCP-HikariCP-2.4.4-1-ga7e0d35.zip!/brettwooldridge-HikariCP-a7e0d35/src/test/java" />
+    </SOURCES>
+  </library>
+</component>

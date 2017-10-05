@@ -1,0 +1,92 @@
+main: com.battlegroundspvp.Core
+name: Core
+author: GamerBah
+version: 0.13.3b
+depend: [ProtocolLib]
+commands:
+  rank:
+    description: Changes a players rank
+  clearchat:
+    description: Clears the chat
+    aliases: [cc, cchat]
+  lockchat:
+    description: Locks the chat and allows only Staff members to talk
+    aliases: [lc, lchat]
+  staff:
+    description: Chat in the Staff channel
+    aliases: [s]
+  freeze:
+    description: Freezes players
+  mute:
+    description: Mutes a player
+  unmute:
+    description: Unmutes a player
+  flyspeed:
+    description: Sets your flying speed
+    aliases: [fspeed, fsp]
+  report:
+    description: Report a player
+  staffreq:
+    description: Requests a Staff member
+  team:
+    description: Team with another player!
+  spawn:
+    description: Takes you back to the spawn
+  afk:
+    description: Sets you as AFK (away-from-keyboard)
+  message:
+    description: Message another player
+    aliases: [m, msg]
+  reply:
+    description: Quick reply to your last-received message
+    aliases: [r]
+  options:
+    description: Open options for a player
+  ping:
+    description: View the ping of yourself or another player
+  donation:
+    description:
+  essences:
+    description: View your Battle Essences
+  thanks:
+    description: Thanks a player for activating an Essence
+  punish:
+    description: Punish players and perform lookups
+  ban:
+    description: Bans a player from the server
+  unban:
+    description: Removes a player's active ban
+  maintenance:
+    description: Puts the in a Staff-only maintenance mode
+  slots:
+    description: Opens up the K-Slots menu
+    aliases: [kslots, kitslots]
+  dailyreward:
+    description: Claims available daily rewards
+    aliases: [dr, daily, dreward]
+  skull:
+    description: Gets the head of a specified player
+  help:
+    description: Shows help message
+  refer:
+    description: Refers the player who invited you to the server
+  reload:
+    description: Reloads the server
+  friend:
+    description: Friends Command
+    aliases: [friends, f]
+  kick:
+    description: Kicks a player
+  tempban:
+    description: Temp-ban a player
+  crate:
+    description: Opens Crates Menu
+    aliases: [crates]
+  warn:
+    description: Warns a player
+  rules:
+    description: Displays the Server Rules
+  spectate:
+    description: Puts the player into spectate mode
+  launcher:
+    description: Adds either upwards or forwards launchers
