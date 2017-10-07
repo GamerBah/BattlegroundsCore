@@ -1,12 +1,12 @@
 package com.battlegroundspvp.playerevents;
 /* Created by GamerBah on 8/7/2016 */
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.commands.FreezeCommand;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.punishments.Punishment;
-import com.battlegroundspvp.runnables.AutoUpdate;
+import com.battlegroundspvp.runnables.UpdateRunnable;
 import com.battlegroundspvp.utils.enums.ColorBuilder;
 import com.battlegroundspvp.utils.enums.Time;
 import de.Herbystar.TTA.TTA_Methods;
@@ -24,16 +24,16 @@ import java.util.ArrayList;
 
 public class PlayerJoin implements Listener {
 
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public PlayerJoin(Core plugin) {
+    public PlayerJoin(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 
     @EventHandler
     public void onLogin(AsyncPlayerPreLoginEvent event) {
         if (plugin.getGameProfile(event.getUniqueId()) == null) {
-            Core.createNewGameProfile(event.getName(), event.getUniqueId());
+            BattlegroundsCore.createNewGameProfile(event.getName(), event.getUniqueId());
             //plugin.getGlobalStats().addUniqueJoin();
         }
 
@@ -74,7 +74,7 @@ public class PlayerJoin implements Listener {
             }
         }
 
-        if (AutoUpdate.updating) {
+        if (UpdateRunnable.updating) {
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, ColorBuilder.YELLOW.bold().create() + "SERVER IS UPDATING!\n"
                     + ChatColor.RED + "To prevent your data from being corrupted, you didn't connect\n\n" + ChatColor.GRAY + "You should be able to join in a few seconds! Hang in there!");
         }

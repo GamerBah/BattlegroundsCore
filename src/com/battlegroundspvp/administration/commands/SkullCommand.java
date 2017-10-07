@@ -1,10 +1,10 @@
 package com.battlegroundspvp.administration.commands;
 /* Created by GamerBah on 8/29/2016 */
 
-import com.battlegroundspvp.administration.data.Rank;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
+import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.utils.enums.EventSound;
-import com.battlegroundspvp.Core;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -17,9 +17,9 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 public class SkullCommand implements CommandExecutor {
 
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public SkullCommand(Core plugin) {
+    public SkullCommand(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 

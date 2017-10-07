@@ -2,10 +2,10 @@ package com.battlegroundspvp.administration.commands;
 /* Created by GamerBah on 9/7/2016 */
 
 
-import com.battlegroundspvp.Core;
-import com.battlegroundspvp.administration.data.Rank;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
-import com.battlegroundspvp.runnables.AutoUpdate;
+import com.battlegroundspvp.administration.data.Rank;
+import com.battlegroundspvp.runnables.UpdateRunnable;
 import com.battlegroundspvp.utils.enums.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
 import de.Herbystar.TTA.TTA_Methods;
@@ -18,9 +18,9 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 public class ReloadCommand implements CommandExecutor {
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public ReloadCommand(Core plugin) {
+    public ReloadCommand(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 
@@ -37,13 +37,13 @@ public class ReloadCommand implements CommandExecutor {
             plugin.sendNoPermission(player);
         } else {
             if (args.length != 1) {
-                plugin.sendIncorrectUsage(player, "/reload <server/...>");
+                plugin.sendIncorrectUsage(player, "/reload <server/plugin>");
                 return true;
             }
             if (args[0].equalsIgnoreCase("server")) {
                 plugin.getServer().broadcastMessage(ColorBuilder.RED.bold().create() + "SERVER: " + ChatColor.GRAY + "Reloading in 5 seconds. Hang in there!");
                 plugin.getServer().broadcastMessage(ChatColor.GRAY + "(You'll get sent back to the spawn once the reload is complete)");
-                AutoUpdate.updating = true;
+                UpdateRunnable.updating = true;
                 //ScoreboardListener scoreboardListener = new ScoreboardListener(plugin);
                 for (Player players : plugin.getServer().getOnlinePlayers()) {
                     players.closeInventory();
@@ -72,7 +72,7 @@ public class ReloadCommand implements CommandExecutor {
                     }
                     plugin.getServer().broadcastMessage(ColorBuilder.RED.bold().create() + "SERVER: " + ChatColor.GRAY
                             + "Server Reload was a " + ColorBuilder.GREEN.bold().create() + "success" + ChatColor.GRAY + "! Now go have fun!");
-                    AutoUpdate.updating = false;
+                    UpdateRunnable.updating = false;
                 }, 100);
             }
             return true;

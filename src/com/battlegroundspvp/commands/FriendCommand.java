@@ -1,7 +1,7 @@
 package com.battlegroundspvp.commands;
 /* Created by GamerBah on 9/7/2016 */
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.utils.enums.EventSound;
 import com.battlegroundspvp.utils.friends.FriendMessages;
@@ -15,9 +15,9 @@ import org.bukkit.entity.Player;
 
 public class FriendCommand implements CommandExecutor {
 
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public FriendCommand(Core plugin) {
+    public FriendCommand(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 
@@ -93,8 +93,8 @@ public class FriendCommand implements CommandExecutor {
                 }
                 friendUtils.createPendingRequest(player, target);
                 plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-                    if (Core.pendingFriends.containsKey(target)) {
-                        Core.pendingFriends.remove(target);
+                    if (BattlegroundsCore.pendingFriends.containsKey(target)) {
+                        BattlegroundsCore.pendingFriends.remove(target);
                         player.sendMessage(org.bukkit.ChatColor.RED + "You friend request to "
                                 + ChatColor.GOLD + target.getName() + ChatColor.RED + " has expired!");
                         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BASS, 2, 0.5F);

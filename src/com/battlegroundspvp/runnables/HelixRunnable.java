@@ -1,14 +1,14 @@
 package com.battlegroundspvp.runnables;
 /* Created by GamerBah on 8/30/2016 */
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 
 public class HelixRunnable implements Runnable {
 
     private double phi = 0;
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public HelixRunnable(Core plugin) {
+    public HelixRunnable(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 
@@ -17,7 +17,7 @@ public class HelixRunnable implements Runnable {
         /*for (Player player : plugin.getServer().getOnlinePlayers()) {
             GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
             if (TrailRunnable.getStill().contains(player)) {
-                if (!Core.getAfk().contains(player.getUniqueId())) {
+                if (!BattlegroundsCore.getAfk().contains(player.getUniqueId())) {
                     //if (!CombatListener.getTagged().containsKey(player.getUniqueId())) {
                         if (gameProfile.getTrail().equals(Cosmetic.Item.TRAIL_FLAME_WARRIOR)) {
                             phi += Math.PI / 16;

@@ -1,7 +1,7 @@
 package com.battlegroundspvp.commands;
 /* Created by GamerBah on 8/15/2016 */
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.utils.enums.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
 import net.md_5.bungee.api.ChatColor;
@@ -12,9 +12,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class PingCommand implements CommandExecutor {
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public PingCommand(Core plugin) {
+    public PingCommand(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 
@@ -81,7 +81,7 @@ public class PingCommand implements CommandExecutor {
         if (player == target) {
             player.sendMessage(ChatColor.GRAY + "Your connection to Battlegrounds is " + status + ChatColor.GRAY + "(" + ping + "ms)");
         } else {
-            player.sendMessage(ChatColor.RED + target.getName() + ChatColor.GRAY + "'s connection to Core is " + status + ChatColor.GRAY + "(" + ping + "ms)");
+            player.sendMessage(ChatColor.RED + target.getName() + ChatColor.GRAY + "'s connection to BattlegroundsCore is " + status + ChatColor.GRAY + "(" + ping + "ms)");
         }
 
         return true;

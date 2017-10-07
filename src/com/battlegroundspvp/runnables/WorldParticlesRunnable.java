@@ -1,7 +1,7 @@
 package com.battlegroundspvp.runnables;
 /* Created by GamerBah on 8/30/2016 */
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.utils.packets.particles.ParticleEffect;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -11,10 +11,10 @@ import java.math.RoundingMode;
 
 public class WorldParticlesRunnable implements Runnable {
 
-    private Core plugin;
+    private BattlegroundsCore plugin;
     private int i = 0;
 
-    public WorldParticlesRunnable(Core plugin) {
+    public WorldParticlesRunnable(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 

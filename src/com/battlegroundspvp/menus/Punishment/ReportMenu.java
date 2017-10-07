@@ -1,8 +1,8 @@
 package com.battlegroundspvp.menus.Punishment;
 
-import com.battlegroundspvp.Core;
-import com.battlegroundspvp.administration.data.Rank;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
+import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.commands.ReportCommand;
 import com.battlegroundspvp.utils.enums.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
@@ -23,7 +23,7 @@ import java.util.List;
 
 public class ReportMenu extends GameInventory {
 
-    private Core plugin = Core.getInstance();
+    private BattlegroundsCore plugin = BattlegroundsCore.getInstance();
     @Getter private String message;
     @Getter private List<ItemBuilder> selected;
 
@@ -97,7 +97,7 @@ public class ReportMenu extends GameInventory {
         wool.lore(ChatColor.DARK_RED + "" + ChatColor.BOLD + "NOTICE:");
         wool.lore(ChatColor.RED + "Please do not falsely report a player");
         wool.lore(ChatColor.RED + "with the intention of getting them banned.");
-        wool.lore(ChatColor.RED + "Core Staff do not take this lightly,");
+        wool.lore(ChatColor.RED + "BattlegroundsCore Staff do not take this lightly,");
         wool.lore(ChatColor.RED + "and will deal with the situation if needed.");
 
         getInventory().setItem(10, killAura);

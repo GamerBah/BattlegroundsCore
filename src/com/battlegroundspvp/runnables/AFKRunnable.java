@@ -2,7 +2,7 @@ package com.battlegroundspvp.runnables;
 /* Created by GamerBah on 8/24/2016 */
 
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 
@@ -12,9 +12,9 @@ public class AFKRunnable implements Runnable {
 
     @Getter
     private static HashMap<Player, Integer> afkTimer = new HashMap<>();
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public AFKRunnable(Core plugin) {
+    public AFKRunnable(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 
@@ -26,7 +26,7 @@ public class AFKRunnable implements Runnable {
                     afkTimer.put(player, afkTimer.get(player) + 1);
                 }
                 if (afkTimer.get(player) == 300) {
-                    if (!Core.getAfk().contains(player.getUniqueId())) {
+                    if (!BattlegroundsCore.getAfk().contains(player.getUniqueId())) {
                         player.chat("/afk");
                     }
                 }

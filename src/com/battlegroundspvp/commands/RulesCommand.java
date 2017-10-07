@@ -1,7 +1,7 @@
 package com.battlegroundspvp.commands;
 /* Created by GamerBah on 8/7/2016 */
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.utils.enums.ColorBuilder;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.Command;
@@ -10,9 +10,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class RulesCommand implements CommandExecutor {
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public RulesCommand(Core plugin) {
+    public RulesCommand(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 

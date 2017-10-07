@@ -26,7 +26,7 @@ package com.battlegroundspvp.utils;
  * #L%
  */
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -135,7 +135,7 @@ public class PluginUtil {
      *
      * @param plugin plugin to load
      */
-    private static void load(Plugin plugin) {
+    private static void load(Plugin plugin) throws InvalidPluginException, InvalidDescriptionException {
         load(plugin.getName());
     }
 
@@ -144,14 +144,14 @@ public class PluginUtil {
      *
      * @param name plugin's name
      */
-    public static void load(String name) {
+    public static void load(String name) throws InvalidPluginException, InvalidDescriptionException {
 
         Plugin target;
 
         File pluginDir = new File("plugins");
 
         if (!pluginDir.isDirectory()) {
-            Core.getInstance().getLogger().severe("Plugins directory does not exist!");
+            BattlegroundsCore.getInstance().getLogger().severe("Plugins directory does not exist!");
             return;
         }
 
@@ -160,36 +160,22 @@ public class PluginUtil {
         if (!pluginFile.isFile()) {
             for (File f : pluginDir.listFiles()) {
                 if (f.getName().endsWith(".jar")) {
-                    try {
-                        PluginDescriptionFile desc = Core.getInstance().getPluginLoader().getPluginDescription(f);
-                        if (desc.getName().equalsIgnoreCase(name)) {
-                            pluginFile = f;
-                            break;
-                        }
-                    } catch (InvalidDescriptionException e) {
-                        Core.getInstance().getLogger().severe("Cannot find plugin description file!");
-                        return;
+                    PluginDescriptionFile desc = BattlegroundsCore.getInstance().getPluginLoader().getPluginDescription(f);
+                    if (desc.getName().equalsIgnoreCase(name)) {
+                        pluginFile = f;
+                        break;
                     }
                 }
             }
         }
 
-        try {
-            target = Bukkit.getPluginManager().loadPlugin(pluginFile);
-        } catch (InvalidDescriptionException e) {
-            e.printStackTrace();
-            Core.getInstance().getLogger().severe("Invalid plugin description file!");
-            return;
-        } catch (InvalidPluginException e) {
-            e.printStackTrace();
-            Core.getInstance().getLogger().severe("Invalid plugin!");
-            return;
-        }
+        target = Bukkit.getPluginManager().loadPlugin(pluginFile);
+
 
         target.onLoad();
         Bukkit.getPluginManager().enablePlugin(target);
 
-        Core.getInstance().getLogger().info("Successfully loaded plugin " + name + "!");
+        BattlegroundsCore.getInstance().getLogger().info("Successfully loaded plugin " + name + "!");
     }
 
     /**
@@ -200,7 +186,13 @@ public class PluginUtil {
     static void reload(Plugin plugin) {
         if (plugin != null) {
             unload(plugin);
-            load(plugin);
+            try {
+                load(plugin);
+            } catch (InvalidDescriptionException e) {
+                plugin.getLogger().severe("Invalid Plugin Description!");
+            } catch (InvalidPluginException e) {
+                plugin.getLogger().severe("Invalid Plugin!");
+            }
         }
     }
 
@@ -261,7 +253,7 @@ public class PluginUtil {
 
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 e.printStackTrace();
-                Core.getInstance().getLogger().severe("Failed to unload plugin " + name + "!");
+                BattlegroundsCore.getInstance().getLogger().severe("Failed to unload plugin " + name + "!");
                 return;
             }
 
@@ -315,7 +307,7 @@ public class PluginUtil {
         // refuses to unlock jar files that were previously loaded into the JVM.
         System.gc();
 
-        Core.getInstance().getLogger().info("Unloaded plugin " + name + "!");
+        BattlegroundsCore.getInstance().getLogger().info("Unloaded plugin " + name + "!");
     }
 
     /**

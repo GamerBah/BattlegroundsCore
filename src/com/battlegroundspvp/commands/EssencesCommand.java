@@ -1,8 +1,8 @@
 package com.battlegroundspvp.commands;
 /* Created by GamerBah on 8/18/2016 */
 
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.utils.enums.EventSound;
-import com.battlegroundspvp.Core;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -11,9 +11,9 @@ import org.bukkit.entity.Player;
 
 public class EssencesCommand implements CommandExecutor {
 
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public EssencesCommand(Core plugin) {
+    public EssencesCommand(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 

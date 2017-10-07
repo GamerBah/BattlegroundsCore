@@ -17,7 +17,7 @@
 
 package com.battlegroundspvp.utils.packets.signs;
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
 import com.google.common.base.Objects;
@@ -56,20 +56,6 @@ public abstract class AbstractPacket {
     }
 
     /**
-     * Send the current packet to the given receiver.
-     *
-     * @param receiver - the receiver.
-     * @throws RuntimeException If the packet cannot be sent.
-     */
-    public void sendPacket(Player receiver) {
-        try {
-            Core.getProtocolManager().sendServerPacket(receiver, getHandle());
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException("Cannot send packet.", e);
-        }
-    }
-
-    /**
      * Simulate receiving the current packet from the given sender.
      *
      * @param sender - the sender.
@@ -77,9 +63,23 @@ public abstract class AbstractPacket {
      */
     public void recievePacket(Player sender) {
         try {
-            Core.getProtocolManager().recieveClientPacket(sender, getHandle());
+            BattlegroundsCore.getProtocolManager().recieveClientPacket(sender, getHandle());
         } catch (Exception e) {
             throw new RuntimeException("Cannot recieve packet.", e);
+        }
+    }
+
+    /**
+     * Send the current packet to the given receiver.
+     *
+     * @param receiver - the receiver.
+     * @throws RuntimeException If the packet cannot be sent.
+     */
+    public void sendPacket(Player receiver) {
+        try {
+            BattlegroundsCore.getProtocolManager().sendServerPacket(receiver, getHandle());
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException("Cannot send packet.", e);
         }
     }
 }

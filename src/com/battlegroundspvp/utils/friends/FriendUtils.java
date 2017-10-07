@@ -1,30 +1,24 @@
 package com.battlegroundspvp.utils.friends;
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import org.bukkit.entity.Player;
 
 public class FriendUtils {
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public FriendUtils(Core plugin) {
+    public FriendUtils(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 
     public void createPendingRequest(Player sender, Player target) {
         FriendMessages friendMessages = new FriendMessages(plugin);
-        Core.pendingFriends.put(target, sender);
+        BattlegroundsCore.pendingFriends.put(target, sender);
         friendMessages.sendRequestMessage(sender, target);
     }
 
-    public void removePendingRequest(Player target, boolean accepted) {
-        FriendMessages friendMessages = new FriendMessages(plugin);
-        if (accepted) {
-            friendMessages.sendAcceptMessage(target, Core.pendingFriends.get(target));
-        } else {
-            friendMessages.sendDeclineMessage(target, Core.pendingFriends.get(target));
-        }
-        Core.pendingFriends.remove(target);
+    public Player getRequester(Player target) {
+        return BattlegroundsCore.pendingFriends.get(target);
     }
 
     public void addFriend(Player sender, Player target) {
@@ -53,8 +47,8 @@ public class FriendUtils {
     }
 
     public boolean hasPendingRequest(Player target, Player sender) {
-        if (Core.pendingFriends.containsKey(target)) {
-            return Core.pendingFriends.get(target).equals(sender);
+        if (BattlegroundsCore.pendingFriends.containsKey(target)) {
+            return BattlegroundsCore.pendingFriends.get(target).equals(sender);
         }
         return false;
     }
@@ -68,8 +62,14 @@ public class FriendUtils {
         return gameProfile.getFriends().contains(targetData.getUuid() + ",");
     }
 
-    public Player getRequester(Player target) {
-        return Core.pendingFriends.get(target);
+    public void removePendingRequest(Player target, boolean accepted) {
+        FriendMessages friendMessages = new FriendMessages(plugin);
+        if (accepted) {
+            friendMessages.sendAcceptMessage(target, BattlegroundsCore.pendingFriends.get(target));
+        } else {
+            friendMessages.sendDeclineMessage(target, BattlegroundsCore.pendingFriends.get(target));
+        }
+        BattlegroundsCore.pendingFriends.remove(target);
     }
 
 }

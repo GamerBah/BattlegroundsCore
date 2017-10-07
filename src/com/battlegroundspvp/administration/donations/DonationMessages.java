@@ -1,9 +1,9 @@
 package com.battlegroundspvp.administration.donations;
 /* Created by GamerBah on 8/18/2016 */
 
-import com.battlegroundspvp.Core;
-import com.battlegroundspvp.administration.data.Rank;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
+import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.utils.enums.ColorBuilder;
 import com.battlegroundspvp.utils.enums.Time;
 import net.md_5.bungee.api.ChatColor;
@@ -12,9 +12,9 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 public class DonationMessages {
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public DonationMessages(Core plugin) {
+    public DonationMessages(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 

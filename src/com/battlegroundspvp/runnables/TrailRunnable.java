@@ -2,7 +2,7 @@ package com.battlegroundspvp.runnables;
 /* Created by GamerBah on 8/20/2016 */
 
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -17,10 +17,10 @@ public class TrailRunnable implements Runnable {
     @Getter
     private static HashSet<Player> still = new HashSet<>();
     private static ArrayList<Player> disabled = new ArrayList<>();
-    private Core plugin;
+    private BattlegroundsCore plugin;
     private Map<Player, Location> playerLocations = new HashMap<>();
 
-    public TrailRunnable(Core plugin) {
+    public TrailRunnable(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 
@@ -42,13 +42,13 @@ public class TrailRunnable implements Runnable {
                 playerLocations.put(player, player.getLocation());
                 still.remove(player);
                 plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-                    if (Core.getAfk().contains(player.getUniqueId())) {
+                    if (BattlegroundsCore.getAfk().contains(player.getUniqueId())) {
                         if (AFKRunnable.getAfkTimer().containsKey(player)) {
                             AFKRunnable.getAfkTimer().remove(player);
                             TTA_Methods.sendTitle(player, null, 0, 0, 0, null, 0, 0, 0);
                             player.sendMessage(ChatColor.GRAY + "You are no longer AFK");
                             EventSound.playSound(player, EventSound.CLICK);
-                            Core.getAfk().remove(player.getUniqueId());
+                            BattlegroundsCore.getAfk().remove(player.getUniqueId());
                             plugin.respawn(player);
                             player.removePotionEffect(PotionEffectType.INVISIBILITY);
                         }
@@ -60,7 +60,7 @@ public class TrailRunnable implements Runnable {
                 if (gameProfile.getTrail() != null) {
                     if (!disabled.contains(player)) {
                         if (still.contains(player)) {
-                            if (!Core.getAfk().contains(player.getUniqueId())) {
+                            if (!BattlegroundsCore.getAfk().contains(player.getUniqueId())) {
                                 // ParticleQuality quality = gameProfile.getParticleQuality();
                                 // (quality.equals(ParticleQuality.LOW) ? 3 : quality.equals(ParticleQuality.MEDIUM) ? 6 : 9)
                                 // Rare

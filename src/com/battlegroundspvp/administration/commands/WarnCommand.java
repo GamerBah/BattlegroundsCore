@@ -1,9 +1,9 @@
 package com.battlegroundspvp.administration.commands;
 /* Created by GamerBah on 11/8/2016 */
 
-import com.battlegroundspvp.Core;
-import com.battlegroundspvp.administration.data.Rank;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
+import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.menus.Punishment.WarnMenu;
 import com.battlegroundspvp.utils.enums.EventSound;
 import lombok.Getter;
@@ -21,9 +21,9 @@ public class WarnCommand implements CommandExecutor {
 
     @Getter
     private static HashMap<UUID, Integer> warned = new HashMap<>();
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public WarnCommand(Core plugin) {
+    public WarnCommand(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 

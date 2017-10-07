@@ -1,7 +1,7 @@
 package com.battlegroundspvp.administration.donations;
 /* Created by GamerBah on 8/17/2016 */
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 
 public class Essence {
 
-    private Core plugin = Core.getInstance();
+    private BattlegroundsCore plugin = BattlegroundsCore.getInstance();
 
     public static Type typeFromName(String string) {
         for (Type type : Type.values()) {

@@ -4,9 +4,9 @@ package com.battlegroundspvp.administration.data.old;
 public class MySQL {
 
     /*private static HikariDataSource dataSource = null;
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public MySQL(Core plugin) {
+    public MySQL(BattlegroundsCore plugin) {
         this.plugin = plugin;
         String host = plugin.getConfig().getString("host");
         String db = plugin.getConfig().getString("database");

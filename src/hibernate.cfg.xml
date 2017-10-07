@@ -14,7 +14,7 @@
         <property name="hibernate.hikari.idleTimeout">30000</property>-->
         <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
         <property name="hibernate.connection.password">642fe60176</property>
-        <property name="hibernate.connection.url">jdbc:mysql://149.56.241.15/mc2162</property>
+        <property name="hibernate.connection.url">jdbc:mysql://149.56.241.15/mc2162?autoReconnect=true</property>
         <property name="hibernate.connection.username">mc2162</property>
         <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
 

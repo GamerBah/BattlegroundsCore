@@ -1,7 +1,7 @@
 package com.battlegroundspvp.menus;
 /* Created by GamerBah on 9/17/2016 */
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.utils.enums.ColorBuilder;
 import com.battlegroundspvp.utils.inventories.ItemBuilder;
@@ -15,9 +15,9 @@ import java.util.List;
 
 public class CosmeticrateMenu {
     public static List<Player> usingCrates = new ArrayList<>();
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public CosmeticrateMenu(Core plugin) {
+    public CosmeticrateMenu(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 
@@ -116,7 +116,7 @@ public class CosmeticrateMenu {
         }, 10L);
 
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-            if (!AutoUpdate.updating) {
+            if (!UpdateRunnable.updating) {
                 inventory.setItem(12, new ItemBuilder(Material.STAINED_GLASS_PANE).name(" ").durability(5));
                 inventory.setItem(14, new ItemBuilder(Material.STAINED_GLASS_PANE).name(" ").durability(5));
                 inventory.setItem(13, cosmetics.get(ThreadLocalRandom.current().nextInt(0, cosmetics.size() - 1)).getItem());

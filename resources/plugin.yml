@@ -1,7 +1,7 @@
-main: com.battlegroundspvp.Core
-name: Core
+main: com.battlegroundspvp.BattlegroundsCore
+name: BattlegroundsCore
 author: GamerBah
-version: 0.13.3b
+version: 0.2.1b
 depend: [ProtocolLib]
 commands:
   rank:

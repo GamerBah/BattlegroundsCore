@@ -1,8 +1,8 @@
 package com.battlegroundspvp.administration.commands;
 
-import com.battlegroundspvp.Core;
-import com.battlegroundspvp.administration.data.Rank;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
+import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.utils.enums.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
 import org.bukkit.Bukkit;
@@ -14,9 +14,9 @@ import org.bukkit.entity.Player;
 public class ChatCommands implements CommandExecutor {
 
     public static boolean chatSilenced = false;
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public ChatCommands(Core plugin) {
+    public ChatCommands(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 

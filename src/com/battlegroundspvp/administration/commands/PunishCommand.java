@@ -1,9 +1,9 @@
 package com.battlegroundspvp.administration.commands;
 /* Created by GamerBah on 8/25/2016 */
 
-import com.battlegroundspvp.Core;
-import com.battlegroundspvp.administration.data.Rank;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
+import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.menus.Punishment.PunishmentMenus;
 import com.battlegroundspvp.utils.enums.EventSound;
 import com.battlegroundspvp.utils.inventories.InventoryBuilder;
@@ -16,9 +16,9 @@ import org.bukkit.entity.Player;
 
 public class PunishCommand implements CommandExecutor {
 
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public PunishCommand(Core plugin) {
+    public PunishCommand(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 

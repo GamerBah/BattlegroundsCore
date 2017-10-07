@@ -1,7 +1,7 @@
 package com.battlegroundspvp.administration.data;
 /* Created by GamerBah on 8/22/2016 */
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.sql.EssencesEntity;
 import com.battlegroundspvp.administration.donations.Essence;
 import lombok.AllArgsConstructor;
@@ -18,7 +18,7 @@ public class EssenceData {
     @Getter
     private int one50, one100, one150, three50, three100, three150, six50, six100, six150;
 
-    public EssenceData(EssencesEntity entity) {
+    EssenceData(EssencesEntity entity) {
         this.entity = entity;
         this.id = entity.getId();
         this.one50 = entity.getOne50();
@@ -74,25 +74,18 @@ public class EssenceData {
             this.six150--;
     }
 
-    public void sync() {
-        EssencesEntity entity = null;
-        Session session = Core.getSessionFactory().openSession();
+    void sync() {
+        Session session = BattlegroundsCore.getSessionFactory().openSession();
         session.beginTransaction();
-        if (!session.createQuery("from EssencesEntity where id = :id", EssencesEntity.class)
-                .setParameter("id", this.id).getResultList().isEmpty())
-            entity = session.createQuery("from EssencesEntity where id = :id", EssencesEntity.class)
-                    .setParameter("id", this.id).getSingleResult();
-        if (entity != null) {
-            entity.setOne50(this.one50);
-            entity.setOne100(this.one100);
-            entity.setOne150(this.one150);
-            entity.setThree50(this.three50);
-            entity.setThree100(this.three100);
-            entity.setThree150(this.three150);
-            entity.setSix50(this.six50);
-            entity.setSix100(this.six100);
-            entity.setSix150(this.six150);
-        }
+        entity.setOne50(this.one50);
+        entity.setOne100(this.one100);
+        entity.setOne150(this.one150);
+        entity.setThree50(this.three50);
+        entity.setThree100(this.three100);
+        entity.setThree150(this.three150);
+        entity.setSix50(this.six50);
+        entity.setSix100(this.six100);
+        entity.setSix150(this.six150);
         session.getTransaction().commit();
         session.close();
     }

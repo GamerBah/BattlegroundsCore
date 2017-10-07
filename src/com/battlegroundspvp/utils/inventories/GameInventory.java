@@ -1,7 +1,7 @@
 package com.battlegroundspvp.utils.inventories;
 /* Created by GamerBah on 7/22/2017 */
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import org.bukkit.inventory.Inventory;
 
 import java.util.ArrayList;
@@ -17,14 +17,14 @@ public class GameInventory {
     private GameInventory previousInventory;
 
     public GameInventory(String name, int itemCount, Type type, GameInventory previousInventory) {
-        this.inventory = Core.getInstance().getServer().createInventory(null, 54, name);
+        this.inventory = BattlegroundsCore.getInstance().getServer().createInventory(null, 54, name);
         this.itemCount = itemCount;
         this.type = type;
         this.previousInventory = previousInventory;
     }
 
     public GameInventory(String name, GameInventory previousInventory) {
-        this.inventory = Core.getInstance().getServer().createInventory(null, 54, name);
+        this.inventory = BattlegroundsCore.getInstance().getServer().createInventory(null, 54, name);
         this.itemCount = 0;
         this.type = Type.STANDARD;
         this.previousInventory = previousInventory;

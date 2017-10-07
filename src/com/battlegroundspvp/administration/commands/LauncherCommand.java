@@ -1,9 +1,9 @@
 package com.battlegroundspvp.administration.commands;
 /* Created by GamerBah on 5/19/2017 */
 
-import com.battlegroundspvp.Core;
-import com.battlegroundspvp.administration.data.Rank;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
+import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.utils.enums.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
 import com.battlegroundspvp.utils.messages.TextComponentMessages;
@@ -18,9 +18,9 @@ import org.bukkit.entity.Player;
 
 public class LauncherCommand implements CommandExecutor {
 
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public LauncherCommand(Core plugin) {
+    public LauncherCommand(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 

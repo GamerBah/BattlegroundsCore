@@ -1,6 +1,6 @@
 package com.battlegroundspvp.commands;
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.punishments.Punishment;
 import com.battlegroundspvp.utils.enums.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
@@ -20,9 +20,9 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 
 public class ReplyCommand implements CommandExecutor {
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public ReplyCommand(Core plugin) {
+    public ReplyCommand(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 
@@ -74,7 +74,7 @@ public class ReplyCommand implements CommandExecutor {
 
         String message = StringUtils.join(args, ' ', 0, args.length);
 
-        if (Core.getAfk().contains(target.getUniqueId())) {
+        if (BattlegroundsCore.getAfk().contains(target.getUniqueId())) {
             player.sendMessage(ChatColor.AQUA + target.getName() + " is AFK, so they might not see your message");
         }
 

@@ -1,6 +1,6 @@
 package com.battlegroundspvp.commands;
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.punishments.Punishment;
 import com.battlegroundspvp.utils.enums.EventSound;
 import com.battlegroundspvp.utils.enums.Time;
@@ -27,9 +27,9 @@ public class ReportCommand implements CommandExecutor {
     private static HashMap<UUID, String> reportBuilders = new HashMap<>();
     @Getter
     private static HashMap<UUID, ArrayList<String>> reportArray = new HashMap<>();
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public ReportCommand(Core plugin) {
+    public ReportCommand(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 

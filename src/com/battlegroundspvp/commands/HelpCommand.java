@@ -1,9 +1,9 @@
 package com.battlegroundspvp.commands;
 /* Created by GamerBah on 8/31/2016 */
 
-import com.battlegroundspvp.Core;
-import com.battlegroundspvp.administration.data.Rank;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
+import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.utils.enums.ColorBuilder;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.Command;
@@ -13,9 +13,9 @@ import org.bukkit.entity.Player;
 
 public class HelpCommand implements CommandExecutor {
 
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public HelpCommand(Core plugin) {
+    public HelpCommand(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 
@@ -44,8 +44,8 @@ public class HelpCommand implements CommandExecutor {
             player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /friend " + ChatColor.GRAY + "- Add, remove, and view friends!");
             player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /message " + ChatColor.GRAY + "- Sends a private message to a player");
             player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /options " + ChatColor.GRAY + "- Shows options for a specified player");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /ping " + ChatColor.GRAY + "- Shows you your connection to Core");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /refer " + ChatColor.GRAY + "- Refer the player who invited you to Core!");
+            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /ping " + ChatColor.GRAY + "- Shows you your connection to BattlegroundsCore");
+            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /refer " + ChatColor.GRAY + "- Refer the player who invited you to BattlegroundsCore!");
             player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /reply " + ChatColor.GRAY + "- Replies to the most recent private message");
             player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /report " + ChatColor.GRAY + "- Reports a player to Staff members");
             player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /rules " + ChatColor.GRAY + "- Displays the server rules");

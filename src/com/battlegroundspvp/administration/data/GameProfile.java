@@ -1,13 +1,21 @@
 package com.battlegroundspvp.administration.data;
 /* Created by GamerBah on 6/18/2016 */
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.sql.GameProfilesEntity;
+import com.battlegroundspvp.punishments.Punishment;
 import com.battlegroundspvp.utils.enums.Cosmetic;
 import com.battlegroundspvp.utils.enums.EventSound;
+import com.battlegroundspvp.utils.enums.Time;
 import lombok.Getter;
 import lombok.Setter;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.hibernate.Session;
 
 import java.time.LocalDateTime;
@@ -77,18 +85,30 @@ public class GameProfile {
         this.punishmentData = null;//new PunishmentData(entity.getPunishments());
     }
 
-    public GameProfile sendMessage(String message) {
-        Core.getInstance().getServer().getPlayer(this.uuid).sendMessage(message);
-        return this;
+    public Player getPlayer() {
+        return BattlegroundsCore.getInstance().getServer().getPlayer(this.uuid);
+    }
+
+    public boolean isMuted(AsyncPlayerChatEvent event) {
+        for (int i = 0; i < punishmentData.getPunishments().size(); i++) {
+            Punishment punishment = punishmentData.getPunishments().get(i);
+            if (!punishment.isPardoned()) {
+                event.setCancelled(true);
+                BaseComponent baseComponent = new TextComponent(ChatColor.RED + "You are muted! " + ChatColor.GRAY + "(Hover to view details)");
+                baseComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GRAY + "Muted by: "
+                        + ChatColor.WHITE + BattlegroundsCore.getInstance().getServer().getPlayer(punishment.getEnforcer()).getName() + "\n" + ChatColor.GRAY + "Reason: "
+                        + ChatColor.WHITE + punishment.getReason().getName() + "\n" + ChatColor.GRAY + "Time Remaining: " + ChatColor.WHITE +
+                        Time.toString(Time.punishmentTimeRemaining(punishment.getExpiration()), true)).create()));
+                event.getPlayer().spigot().sendMessage(baseComponent);
+                EventSound.playSound(event.getPlayer(), EventSound.ACTION_FAIL);
+                return true;
+            }
+        }
+        return false;
     }
 
     public GameProfile playSound(EventSound eventSound) {
-        EventSound.playSound(Core.getInstance().getServer().getPlayer(this.uuid), eventSound);
-        return this;
-    }
-
-    public GameProfile respawn() {
-        Core.getInstance().getServer().getPlayer(this.uuid).spigot().respawn();
+        EventSound.playSound(BattlegroundsCore.getInstance().getServer().getPlayer(this.uuid), eventSound);
         return this;
     }
 
@@ -111,40 +131,40 @@ public class GameProfile {
         return this;
     }
 
-    public Player getPlayer() {
-        return Core.getInstance().getServer().getPlayer(this.uuid);
+    public GameProfile respawn() {
+        BattlegroundsCore.getInstance().getServer().getPlayer(this.uuid).spigot().respawn();
+        return this;
+    }
+
+    public GameProfile sendMessage(String message) {
+        BattlegroundsCore.getInstance().getServer().getPlayer(this.uuid).sendMessage(message);
+        return this;
     }
 
     public void sync() {
-        GameProfilesEntity entity = null;
-        Session session = Core.getSessionFactory().openSession();
+        Session session = BattlegroundsCore.getSessionFactory().openSession();
         session.beginTransaction();
-        if (!session.createQuery("from GameProfilesEntity where id = :id", GameProfilesEntity.class)
-                .setParameter("id", this.id).getResultList().isEmpty())
-            entity = session.createQuery("from GameProfilesEntity where id = :id", GameProfilesEntity.class)
-                    .setParameter("id", this.id).getSingleResult();
-        if (entity != null) {
-            entity.setName(this.name);
-            entity.setRank(this.rank.toString());
-            entity.setCoins(this.coins);
-            entity.setPlayersRecruited(this.playersRecruited);
-            entity.setRecruitedBy(this.recruitedBy);
-            entity.setDailyReward(this.dailyReward);
-            entity.setTrail(this.trail.toString());
-            entity.setWarcry(this.warcry.toString());
-            entity.setGore(this.gore.toString());
-            entity.setDailyRewardLast(this.dailyRewardLast);
-            entity.setLastOnline(this.lastOnline);
-            entity.setFriends(this.friends);
-            entity.setCosmetics(this.ownedCosmetics);
-            this.kitPvpData.sync();
-            this.essenceData.sync();
-            this.playerSettings.sync();
-            //this.punishmentData.sync();
-            entity.setKitPvpData(this.kitPvpData.getEntity());
-            entity.setSettings(this.playerSettings.getEntity());
-            entity.setEssences(this.essenceData.getEntity());
-        }
+        entity.setName(this.name);
+        entity.setRank(this.rank.toString());
+        entity.setCoins(this.coins);
+        entity.setPlayersRecruited(this.playersRecruited);
+        entity.setRecruitedBy(this.recruitedBy);
+        entity.setDailyReward(this.dailyReward);
+        entity.setTrail(this.trail.toString());
+        entity.setWarcry(this.warcry.toString());
+        entity.setGore(this.gore.toString());
+        entity.setDailyRewardLast(this.dailyRewardLast);
+        entity.setLastOnline(this.lastOnline);
+        entity.setFriends(this.friends);
+        entity.setCosmetics(this.ownedCosmetics);
+        this.kitPvpData.sync();
+        this.essenceData.sync();
+        this.playerSettings.sync();
+        //this.punishmentData.sync();
+        entity.setKitPvpData(this.kitPvpData.getEntity());
+        entity.setSettings(this.playerSettings.getEntity());
+        entity.setEssences(this.essenceData.getEntity());
+        session.merge(entity);
         session.getTransaction().commit();
         session.close();
     }

@@ -2,10 +2,10 @@ package com.battlegroundspvp.administration.commands;
 /* Created by GamerBah on 8/7/2016 */
 
 
-import com.battlegroundspvp.administration.data.Rank;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
+import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.utils.enums.EventSound;
-import com.battlegroundspvp.Core;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.OfflinePlayer;
@@ -21,9 +21,9 @@ import java.util.List;
 
 public class RankCommand implements CommandExecutor, TabCompleter {
 
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public RankCommand(Core plugin) {
+    public RankCommand(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 
@@ -66,10 +66,9 @@ public class RankCommand implements CommandExecutor, TabCompleter {
                                     + (gameProfile.hasRank(Rank.WARRIOR) ? ChatColor.WHITE : ChatColor.GRAY) + target.getName());
                         } else {
                             gameProfile.setRank(rank);
-                            gameProfile.sendMessage("hi");
                         }
                         if (!gameProfile.hasRank(Rank.MODERATOR)) {
-                            //gameProfile.getPlayerSettings().setStealthyJoin(false);
+                            gameProfile.getPlayerSettings().setStealthyJoin(false);
                         }
                         sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Success! " + ChatColor.GRAY + target.getName() + "'s rank was changed to " + WordUtils.capitalizeFully(rank.toString()));
                         return;

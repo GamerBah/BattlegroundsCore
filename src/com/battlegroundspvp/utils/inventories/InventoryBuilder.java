@@ -1,7 +1,7 @@
 package com.battlegroundspvp.utils.inventories;
 /* Created by GamerBah on 7/17/2017 */
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.utils.enums.EventSound;
 import lombok.AllArgsConstructor;
@@ -17,7 +17,7 @@ import java.util.HashMap;
 
 public class InventoryBuilder {
 
-    private Core plugin = Core.getInstance();
+    private BattlegroundsCore plugin = BattlegroundsCore.getInstance();
 
     @Getter
     private static HashMap<Player, InventoryBuilder> inventoryUsers = new HashMap<>();
@@ -71,15 +71,15 @@ public class InventoryBuilder {
             case RANK_HIGH_LOW:
                 if (gameInventory.getType() == GameInventory.Type.PUNISH_SEARCH)
                     throw new IllegalArgumentException("Inventories of type " + gameInventory.getType().name() + " cannot be sorted by rank!");
-                items.sort((ItemStack is1, ItemStack is2) -> Rank.valueOf(ChatColor.stripColor(Core.getLore(is1, 1)).replace("Rank: ", "").toUpperCase())
-                        .compareTo(Rank.valueOf(ChatColor.stripColor(Core.getLore(is2, 1)).replace("Rank: ", "").toUpperCase())));
+                items.sort((ItemStack is1, ItemStack is2) -> Rank.valueOf(ChatColor.stripColor(BattlegroundsCore.getLore(is1, 1)).replace("Rank: ", "").toUpperCase())
+                        .compareTo(Rank.valueOf(ChatColor.stripColor(BattlegroundsCore.getLore(is2, 1)).replace("Rank: ", "").toUpperCase())));
                 sortType = SortType.RANK_HIGH_LOW;
 
             case RANK_LOW_HIGH:
                 if (gameInventory.getType() == GameInventory.Type.PUNISH_SEARCH)
                     throw new IllegalArgumentException("Inventories of type " + gameInventory.getType().name() + " cannot be sorted by rank!");
-                items.sort((ItemStack is1, ItemStack is2) -> Rank.valueOf(ChatColor.stripColor(Core.getLore(is2, 1)).replace("Rank: ", "").toUpperCase())
-                        .compareTo(Rank.valueOf(ChatColor.stripColor(Core.getLore(is1, 1)).replace("Rank: ", "").toUpperCase())));
+                items.sort((ItemStack is1, ItemStack is2) -> Rank.valueOf(ChatColor.stripColor(BattlegroundsCore.getLore(is2, 1)).replace("Rank: ", "").toUpperCase())
+                        .compareTo(Rank.valueOf(ChatColor.stripColor(BattlegroundsCore.getLore(is1, 1)).replace("Rank: ", "").toUpperCase())));
                 sortType = SortType.RANK_LOW_HIGH;
         }
         return this;

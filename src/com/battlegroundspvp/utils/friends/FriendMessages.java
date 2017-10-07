@@ -1,6 +1,6 @@
 package com.battlegroundspvp.utils.friends;
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.utils.enums.EventSound;
 import com.battlegroundspvp.utils.messages.TextComponentMessages;
@@ -19,10 +19,10 @@ import static org.bukkit.ChatColor.*;
 
 public class FriendMessages {
 
-    private Core plugin;
+    private BattlegroundsCore plugin;
     private TextComponentMessages tcm = new TextComponentMessages(plugin);
 
-    public FriendMessages(Core plugin) {
+    public FriendMessages(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 

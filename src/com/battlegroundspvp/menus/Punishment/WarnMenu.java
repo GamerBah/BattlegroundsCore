@@ -1,12 +1,12 @@
 package com.battlegroundspvp.menus.Punishment;
 /* Created by GamerBah on 8/25/2016 */
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 
 public class WarnMenu {
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public WarnMenu(Core plugin) {
+    public WarnMenu(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 

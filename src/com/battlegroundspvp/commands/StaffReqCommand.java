@@ -1,11 +1,11 @@
 package com.battlegroundspvp.commands;
 /* Created by GamerBah on 3/6/2016 */
 
-import com.battlegroundspvp.administration.data.Rank;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
-import com.battlegroundspvp.utils.enums.EventSound;
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.punishments.Punishment;
+import com.battlegroundspvp.utils.enums.EventSound;
 import com.battlegroundspvp.utils.enums.Time;
 import net.gpedro.integrations.slack.SlackMessage;
 import net.md_5.bungee.api.ChatColor;
@@ -25,10 +25,10 @@ import java.util.UUID;
 
 public class StaffReqCommand implements CommandExecutor {
 
-    private Core plugin;
+    private BattlegroundsCore plugin;
     private HashMap<UUID, Integer> cooldown = new HashMap<>();
 
-    public StaffReqCommand(Core plugin) {
+    public StaffReqCommand(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 

@@ -1,7 +1,7 @@
 package com.battlegroundspvp.listeners;
 /* Created by GamerBah on 8/4/2017 */
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.utils.inventories.ClickEvent;
 import com.battlegroundspvp.utils.inventories.GameInventory;
 import com.battlegroundspvp.utils.inventories.InventoryBuilder;
@@ -17,7 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class InventoryClickListener implements Listener {
 
-    private Core plugin = Core.getInstance();
+    private BattlegroundsCore plugin = BattlegroundsCore.getInstance();
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onInventoryClick(InventoryClickEvent event) {

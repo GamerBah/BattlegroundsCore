@@ -2,9 +2,9 @@ package com.battlegroundspvp.administration.commands;
 /* Created by GamerBah on 8/9/2016 */
 
 
-import com.battlegroundspvp.Core;
-import com.battlegroundspvp.administration.data.Rank;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
+import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.utils.enums.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
 import lombok.Getter;
@@ -22,9 +22,9 @@ import java.util.UUID;
 public class StaffChatCommand implements CommandExecutor {
     @Getter
     private static Set<UUID> toggled = new HashSet<>();
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public StaffChatCommand(Core plugin) {
+    public StaffChatCommand(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 

@@ -1,11 +1,11 @@
 package com.battlegroundspvp.punishments.commands;
 /* Created by GamerBah on 8/10/2016 */
 
-import com.battlegroundspvp.administration.data.Rank;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
-import com.battlegroundspvp.utils.enums.EventSound;
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.punishments.Punishment;
+import com.battlegroundspvp.utils.enums.EventSound;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -17,9 +17,9 @@ import java.util.ArrayList;
 
 public class UnmuteCommand implements CommandExecutor {
 
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public UnmuteCommand(Core plugin) {
+    public UnmuteCommand(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 
@@ -69,7 +69,7 @@ public class UnmuteCommand implements CommandExecutor {
                     if (punishment.getType().equals(Punishment.Type.MUTE)) {
                         if (!punishment.isPardoned()) {
                             p = punishment;
-                            //Core.getSql().executeUpdate(Query.UPDATE_PUNISHMENT_PARDONED, true, targetData.getUuid().toString(), punishment.getType().toString(), punishment.getDate().toString());
+                            //BattlegroundsCore.getSql().executeUpdate(Query.UPDATE_PUNISHMENT_PARDONED, true, targetData.getUuid().toString(), punishment.getType().toString(), punishment.getDate().toString());
                             punishment.setPardoned(true);
                         }
                     }

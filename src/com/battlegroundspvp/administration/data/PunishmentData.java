@@ -1,7 +1,7 @@
 package com.battlegroundspvp.administration.data;
 /* Created by GamerBah on 9/30/2017 */
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.sql.PunishmentsEntity;
 import com.battlegroundspvp.punishments.Punishment;
 import lombok.Getter;
@@ -35,7 +35,7 @@ public class PunishmentData {
 
     public void sync() {
         PunishmentsEntity entity = null;
-        Session session = Core.getSessionFactory().openSession();
+        Session session = BattlegroundsCore.getSessionFactory().openSession();
         session.beginTransaction();
         if (!session.createQuery("from PunishmentsEntity where id = :id", PunishmentsEntity.class)
                 .setParameter("id", this.id).getResultList().isEmpty())

@@ -1,10 +1,10 @@
 package com.battlegroundspvp.administration.commands;
 /* Created by GamerBah on 8/7/2016 */
 
+import com.battlegroundspvp.BattlegroundsCore;
+import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.utils.enums.EventSound;
-import com.battlegroundspvp.Core;
-import com.battlegroundspvp.administration.data.GameProfile;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -26,9 +26,9 @@ public class FreezeCommand implements CommandExecutor {
     public static boolean reloadFreeze = false;
     public static List<Player> frozenPlayers = new ArrayList<>();
 
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public FreezeCommand(Core plugin) {
+    public FreezeCommand(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 

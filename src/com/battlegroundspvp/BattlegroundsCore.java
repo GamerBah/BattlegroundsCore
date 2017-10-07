@@ -56,7 +56,7 @@ import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public class Core extends JavaPlugin {
+public class BattlegroundsCore extends JavaPlugin {
 
     @Getter
     public static Map<Player, Player> pendingFriends = new HashMap<>();
@@ -64,7 +64,7 @@ public class Core extends JavaPlugin {
     public static HashMap<Player, HashMap<Punishment.Reason, Integer>> punishmentCreation = new HashMap<>();
 
     @Getter
-    private static Core instance = null;
+    private static BattlegroundsCore instance = null;
     @Getter
     private static SessionFactory sessionFactory = null;
     @Getter
@@ -109,6 +109,110 @@ public class Core extends JavaPlugin {
     public SlackApi slackPunishments = null;
     public SlackApi slackErrorReporting = null;
 
+    public static void createNewGameProfile(String name, UUID uuid) {
+        Session session = BattlegroundsCore.getSessionFactory().openSession();
+
+        GameProfilesEntity gameProfilesEntity = new GameProfilesEntity();
+        gameProfilesEntity.setName(name);
+        gameProfilesEntity.setUuid(uuid);
+        gameProfilesEntity.setDailyRewardLast(LocalDateTime.now());
+
+        SettingsEntity settingsEntity = new SettingsEntity();
+        KitPvpDataEntity kitPvpDataEntity = new KitPvpDataEntity();
+        EssencesEntity essencesEntity = new EssencesEntity();
+
+        gameProfilesEntity.setSettings(settingsEntity);
+        gameProfilesEntity.setKitPvpData(kitPvpDataEntity);
+        gameProfilesEntity.setEssences(essencesEntity);
+        settingsEntity.setGameProfile(gameProfilesEntity);
+        kitPvpDataEntity.setGameProfile(gameProfilesEntity);
+        essencesEntity.setGameProfile(gameProfilesEntity);
+
+        session.beginTransaction();
+        session.saveOrUpdate(gameProfilesEntity);
+        session.getTransaction().commit();
+        session.close();
+
+        gameProfiles.add(new GameProfile(gameProfilesEntity));
+        BattlegroundsCore.getInstance().getServer().getLogger().info("New GameProfile created for user " + name);
+    }
+
+    public static void syncGameProfiles() {
+        for (GameProfile gameProfile : gameProfiles)
+            gameProfile.sync();
+    }
+
+    public GameProfile getGameProfile(UUID uuid) {
+        Optional<GameProfile> gameProfileStream = gameProfiles.stream().filter(gameProfile ->
+                gameProfile.getUuid().equals(uuid)).findFirst();
+
+        if (gameProfileStream.isPresent()) {
+            return gameProfileStream.get();
+        } else {
+            GameProfilesEntity dbGameProfile = null;
+            Session session = sessionFactory.openSession();
+            session.beginTransaction();
+            if (!session.createQuery("from GameProfilesEntity where uuid = :uuid", GameProfilesEntity.class)
+                    .setParameter("uuid", uuid).getResultList().isEmpty())
+                dbGameProfile = session.createQuery("from GameProfilesEntity where uuid = :uuid", GameProfilesEntity.class)
+                        .setParameter("uuid", uuid).getSingleResult();
+            session.getTransaction().commit();
+            session.close();
+            if (dbGameProfile != null) {
+                gameProfiles.add(new GameProfile(dbGameProfile));
+                return getGameProfile(uuid);
+            } else {
+
+                return null;
+            }
+        }
+    }
+
+    public GameProfile getGameProfile(String name) {
+        Optional<GameProfile> playerDataStream = gameProfiles.stream().filter(gameProfile ->
+                gameProfile.getName().equalsIgnoreCase(name)).findFirst();
+
+        if (playerDataStream.isPresent()) {
+            return playerDataStream.get();
+        } else {
+            GameProfilesEntity dbGameProfile = null;
+            Session session = sessionFactory.openSession();
+            session.beginTransaction();
+            if (!session.createQuery("from GameProfilesEntity where name = :name", GameProfilesEntity.class)
+                    .setParameter("name", name).getResultList().isEmpty())
+                dbGameProfile = session.createQuery("from GameProfilesEntity where name = :name", GameProfilesEntity.class)
+                        .setParameter("name", name).getSingleResult();
+            session.getTransaction().commit();
+            session.close();
+            if (dbGameProfile != null) {
+                gameProfiles.add(new GameProfile(dbGameProfile));
+                return getGameProfile(name);
+            } else {
+                return null;
+            }
+        }
+    }
+
+    public ArrayList<Punishment> getMutes(GameProfile targetData) {
+        ArrayList<Punishment> mutes = new ArrayList<>();
+        if (this.getPlayerPunishments().get(targetData.getUuid()) != null) {
+            for (int i = 0; i < this.getPlayerPunishments().get(targetData.getUuid()).size(); i++)
+                if (this.getPlayerPunishments().get(targetData.getUuid()).get(i).getType().equals(Punishment.Type.MUTE))
+                    mutes.add(this.getPlayerPunishments().get(targetData.getUuid()).get(i));
+            if (mutes.isEmpty())
+                return null;
+        } else return null;
+        return mutes;
+    }
+
+    public void onDisable() {
+        uLaunchers.add(0, new Location(getServer().getWorlds().get(0), 3.1415, 3.1415, 3.1415));
+        fLaunchers.add(0, new Location(getServer().getWorlds().get(0), 3.1415, 3.1415, 3.1415));
+        getConfig().set("launchersUp", uLaunchers);
+        getConfig().set("launchersForward", fLaunchers);
+        saveConfig();
+    }
+
     public void onEnable() {
         instance = this;
         registerCommands();
@@ -126,6 +230,7 @@ public class Core extends JavaPlugin {
         saveDefaultConfig();
 
         // Reload player data on reload
+        reloadGameProfiles();
         for (Player player : getServer().getOnlinePlayers()) {
             if (player != null) {
                 TTA_Methods.createBossBar(player, "", 0.0, BarStyle.SOLID, BarColor.WHITE, BarFlag.CREATE_FOG, false);
@@ -150,7 +255,7 @@ public class Core extends JavaPlugin {
             fLaunchersParticle.add(location.clone().add(0, 1, 0));
 
         // Initialize Various Repeating Tasks
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, new AutoUpdate(this), 120, 120);
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, new UpdateRunnable(this), 120, 120);
         //getServer().getScheduler().scheduleSyncRepeatingTask(this, new DonationUpdater(this), 0, 20);
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new TrailRunnable(this), 0, 2);
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new HelixRunnable(this), 0, 5);
@@ -218,32 +323,6 @@ public class Core extends JavaPlugin {
                     }).syncStart();
     }
 
-    public void onDisable() {
-        uLaunchers.add(0, new Location(getServer().getWorlds().get(0), 3.1415, 3.1415, 3.1415));
-        fLaunchers.add(0, new Location(getServer().getWorlds().get(0), 3.1415, 3.1415, 3.1415));
-        getConfig().set("launchersUp", uLaunchers);
-        getConfig().set("launchersForward", fLaunchers);
-        saveConfig();
-        syncGameProfiles();
-    }
-
-
-    private void setUp() throws Exception {
-        // sessionFactory SessionFactory is set up once for an application!
-        final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
-                .configure() // configures settings from hibernate.cfg.xml
-                .build();
-        try {
-            sessionFactory = new MetadataSources(registry).buildMetadata().buildSessionFactory();
-        } catch (Exception e) {
-            e.printStackTrace();
-            // The registry would be destroyed by the SessionFactory, but we had trouble building the SessionFactory
-            // so destroy it manually.
-            StandardServiceRegistryBuilder.destroy(registry);
-        }
-    }
-
-
     private void registerCommands() {
         getCommand("rank").setExecutor(new RankCommand(this));
         getCommand("clearchat").setExecutor(new ChatCommands(this));
@@ -274,95 +353,24 @@ public class Core extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerQuit(this), this);
         getServer().getPluginManager().registerEvents(new PlayerChat(this), this);
         getServer().getPluginManager().registerEvents(new PlayerCommandPreProcess(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerRespawn(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerCloseInventory(), this);
+        getServer().getPluginManager().registerEvents(new PlayerDamage(), this);
+
         getServer().getPluginManager().registerEvents(new ChatFilter(this), this);
         getServer().getPluginManager().registerEvents(new ServerListPingListener(this), this);
         getServer().getPluginManager().registerEvents(new InventoryClickListener(), this);
         getServer().getPluginManager().registerEvents(new WeatherChangeListener(), this);
-        getServer().getPluginManager().registerEvents(new PlayerCloseInventory(), this);
     }
 
-    public GameProfile getGameProfile(UUID uuid) {
-        Optional<GameProfile> gameProfileStream = gameProfiles.stream().filter(gameProfile ->
-                gameProfile.getUuid().equals(uuid)).findFirst();
-
-        if (gameProfileStream.isPresent()) {
-            return gameProfileStream.get();
-        } else {
-            GameProfilesEntity dbGameProfile = null;
-            Session session = sessionFactory.openSession();
-            session.beginTransaction();
-            if (!session.createQuery("from GameProfilesEntity where uuid = :uuid", GameProfilesEntity.class)
-                    .setParameter("uuid", uuid).getResultList().isEmpty())
-                dbGameProfile = session.createQuery("from GameProfilesEntity where uuid = :uuid", GameProfilesEntity.class)
-                        .setParameter("uuid", uuid).getSingleResult();
-            session.getTransaction().commit();
-            session.close();
-            if (dbGameProfile != null) {
-                gameProfiles.add(new GameProfile(dbGameProfile));
-                return getGameProfile(uuid);
-            } else {
-
-                return null;
-            }
-        }
-    }
-
-    public GameProfile getGameProfile(String name) {
-        Optional<GameProfile> playerDataStream = gameProfiles.stream().filter(gameProfile ->
-                gameProfile.getName().equalsIgnoreCase(name)).findFirst();
-
-        if (playerDataStream.isPresent()) {
-            return playerDataStream.get();
-        } else {
-            GameProfilesEntity dbGameProfile = null;
-            Session session = sessionFactory.openSession();
-            session.beginTransaction();
-            if (!session.createQuery("from GameProfilesEntity where name = :name", GameProfilesEntity.class)
-                    .setParameter("name", name).getResultList().isEmpty())
-                dbGameProfile = session.createQuery("from GameProfilesEntity where name = :name", GameProfilesEntity.class)
-                        .setParameter("name", name).getSingleResult();
-            session.getTransaction().commit();
-            session.close();
-            if (dbGameProfile != null) {
-                gameProfiles.add(new GameProfile(dbGameProfile));
-                return getGameProfile(name);
-            } else {
-                return null;
-            }
-        }
-    }
-
-    private void syncGameProfiles() {
-        for (GameProfile gameProfile : getGameProfiles())
-            gameProfile.sync();
-    }
-
-    public static void createNewGameProfile(String name, UUID uuid) {
-        Session session = Core.getSessionFactory().openSession();
+    private void reloadGameProfiles() {
+        Session session = sessionFactory.openSession();
         session.beginTransaction();
-
-        GameProfilesEntity gameProfilesEntity = new GameProfilesEntity();
-        gameProfilesEntity.setName(name);
-        gameProfilesEntity.setUuid(uuid);
-        gameProfilesEntity.setDailyRewardLast(LocalDateTime.now());
-
-        SettingsEntity settingsEntity = new SettingsEntity();
-        KitPvpDataEntity kitPvpDataEntity = new KitPvpDataEntity();
-        EssencesEntity essencesEntity = new EssencesEntity();
-
-        gameProfilesEntity.setSettings(settingsEntity);
-        gameProfilesEntity.setKitPvpData(kitPvpDataEntity);
-        gameProfilesEntity.setEssences(essencesEntity);
-        settingsEntity.setGameProfile(gameProfilesEntity);
-        kitPvpDataEntity.setGameProfile(gameProfilesEntity);
-        essencesEntity.setGameProfile(gameProfilesEntity);
-
-        session.save(gameProfilesEntity);
+        if (!session.createQuery("from GameProfilesEntity", GameProfilesEntity.class).getResultList().isEmpty())
+            for (GameProfilesEntity entity : session.createQuery("from GameProfilesEntity", GameProfilesEntity.class).getResultList())
+                gameProfiles.add(new GameProfile(entity));
         session.getTransaction().commit();
         session.close();
-
-        gameProfiles.add(new GameProfile(gameProfilesEntity));
-        Core.getInstance().getServer().getLogger().info("New GameProfile created for user " + name);
     }
 
     public void sendNoPermission(Player player) {
@@ -469,16 +477,19 @@ public class Core extends JavaPlugin {
         return itemStack.getItemMeta().getLore().get(line - 1);
     }
 
-    public ArrayList<Punishment> getMutes(GameProfile targetData) {
-        ArrayList<Punishment> mutes = new ArrayList<>();
-        if (this.getPlayerPunishments().get(targetData.getUuid()) != null) {
-            for (int i = 0; i < this.getPlayerPunishments().get(targetData.getUuid()).size(); i++)
-                if (this.getPlayerPunishments().get(targetData.getUuid()).get(i).getType().equals(Punishment.Type.KICK))
-                    mutes.add(this.getPlayerPunishments().get(targetData.getUuid()).get(i));
-            if (mutes.isEmpty())
-                return null;
-        } else return null;
-        return mutes;
+    private void setUp() throws Exception {
+        // sessionFactory SessionFactory is set up once for an application!
+        final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
+                .configure() // configures settings from hibernate.cfg.xml
+                .build();
+        try {
+            sessionFactory = new MetadataSources(registry).buildMetadata().buildSessionFactory();
+        } catch (Exception e) {
+            e.printStackTrace();
+            // The registry would be destroyed by the SessionFactory, but we had trouble building the SessionFactory
+            // so destroy it manually.
+            StandardServiceRegistryBuilder.destroy(registry);
+        }
     }
 
     public ArrayList<Punishment> getKicks(GameProfile targetData) {

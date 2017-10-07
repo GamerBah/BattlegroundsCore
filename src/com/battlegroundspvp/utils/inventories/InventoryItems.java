@@ -1,9 +1,9 @@
 package com.battlegroundspvp.utils.inventories;
 /* Created by GamerBah on 8/2/2017 */
 
-import com.battlegroundspvp.Core;
-import com.battlegroundspvp.administration.data.Rank;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
+import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.punishments.Punishment;
 import com.battlegroundspvp.utils.enums.ColorBuilder;
 import com.battlegroundspvp.utils.enums.Time;
@@ -22,8 +22,33 @@ public class InventoryItems {
     public static ItemBuilder border = new ItemBuilder(Material.STAINED_GLASS_PANE).name(" ").durability(15);
 
 
+    public static ItemBuilder playerHead(GameProfile gameProfile, GameInventory.Type type) {
+        ItemBuilder head = new ItemBuilder(Material.SKULL_ITEM)
+                .name(gameProfile.getRank().getColor() + gameProfile.getName())
+                .lore(ChatColor.GRAY + "Rank: " + gameProfile.getRank().getColor()
+                        + (gameProfile.getRank().equals(Rank.DEFAULT) ? "" : "" + ChatColor.BOLD) + gameProfile.getRank().getName())
+                .durability(3);
+
+        if (type.equals(GameInventory.Type.PUNISH_SEARCH)) {
+            head.lore("")
+                    .lore(ColorBuilder.YELLOW.bold().italic().create()
+                            + (BattlegroundsCore.getInstance().getMutes(gameProfile) != null ? BattlegroundsCore.getInstance().getMutes(gameProfile).size() : 0) + " Mutes " + ColorBuilder.GRAY.italic().create() + "on record")
+                    .lore(ColorBuilder.GOLD.bold().italic().create()
+                            + (BattlegroundsCore.getInstance().getMutes(gameProfile) != null ? BattlegroundsCore.getInstance().getMutes(gameProfile).size() : 0) + " Kicks " + ColorBuilder.GRAY.italic().create() + "on record")
+                    .lore(ColorBuilder.RED.bold().italic().create()
+                            + (BattlegroundsCore.getInstance().getMutes(gameProfile) != null ? BattlegroundsCore.getInstance().getMutes(gameProfile).size() : 0) + " Temp-Bans " + ColorBuilder.GRAY.italic().create() + "on record")
+                    .lore(ColorBuilder.DARK_RED.bold().italic().create()
+                            + (BattlegroundsCore.getInstance().getMutes(gameProfile) != null ? BattlegroundsCore.getInstance().getMutes(gameProfile).size() : 0) + " Bans " + ColorBuilder.GRAY.italic().create() + "on record");
+        }
+
+        SkullMeta meta = (SkullMeta) head.getItemMeta();
+        meta.setOwningPlayer(gameProfile.getPlayer());
+        head.setItemMeta(meta);
+        return head;
+    }
+
     public static ItemBuilder punishItem(Punishment punishment) {
-        GameProfile gameProfile = Core.getInstance().getGameProfile(punishment.getEnforcer());
+        GameProfile gameProfile = BattlegroundsCore.getInstance().getGameProfile(punishment.getEnforcer());
         String prefix = (punishment.getType() == Punishment.Type.BAN || punishment.getType() == Punishment.Type.TEMP_BAN ? "Banned" : punishment.getType() == Punishment.Type.KICK ? "Kicked " : "Muted");
 
         ItemBuilder item = new ItemBuilder(Material.MAP).name(ChatColor.AQUA + punishment.getDate().format(DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a '(EST)'")))
@@ -35,30 +60,5 @@ public class InventoryItems {
                     .lore(ChatColor.GRAY + "Active: " + (punishment.isPardoned() ? ChatColor.GREEN + "Yes" : ChatColor.RED + "No"));
 
         return item;
-    }
-
-    public static ItemBuilder playerHead(GameProfile gameProfile, GameInventory.Type type) {
-        ItemBuilder head = new ItemBuilder(Material.SKULL_ITEM)
-                .name(gameProfile.getRank().getColor() + gameProfile.getName())
-                .lore(ChatColor.GRAY + "Rank: " + gameProfile.getRank().getColor()
-                        + (gameProfile.getRank().equals(Rank.DEFAULT) ? "" : "" + ChatColor.BOLD) + gameProfile.getRank().getName())
-                .durability(3);
-
-        if (type.equals(GameInventory.Type.PUNISH_SEARCH)) {
-            head.lore("")
-                    .lore(ColorBuilder.YELLOW.bold().italic().create()
-                            + (Core.getInstance().getMutes(gameProfile) != null ? Core.getInstance().getMutes(gameProfile).size() : 0) + " Mutes " + ColorBuilder.GRAY.italic().create() + "on record")
-                    .lore(ColorBuilder.GOLD.bold().italic().create()
-                            + (Core.getInstance().getMutes(gameProfile) != null ? Core.getInstance().getMutes(gameProfile).size() : 0) + " Kicks " + ColorBuilder.GRAY.italic().create() + "on record")
-                    .lore(ColorBuilder.RED.bold().italic().create()
-                            + (Core.getInstance().getMutes(gameProfile) != null ? Core.getInstance().getMutes(gameProfile).size() : 0) + " Temp-Bans " + ColorBuilder.GRAY.italic().create() + "on record")
-                    .lore(ColorBuilder.DARK_RED.bold().italic().create()
-                            + (Core.getInstance().getMutes(gameProfile) != null ? Core.getInstance().getMutes(gameProfile).size() : 0) + " Bans " + ColorBuilder.GRAY.italic().create() + "on record");
-        }
-
-        SkullMeta meta = (SkullMeta) head.getItemMeta();
-        meta.setOwningPlayer(gameProfile.getPlayer());
-        head.setItemMeta(meta);
-        return head;
     }
 }

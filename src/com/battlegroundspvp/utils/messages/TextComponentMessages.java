@@ -1,7 +1,7 @@
 package com.battlegroundspvp.utils.messages;
 // AUTHOR: gamer_000 (12/28/2015)
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
 import org.bukkit.Location;
@@ -9,9 +9,9 @@ import org.bukkit.entity.Player;
 
 public class TextComponentMessages {
 
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public TextComponentMessages(Core plugin) {
+    public TextComponentMessages(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 

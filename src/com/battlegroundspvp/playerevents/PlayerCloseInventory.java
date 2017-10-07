@@ -1,7 +1,7 @@
 package com.battlegroundspvp.playerevents;
 /* Created by GamerBah on 9/22/2017 */
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.commands.ReportCommand;
 import com.battlegroundspvp.utils.inventories.InventoryBuilder;
 import org.bukkit.entity.Player;
@@ -28,7 +28,7 @@ public class PlayerCloseInventory implements Listener {
         }
 
         if (inventory.getName().contains("Punishment Creation:"))
-            if (Core.punishmentCreation.containsKey(player))
-                Core.punishmentCreation.remove(player);
+            if (BattlegroundsCore.punishmentCreation.containsKey(player))
+                BattlegroundsCore.punishmentCreation.remove(player);
     }
 }

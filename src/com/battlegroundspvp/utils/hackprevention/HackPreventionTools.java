@@ -2,7 +2,7 @@ package com.battlegroundspvp.utils.hackprevention;
 /* Created by GamerBah on 9/20/2016 */
 
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 
 public class HackPreventionTools {
 
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public HackPreventionTools(Core plugin) {
+    public HackPreventionTools(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 

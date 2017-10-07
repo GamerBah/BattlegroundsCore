@@ -1,10 +1,10 @@
 package com.battlegroundspvp.playerevents;
 /* Created by GamerBah on 8/15/2016 */
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.commands.FreezeCommand;
-import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.administration.data.GameProfile;
+import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.runnables.AFKRunnable;
 import com.battlegroundspvp.utils.enums.EventSound;
 import de.Herbystar.TTA.TTA_Methods;
@@ -17,9 +17,9 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.potion.PotionEffectType;
 
 public class PlayerCommandPreProcess implements Listener {
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public PlayerCommandPreProcess(Core plugin) {
+    public PlayerCommandPreProcess(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 
@@ -80,8 +80,8 @@ public class PlayerCommandPreProcess implements Listener {
             return;
         }
 
-        if (Core.getAfk().contains(player.getUniqueId()) && !StringUtils.startsWithIgnoreCase(command, "/afk") && !StringUtils.startsWithIgnoreCase(command, "/spawn")) {
-            Core.getAfk().remove(player.getUniqueId());
+        if (BattlegroundsCore.getAfk().contains(player.getUniqueId()) && !StringUtils.startsWithIgnoreCase(command, "/afk") && !StringUtils.startsWithIgnoreCase(command, "/spawn")) {
+            BattlegroundsCore.getAfk().remove(player.getUniqueId());
             player.sendMessage(ChatColor.GRAY + "You are no longer AFK");
             EventSound.playSound(player, EventSound.CLICK);
             TTA_Methods.sendTitle(player, null, 0, 0, 0, null, 0, 0, 0);
@@ -94,7 +94,7 @@ public class PlayerCommandPreProcess implements Listener {
         }
 
         plugin.getServer().getOnlinePlayers().stream().filter(players ->
-                plugin.getGameProfile(players.getUniqueId()).hasRank(Rank.HELPER) && Core.getCmdspies().contains(players.getUniqueId()))
+                plugin.getGameProfile(players.getUniqueId()).hasRank(Rank.HELPER) && BattlegroundsCore.getCmdspies().contains(players.getUniqueId()))
                 .forEach(players -> players.sendMessage(ChatColor.GRAY + "" + ChatColor.BOLD + "" + ChatColor.DARK_GRAY + player.getName() + ": " + ChatColor.GRAY + command));
     }
 

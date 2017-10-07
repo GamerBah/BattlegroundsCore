@@ -2,7 +2,7 @@ package com.battlegroundspvp.administration.data;
 /* Created by GamerBah on 1/3/2017 */
 
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.sql.KitPvpDataEntity;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,22 +16,24 @@ public class KitPvpData {
     private final int id;
     @Getter
     @Setter
-    private int kills, deaths, souls, combatRating, killstreaksEnded, revengeKills, highestKillstreak, lastKilledBy;
+    private int kills, deaths, souls, combatLevel, killstreaksEnded, revengeKills, highestKillstreak, lastKilledBy, combatLogLevel, combatLogs;
     @Getter
     @Setter
     private String playersRated, ownedKits, title;
 
-    public KitPvpData(KitPvpDataEntity entity) {
+    KitPvpData(KitPvpDataEntity entity) {
         this.entity = entity;
         this.id = entity.getId();
         this.kills = entity.getKills();
         this.deaths = entity.getDeaths();
         this.souls = entity.getSouls();
-        this.combatRating = entity.getCombatRating();
+        this.combatLevel = entity.getCombatLevel();
         this.killstreaksEnded = entity.getKillstreaksEnded();
         this.revengeKills = entity.getRevengeKills();
         this.highestKillstreak = entity.getHighestKillstreak();
         this.lastKilledBy = entity.getLastKilledBy();
+        this.combatLogs = entity.getCombatLogs();
+        this.combatLogLevel = entity.getCombatLogLevel();
         this.playersRated = entity.getPlayersRated();
         this.ownedKits = entity.getOwnedKits();
         this.title = entity.getTitle();
@@ -49,8 +51,8 @@ public class KitPvpData {
         setSouls(getSouls() + amount);
     }
 
-    public void addCombatRating() {
-        setCombatRating(getCombatRating() + 1);
+    public void addCombatLog() {
+        setCombatLogs(getCombatLogs() + 1);
     }
 
     public void addPlayerRated(int id) {
@@ -69,27 +71,24 @@ public class KitPvpData {
         setRevengeKills(getRevengeKills() + 1);
     }
 
-    public void sync() {
-        KitPvpDataEntity entity = null;
-        Session session = Core.getSessionFactory().openSession();
+    public void addCombatRating() {
+        setCombatLevel(getCombatLevel() + 1);
+    }
+
+    void sync() {
+        Session session = BattlegroundsCore.getSessionFactory().openSession();
         session.beginTransaction();
-        if (!session.createQuery("from KitPvpDataEntity where id = :id", KitPvpDataEntity.class)
-                .setParameter("id", this.id).getResultList().isEmpty())
-            entity = session.createQuery("from KitPvpDataEntity where id = :id", KitPvpDataEntity.class)
-                    .setParameter("id", this.id).getSingleResult();
-        if (entity != null) {
-            entity.setKills(this.kills);
-            entity.setDeaths(this.deaths);
-            entity.setSouls(this.souls);
-            entity.setCombatRating(this.combatRating);
-            entity.setKillstreaksEnded(this.killstreaksEnded);
-            entity.setRevengeKills(this.revengeKills);
-            entity.setHighestKillstreak(this.highestKillstreak);
-            entity.setLastKilledBy(this.lastKilledBy);
-            entity.setPlayersRated(this.playersRated);
-            entity.setOwnedKits(this.ownedKits);
-            entity.setTitle(this.title);
-        }
+        entity.setKills(this.kills);
+        entity.setDeaths(this.deaths);
+        entity.setSouls(this.souls);
+        entity.setCombatLevel(this.combatLevel);
+        entity.setKillstreaksEnded(this.killstreaksEnded);
+        entity.setRevengeKills(this.revengeKills);
+        entity.setHighestKillstreak(this.highestKillstreak);
+        entity.setLastKilledBy(this.lastKilledBy);
+        entity.setPlayersRated(this.playersRated);
+        entity.setOwnedKits(this.ownedKits);
+        entity.setTitle(this.title);
         session.getTransaction().commit();
         session.close();
     }

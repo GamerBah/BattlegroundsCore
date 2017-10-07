@@ -22,7 +22,7 @@ public class KitPvpDataEntity {
     @GeneratedValue(generator = "generator")
     private int id;
     @Column(insertable = false)
-    private int combatRating;
+    private int combatLevel;
     @Column(insertable = false)
     private int deaths;
     @Column(insertable = false)
@@ -33,6 +33,10 @@ public class KitPvpDataEntity {
     private int killstreaksEnded;
     @Column(insertable = false)
     private int lastKilledBy;
+    @Column(insertable = false)
+    private int combatLogLevel;
+    @Column(insertable = false)
+    private int combatLogs;
     @Column(insertable = false)
     private String ownedKits;
     @Column(insertable = false)

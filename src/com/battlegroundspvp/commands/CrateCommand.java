@@ -2,7 +2,7 @@ package com.battlegroundspvp.commands;
 /* Created by GamerBah on 9/17/2016 */
 
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.menus.CosmeticrateMenu;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -11,9 +11,9 @@ import org.bukkit.entity.Player;
 
 public class CrateCommand implements CommandExecutor {
 
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public CrateCommand(Core plugin) {
+    public CrateCommand(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 

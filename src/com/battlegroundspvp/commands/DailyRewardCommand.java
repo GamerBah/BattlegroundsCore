@@ -1,7 +1,7 @@
 package com.battlegroundspvp.commands;
 /* Created by GamerBah on 8/28/2016 */
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.utils.enums.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
@@ -17,9 +17,9 @@ import java.time.LocalDateTime;
 
 public class DailyRewardCommand implements CommandExecutor {
 
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public DailyRewardCommand(Core plugin) {
+    public DailyRewardCommand(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 

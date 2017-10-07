@@ -1,9 +1,9 @@
 package com.battlegroundspvp.administration.commands;
 /* Created by GamerBah on 8/26/2016 */
 
-import com.battlegroundspvp.Core;
-import com.battlegroundspvp.administration.data.Rank;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
+import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.utils.enums.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
 import net.md_5.bungee.api.ChatColor;
@@ -14,9 +14,9 @@ import org.bukkit.entity.Player;
 
 public class MaintenanceCommand implements CommandExecutor {
 
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public MaintenanceCommand(Core plugin) {
+    public MaintenanceCommand(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 

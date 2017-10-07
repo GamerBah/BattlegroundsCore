@@ -1,7 +1,7 @@
 package com.battlegroundspvp.punishments.commands;
 /* Created by GamerBah on 8/7/2016 */
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.commands.WarnCommand;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
@@ -27,14 +27,14 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class TempBanCommand implements CommandExecutor {
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public TempBanCommand(Core plugin) {
+    public TempBanCommand(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 
     public static void tempbanPlayer(UUID targetUUID, Player player, HashMap<Punishment.Reason, Integer> map) {
-        Core plugin = Core.getInstance();
+        BattlegroundsCore plugin = BattlegroundsCore.getInstance();
         GameProfile targetData = plugin.getGameProfile(targetUUID);
         if (plugin.getPlayerPunishments().containsKey(targetData.getUuid())) {
             ArrayList<Punishment> punishments = plugin.getPlayerPunishments().get(targetData.getUuid());
@@ -96,7 +96,7 @@ public class TempBanCommand implements CommandExecutor {
                 plugin.getServer().getOnlinePlayers().stream().filter(staff -> plugin.getGameProfile(staff.getUniqueId()).hasRank(Rank.HELPER)).forEach(staff -> staff.spigot().sendMessage(baseComponent));
             }
             player.closeInventory();
-            Core.punishmentCreation.remove(player);
+            BattlegroundsCore.punishmentCreation.remove(player);
             //plugin.getGlobalStats().addBan();
         }
     }

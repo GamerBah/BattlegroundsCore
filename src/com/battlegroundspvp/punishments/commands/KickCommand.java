@@ -1,7 +1,7 @@
 package com.battlegroundspvp.punishments.commands;
 /* Created by GamerBah on 8/7/2016 */
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.commands.WarnCommand;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
@@ -23,14 +23,14 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class KickCommand implements CommandExecutor {
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public KickCommand(Core plugin) {
+    public KickCommand(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 
     public static void kickPlayer(UUID targetUUID, Player player, HashMap<Punishment.Reason, Integer> map) {
-        Core plugin = Core.getInstance();
+        BattlegroundsCore plugin = BattlegroundsCore.getInstance();
         GameProfile targetData = plugin.getGameProfile(targetUUID);
 
         Punishment.Reason reason = null;
@@ -62,7 +62,7 @@ public class KickCommand implements CommandExecutor {
                     + ChatColor.YELLOW + reason.getMessage() + "\n\n" + ChatColor.GRAY + "If you feel that staff abuse was an issue, please email support@battlegroundspvp.com");
 
             player.closeInventory();
-            Core.punishmentCreation.remove(player);
+            BattlegroundsCore.punishmentCreation.remove(player);
             //plugin.getGlobalStats().addKick();
         }
     }

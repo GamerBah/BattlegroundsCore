@@ -1,7 +1,7 @@
 package com.battlegroundspvp.playerevents;
 /* Created by GamerBah on 8/7/2016 */
 
-import com.battlegroundspvp.Core;
+import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.commands.ReportCommand;
 import com.battlegroundspvp.utils.enums.ColorBuilder;
@@ -14,9 +14,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.time.LocalDateTime;
 
 public class PlayerQuit implements Listener {
-    private Core plugin;
+    private BattlegroundsCore plugin;
 
-    public PlayerQuit(Core plugin) {
+    public PlayerQuit(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 
@@ -39,8 +39,8 @@ public class PlayerQuit implements Listener {
             ReportCommand.getReportArray().remove(player.getUniqueId());
         }
 
-        if (Core.getAfk().contains(player.getUniqueId())) {
-            Core.getAfk().remove(player.getUniqueId());
+        if (BattlegroundsCore.getAfk().contains(player.getUniqueId())) {
+            BattlegroundsCore.getAfk().remove(player.getUniqueId());
         }
 
         /*if (gameProfile.getPlayerSettings().isStealthyJoin()) {
