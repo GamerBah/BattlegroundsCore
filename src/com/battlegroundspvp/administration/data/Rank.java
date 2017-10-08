@@ -1,6 +1,7 @@
 package com.battlegroundspvp.administration.data;
 /* Created by GamerBah on 8/7/2016 */
 
+import com.battlegroundspvp.utils.enums.ColorBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
@@ -8,19 +9,19 @@ import net.md_5.bungee.api.ChatColor;
 @Getter
 @AllArgsConstructor
 public enum Rank {
-    OWNER("Owner", ChatColor.RED, 100),
-    DEVELOPER("Dev", ChatColor.GOLD, 75),
-    ADMIN("Admin", ChatColor.RED, 50),
-    MODERATOR("Mod", ChatColor.DARK_AQUA, 25),
-    HELPER("Helper", ChatColor.GREEN, 15),
-    WARLORD("Warlord", ChatColor.AQUA, 10),
-    CONQUEROR("Conqueror", ChatColor.YELLOW, 8),
-    GLADIATOR("Gladiator", ChatColor.LIGHT_PURPLE, 6),
-    WARRIOR("Warrior", ChatColor.DARK_PURPLE, 4),
-    DEFAULT("Default", ChatColor.GRAY, 0);
+    OWNER("Owner", new ColorBuilder(ChatColor.RED).bold(), 100),
+    DEVELOPER("Dev", new ColorBuilder(ChatColor.GOLD).bold(), 75),
+    ADMIN("Admin", new ColorBuilder(ChatColor.RED).bold(), 50),
+    MODERATOR("Mod", new ColorBuilder(ChatColor.DARK_AQUA).bold(), 25),
+    HELPER("Helper", new ColorBuilder(ChatColor.GREEN).bold(), 15),
+    WARLORD("Warlord", new ColorBuilder(ChatColor.AQUA).bold(), 10),
+    CONQUEROR("Conqueror", new ColorBuilder(ChatColor.YELLOW).bold(), 8),
+    GLADIATOR("Gladiator", new ColorBuilder(ChatColor.LIGHT_PURPLE).bold(), 6),
+    WARRIOR("Warrior", new ColorBuilder(ChatColor.DARK_PURPLE).bold(), 4),
+    DEFAULT("Default", new ColorBuilder(ChatColor.GRAY), 0);
 
     private String name;
-    private ChatColor color;
+    private ColorBuilder color;
     private int level;
 
     public static Rank fromString(String name) {

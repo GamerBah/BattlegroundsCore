@@ -67,7 +67,7 @@ public class PlayerJoin implements Listener {
 
         if (plugin.getConfig().getBoolean("developmentMode")) {
             if (plugin.getGameProfile(event.getUniqueId()) == null || !plugin.getGameProfile(event.getUniqueId()).hasRank(Rank.HELPER)) {
-                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, ChatColor.RED + "You were not able to join the server because it is in\n" + ColorBuilder.GOLD.bold().underline().create()
+                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, ChatColor.RED + "You were not able to join the server because it is in\n" + new ColorBuilder(ChatColor.GOLD).bold().underline().create()
                         + "MAINTENANCE MODE\n\n" + ChatColor.AQUA + "This means that we are fixing bugs, or found another issue we needed to take care of\n\n"
                         + ChatColor.GRAY + "We put the server into Maintenance Mode in order to reduce the risk of\n§7corrupting player data, etc. The server should be open shortly!");
                 return;
@@ -75,7 +75,7 @@ public class PlayerJoin implements Listener {
         }
 
         if (UpdateRunnable.updating) {
-            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, ColorBuilder.YELLOW.bold().create() + "SERVER IS UPDATING!\n"
+            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, new ColorBuilder(ChatColor.YELLOW).bold().create() + "SERVER IS UPDATING!\n"
                     + ChatColor.RED + "To prevent your data from being corrupted, you didn't connect\n\n" + ChatColor.GRAY + "You should be able to join in a few seconds! Hang in there!");
         }
     }
@@ -86,26 +86,26 @@ public class PlayerJoin implements Listener {
         GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
 
         if (!player.hasPlayedBefore()) {
-            event.setJoinMessage(ColorBuilder.GOLD.bold().create() + "New! " + ColorBuilder.DARK_GRAY.bold().create() + "[" + ColorBuilder.GREEN.bold().create() + "+"
-                    + ColorBuilder.DARK_GRAY.bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName());
+            event.setJoinMessage(new ColorBuilder(ChatColor.GOLD).bold().create() + "New! " + new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "[" + new ColorBuilder(ChatColor.GREEN).bold().create() + "+"
+                    + new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName());
         } else {
-            /*if (gameProfile.getPlayerSettings().isStealthyJoin()) {
+            if (gameProfile.getPlayerSettings().isStealthyJoin()) {
                 event.setJoinMessage(null);
                 plugin.getServer().getOnlinePlayers().stream().filter(staff ->
                         plugin.getGameProfile(staff.getUniqueId()).hasRank(Rank.ADMIN)).forEach(staff ->
-                        staff.sendMessage(ColorBuilder.DARK_GRAY.bold().create() + "[" + ColorBuilder.GREEN.bold().create() + "+"
-                                + ColorBuilder.DARK_GRAY.bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GRAY + " (Stealth Join)"));
-            } else {*/
+                        staff.sendMessage(new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "[" + new ColorBuilder(ChatColor.GREEN).bold().create() + "+"
+                                + new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GRAY + " (Stealth Join)"));
+            } else {
                 if (!player.getName().equals(gameProfile.getPlayer().getName())) {
                     String oldName = gameProfile.getPlayer().getName();
                     gameProfile.setName(player.getName());
-                    event.setJoinMessage(ColorBuilder.DARK_GRAY.bold().create() + "[" + ColorBuilder.GREEN.bold().create() + "+"
-                            + ColorBuilder.DARK_GRAY.bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GRAY + " (" + oldName + ")");
+                    event.setJoinMessage(new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "[" + new ColorBuilder(ChatColor.GREEN).bold().create() + "+"
+                            + new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GRAY + " (" + oldName + ")");
                 } else {
-                    event.setJoinMessage(ColorBuilder.DARK_GRAY.bold().create() + "[" + ColorBuilder.GREEN.bold().create() + "+"
-                            + ColorBuilder.DARK_GRAY.bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName());
+                    event.setJoinMessage(new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "[" + new ColorBuilder(ChatColor.GREEN).bold().create() + "+"
+                            + new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName());
                 }
-            //}
+            }
         }
 
         if ((FreezeCommand.frozen && !gameProfile.hasRank(Rank.MODERATOR)) || FreezeCommand.frozenPlayers.contains(player) || FreezeCommand.reloadFreeze) {
@@ -120,7 +120,7 @@ public class PlayerJoin implements Listener {
         player.setPlayerListName((gameProfile.hasRank(Rank.WARRIOR) ? gameProfile.getRank().getColor() + "" + ChatColor.BOLD + gameProfile.getRank().getName().toUpperCase() + " " : "")
                 + (gameProfile.hasRank(Rank.WARRIOR) ? ChatColor.WHITE : ChatColor.GRAY) + player.getName());
 
-        TTA_Methods.sendTablist(player, ChatColor.AQUA + "You're playing on " + ColorBuilder.GOLD.bold().create() + "BATTLEGROUNDS",
+        TTA_Methods.sendTablist(player, ChatColor.AQUA + "You're playing on " + new ColorBuilder(ChatColor.GOLD).bold().create() + "BATTLEGROUNDS",
                 ChatColor.YELLOW + "Visit our store! store.battlegroundspvp.com");
 
         plugin.respawn(player);

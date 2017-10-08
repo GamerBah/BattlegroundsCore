@@ -78,8 +78,8 @@ public class ReplyCommand implements CommandExecutor {
             player.sendMessage(ChatColor.AQUA + target.getName() + " is AFK, so they might not see your message");
         }
 
-        player.sendMessage(ChatColor.DARK_AQUA + "You" + ChatColor.RED + " \u00BB " + ColorBuilder.AQUA.bold().create() + target.getName() + ChatColor.WHITE + ": " + ChatColor.AQUA + message.trim());
-        target.sendMessage(ColorBuilder.AQUA.bold().create() + player.getName() + ChatColor.RED + " \u00BB " + ChatColor.DARK_AQUA + "You" + ChatColor.WHITE + ": " + ChatColor.AQUA + message);
+        player.sendMessage(ChatColor.DARK_AQUA + "You" + ChatColor.RED + " \u00BB " + new ColorBuilder(ChatColor.AQUA).bold().create() + target.getName() + ChatColor.WHITE + ": " + ChatColor.AQUA + message.trim());
+        target.sendMessage(new ColorBuilder(ChatColor.AQUA).bold().create() + player.getName() + ChatColor.RED + " \u00BB " + ChatColor.DARK_AQUA + "You" + ChatColor.WHITE + ": " + ChatColor.AQUA + message);
 
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_HARP, 2, 2);
         target.playSound(target.getLocation(), Sound.BLOCK_NOTE_HARP, 2, 2);

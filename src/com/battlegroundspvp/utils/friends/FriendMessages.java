@@ -108,7 +108,7 @@ public class FriendMessages {
         for (GameProfile friendData : onlineFriends) {
             Player friend = plugin.getServer().getPlayer(friendData.getUuid());
             TextComponent friendTCM = new TextComponent(friendData.getName());
-            friendTCM.setColor(friendData.getRank().getColor());
+            friendTCM.setColor(friendData.getRank().getColor().baseColor());
             friendTCM.setBold(false);
             //friendTCM.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, tcm.playerStats(friend)));
             friendTCM.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/options " + friend.getName()));
@@ -127,7 +127,7 @@ public class FriendMessages {
             OfflinePlayer friend = plugin.getServer().getOfflinePlayer(friendData.getUuid());
             TextComponent friendTCM = new TextComponent(friendData.getName());
             friendTCM.setBold(false);
-            friendTCM.setColor(friendData.getRank().getColor());
+            friendTCM.setColor(friendData.getRank().getColor().baseColor());
             //friendTCM.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, tcm.playerStats(friend)));
 
             TextComponent statusDot = new TextComponent(" \u2022 ");

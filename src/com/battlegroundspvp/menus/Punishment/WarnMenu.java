@@ -94,14 +94,14 @@ public class WarnMenu {
             if (!reasons.getType().equals(Punishment.Type.BAN) && !reasons.getType().equals(Punishment.Type.AUTO)) {
                 String[] split = reasons.getDescription().split(",");
                 inv.setItem(i++, new ItemBuilder((reason != null && reason.equals(reasons) ? Material.ENCHANTED_BOOK : Material.BOOK))
-                        .name(ChatColor.RED + reasons.getName() + (reason != null && reason.equals(reasons) ? ColorBuilder.GREEN.bold().create() + " SELECTED" : ""))
+                        .name(ChatColor.RED + reasons.getName() + (reason != null && reason.equals(reasons) ? new ColorBuilder(ChatColor.GREEN).bold().create() + " SELECTED" : ""))
                         .lore(ChatColor.GRAY + split[0])
                         .lore(ChatColor.GRAY + split[1]));
             }
         }
 
         ItemStack wool = new ItemBuilder(Material.WOOL)
-                .name(ColorBuilder.GREEN.bold().create() + "ACCEPT & WARN").durability(5);
+                .name(new ColorBuilder(ChatColor.GREEN).bold().create() + "ACCEPT & WARN").durability(5);
         List<String> lore = new ArrayList<>();
         lore.add(ChatColor.GRAY + "Warning: " + ChatColor.YELLOW + target.getName());
         if (reason != null) {

@@ -86,7 +86,7 @@ public class FlySpeedCommand implements CommandExecutor {
                 break;
         }
         player.setFlySpeed(speed);
-        player.sendMessage(ColorBuilder.GREEN.bold().create() + "Success! " + ChatColor.GRAY + "Your fly speed was set to " + ColorBuilder.GREEN.bold().create() + args[0]);
+        player.sendMessage(new ColorBuilder(ChatColor.GREEN).bold().create() + "Success! " + ChatColor.GRAY + "Your fly speed was set to " + new ColorBuilder(ChatColor.GREEN).bold().create() + args[0]);
         EventSound.playSound(player, EventSound.ACTION_SUCCESS);
         return true;
     }

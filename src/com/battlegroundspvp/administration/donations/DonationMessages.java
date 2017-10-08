@@ -33,7 +33,7 @@ public class DonationMessages {
         player.sendMessage(" ");
         player.sendMessage(type.getChatColor() + "\u00AB" + ChatColor.WHITE + "========================================" + type.getChatColor() + "\u00BB");
         player.sendMessage(" ");
-        player.sendMessage(ColorBuilder.GREEN.bold().create() + "   THANKS FOR YOUR PURCHASE!");
+        player.sendMessage(new ColorBuilder(ChatColor.GREEN).bold().create() + "   THANKS FOR YOUR PURCHASE!");
         player.sendMessage(ChatColor.YELLOW + "    We greatly appreciate your support!");
         player.sendMessage(" ");
         BaseComponent component = new TextComponent(ChatColor.GRAY + "    You can now find your\n");
@@ -55,8 +55,8 @@ public class DonationMessages {
             player.sendMessage(" ");
             player.sendMessage(type.getChatColor() + "\u00AB" + ChatColor.WHITE + "========================================" + type.getChatColor() + "\u00BB");
             player.sendMessage(" ");
-            player.sendMessage("    " + ColorBuilder.GOLD.bold().create() + (!player.getName().equals(plugin.getConfig().getString("essenceOwner"))
-                    ? activator.getName() : "You") + ColorBuilder.YELLOW.bold().create() + " activated a Battle Essence!");
+            player.sendMessage("    " + new ColorBuilder(ChatColor.GOLD).bold().create() + (!player.getName().equals(plugin.getConfig().getString("essenceOwner"))
+                    ? activator.getName() : "You") + new ColorBuilder(ChatColor.YELLOW).bold().create() + " activated a Battle Essence!");
             player.sendMessage(ChatColor.GRAY + "    All players will receive " + type.getChatColor() + type.getPercent() + "% more " + ChatColor.GRAY + "Souls");
             player.sendMessage(ChatColor.GRAY + "    and Battle Coins for " + ChatColor.RED + type.getDuration() + (type.getDuration() == 1 ? " Hour" : " Hours") + ChatColor.GRAY + "!");
             player.sendMessage(" ");
@@ -86,8 +86,8 @@ public class DonationMessages {
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_SMALL_FALL, 0.75F, 0.2F), 10L);
         player.sendMessage(type.getChatColor() + "\u00AB" + ChatColor.WHITE + "========================================" + type.getChatColor() + "\u00BB");
         player.sendMessage(" ");
-        player.sendMessage("    " + ColorBuilder.GOLD.bold().create() + (!player.getName().equals(plugin.getConfig().getString("essenceOwner"))
-                ? gameProfile.getName() + ColorBuilder.YELLOW.bold().create() + " has an active Battle Essence!" : "Your " + plugin.getConfig().getInt("essenceIncrease") + "% Battle Essence is still active!"));
+        player.sendMessage("    " + new ColorBuilder(ChatColor.GOLD).bold().create() + (!player.getName().equals(plugin.getConfig().getString("essenceOwner"))
+                ? gameProfile.getName() + new ColorBuilder(ChatColor.YELLOW).bold().create() + " has an active Battle Essence!" : "Your " + plugin.getConfig().getInt("essenceIncrease") + "% Battle Essence is still active!"));
         player.sendMessage(ChatColor.GRAY + "    All players receive " + type.getChatColor() + type.getPercent() + "% more " + ChatColor.GRAY + "Souls");
         player.sendMessage(ChatColor.GRAY + "    and Battle Coins for " + ChatColor.RED + Time.toString(plugin.getConfig().getInt("essenceTimeRemaining") * 1000, true) + ChatColor.GRAY + "!");
         player.sendMessage(" ");
@@ -102,13 +102,13 @@ public class DonationMessages {
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 2, 1);
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> player.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_TWINKLE, 0.6F, 1.2F), 15L);
         player.sendMessage(" ");
-        player.sendMessage(rank.getColor() + "\u00AB" + ChatColor.WHITE + "========================================" + rank.getColor() + "\u00BB");
+        player.sendMessage(rank.getColor().create() + "\u00AB" + ChatColor.WHITE + "========================================" + rank.getColor().create() + "\u00BB");
         player.sendMessage(" ");
-        player.sendMessage(ColorBuilder.GREEN.bold().create() + "   THANKS FOR YOUR PURCHASE!");
+        player.sendMessage(new ColorBuilder(ChatColor.GREEN).bold().create() + "   THANKS FOR YOUR PURCHASE!");
         player.sendMessage(ChatColor.YELLOW + "    We greatly appreciate your support!");
         player.sendMessage(" ");
-        player.sendMessage(ChatColor.GRAY + "   Your rank is now " + rank.getColor() + rank.getName().toUpperCase() + ChatColor.GRAY + "! Enjoy!");
-        player.sendMessage(rank.getColor() + "\u00AB" + ChatColor.WHITE + "========================================" + rank.getColor() + "\u00BB");
+        player.sendMessage(ChatColor.GRAY + "   Your rank is now " + rank.getColor().create() + rank.getName().toUpperCase() + ChatColor.GRAY + "! Enjoy!");
+        player.sendMessage(rank.getColor().create() + "\u00AB" + ChatColor.WHITE + "========================================" + rank.getColor().create() + "\u00BB");
         player.sendMessage(" ");
     }
 

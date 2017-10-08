@@ -31,39 +31,7 @@ public class UpdateRunnable implements Runnable {
         }
 
         updateFile = new File(plugin.getServer().getUpdateFolderFile().getPath() + File.separator + "BattlegroundsCore.jar");
-        currentFile = new File("plugins" + File.separator + "BattlegroundsCore.jar");
-    }
-
-    private void deleteUpdateFile() {
-        try {
-            Files.delete(updateFile.toPath());
-        } catch (IOException exception) {
-            plugin.getLogger().severe("Unable to delete queued jarfile!");
-            plugin.getLogger().severe(exception.getCause().toString());
-        }
-    }
-
-    private void revert() {
-        plugin.getLogger().severe("Reverting to working jarfile, hang tight...");
-        plugin.getServer().broadcastMessage(ColorBuilder.RED.bold().create() + "SERVER: " + ChatColor.GRAY
-                + "Update was a " + ColorBuilder.RED.bold().create() + "failure" + ChatColor.GRAY + "!");
-        plugin.getServer().broadcastMessage(ColorBuilder.RED.bold().create() + "SERVER: " + ChatColor.GRAY
-                + "Reverting to the previous version, hang tight...");
-        try {
-            Files.move(currentFile.toPath(), Paths.get(plugin.getDataFolder().toPath() + File.separator + "BattlegroundsCore.jar"),
-                    StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException exception) {
-            plugin.getLogger().severe("Unable to revert!");
-            plugin.getLogger().severe(exception.getCause().toString());
-        }
-        try {
-            PluginUtil.load("BattlegroundsCore");
-        } catch (Throwable throwable) {
-            plugin.getLogger().severe("Reverted jar has errors, but it'll have to do");
-            plugin.getLogger().severe(throwable.getCause().toString());
-        }
-        plugin.getServer().broadcastMessage(ColorBuilder.RED.bold().create() + "SERVER: " + ChatColor.GRAY
-                + "Successfully reverted to the previous version.");
+        currentFile = new File(plugin.getServer().getUpdateFolderFile().getParentFile().getPath() + File.separator + "BattlegroundsCore.jar");
     }
 
     @Override
@@ -71,7 +39,7 @@ public class UpdateRunnable implements Runnable {
         if (updateFile == null || !updateFile.exists()) {
             return;
         }
-        plugin.getServer().broadcastMessage(ColorBuilder.RED.bold().create() + "SERVER: " + ChatColor.GRAY + "Reloading in 5 seconds for an update. Hang in there!");
+        plugin.getServer().broadcastMessage(new ColorBuilder(ChatColor.RED).bold().create() + "SERVER: " + ChatColor.GRAY + "Reloading in 5 seconds for an update. Hang in there!");
         plugin.getServer().broadcastMessage(ChatColor.GRAY + "(You'll get sent back to the spawn once the update is complete)");
         updating = true;
         // TODO: TRIGGER SUB-PLUGIN UPDATE CORRUPTION PREVENTION
@@ -96,11 +64,11 @@ public class UpdateRunnable implements Runnable {
                 BattlegroundsCore.syncGameProfiles();
                 PluginUtil.unload(plugin);
                 try {
-                    Files.move(currentFile.toPath(), Paths.get(plugin.getDataFolder().toPath() + File.separator + "BattlegroundsCore.jar"),
+                    Files.move(Paths.get(currentFile.getPath()), Paths.get(plugin.getDataFolder().getPath() + File.separator + "BattlegroundsCore.jar"),
                             StandardCopyOption.REPLACE_EXISTING);
-                    currentFile = new File(plugin.getDataFolder().toPath() + File.separator + "BattlegroundsCore.jar");
-                    Files.move(updateFile.toPath(), Paths.get(plugin.getServer().getUpdateFolderFile().getParentFile().toPath()
-                            + File.separator + "BattlegroundsCore.jar"));
+                    currentFile = new File(plugin.getDataFolder().getPath() + File.separator + "BattlegroundsCore.jar");
+                    Files.move(Paths.get(updateFile.getPath()), Paths.get(plugin.getServer().getUpdateFolderFile().getParentFile().getPath()
+                            + File.separator + "BattlegroundsCore.jar"), StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException exception) {
                     plugin.getLogger().severe("Unable to complete update!");
                     plugin.getLogger().severe(exception.getCause().toString());
@@ -115,12 +83,12 @@ public class UpdateRunnable implements Runnable {
                     revert();
                     return;
                 }
-                plugin.getServer().broadcastMessage(ColorBuilder.RED.bold().create() + "SERVER: " + ChatColor.GRAY
-                        + "Update was a " + ColorBuilder.GREEN.bold().create() + "success" + ChatColor.GRAY + "! Now go have fun!");
+                plugin.getServer().broadcastMessage(new ColorBuilder(ChatColor.RED).bold().create() + "SERVER: " + ChatColor.GRAY
+                        + "Update was a " + new ColorBuilder(ChatColor.GREEN).bold().create() + "success" + ChatColor.GRAY + "! Now go have fun!");
             } catch (Throwable throwable) {
                 plugin.getLogger().severe("Error during pre-update, sticking with the current version");
                 plugin.getLogger().severe(throwable.getCause().toString());
-                plugin.getServer().broadcastMessage(ColorBuilder.RED.bold().create() + "SERVER: " + ChatColor.GRAY
+                plugin.getServer().broadcastMessage(new ColorBuilder(ChatColor.RED).bold().create() + "SERVER: " + ChatColor.GRAY
                         + "Stuck to current version due to issues with the update.");
                 deleteUpdateFile();
             } finally {
@@ -131,5 +99,37 @@ public class UpdateRunnable implements Runnable {
                 updating = false;
             }
         }, 100);
+    }
+
+    private void revert() {
+        plugin.getLogger().severe("Reverting to working jarfile, hang tight...");
+        plugin.getServer().broadcastMessage(new ColorBuilder(ChatColor.RED).bold().create() + "SERVER: " + ChatColor.GRAY
+                + "Update was a " + new ColorBuilder(ChatColor.RED).bold().create() + "failure" + ChatColor.GRAY + "!");
+        plugin.getServer().broadcastMessage(new ColorBuilder(ChatColor.RED).bold().create() + "SERVER: " + ChatColor.GRAY
+                + "Reverting to the previous version, hang tight...");
+        try {
+            Files.move(currentFile.toPath(), Paths.get(plugin.getDataFolder().toPath() + File.separator + "BattlegroundsCore.jar"),
+                    StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException exception) {
+            plugin.getLogger().severe("Unable to revert!");
+            plugin.getLogger().severe(exception.getCause().toString());
+        }
+        try {
+            PluginUtil.load("BattlegroundsCore");
+        } catch (Throwable throwable) {
+            plugin.getLogger().severe("Reverted jar has errors, but it'll have to do");
+            plugin.getLogger().severe(throwable.getCause().toString());
+        }
+        plugin.getServer().broadcastMessage(new ColorBuilder(ChatColor.RED).bold().create() + "SERVER: " + ChatColor.GRAY
+                + "Successfully reverted to the previous version.");
+    }
+
+    private void deleteUpdateFile() {
+        try {
+            Files.delete(updateFile.toPath());
+        } catch (IOException exception) {
+            plugin.getLogger().severe("Unable to delete queued jarfile!");
+            plugin.getLogger().severe(exception.getCause().toString());
+        }
     }
 }

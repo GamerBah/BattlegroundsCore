@@ -4,19 +4,27 @@
         "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
     <session-factory>
-        <!--<property name="hibernate.hikari.dataSourceClassName">com.mysql.jdbc.Driver</property>
-        <property name="hibernate.hikari.dataSource.url">jdbc:mysql://149.56.241.15/mc2162</property>
-        <property name="hibernate.hikari.dataSource.user">mc2162</property>
-        <property name="hibernate.hikari.dataSource.password">642fe60176</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
         <property name="hibernate.connection.provider_class">org.hibernate.hikaricp.internal.HikariCPConnectionProvider</property>
-        <property name="hibernate.hikari.minimumIdle">5</property>
-        <property name="hibernate.hikari.maximumPoolSize">10</property>
-        <property name="hibernate.hikari.idleTimeout">30000</property>-->
-        <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="hibernate.connection.datasource">com.mysql.jdbc.jdbc2.optional.MysqlDataSource</property>
+        <property name="hibernate.connection.url">
+            jdbc:mysql://149.56.241.15/mc2162?autoReconnect=true&amp;useSSL=false
+        </property>
+        <property name="hibernate.connection.username">mc2162</property>
+        <property name="hibernate.connection.password">642fe60176</property>
+        <property name="hibernate.connection.minimumIdle">5</property>
+        <property name="hibernate.connection.maximumPoolSize">100</property>
+        <property name="hibernate.connection.idleTimeout">30000</property>
+        <property name="hibernate.connection.cachePrepStmts">true</property>
+        <property name="hibernate.connection.prepStmtCacheSize">250</property>
+        <property name="hibernate.connection.prepStmtCacheSqlLimit">2048</property>
+        <property name="hibernate.connection.useServerPrepStmts">true</property>
+        <property name="hibernate.current_session_context_class">thread</property>
+        <!--<property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
         <property name="hibernate.connection.password">642fe60176</property>
         <property name="hibernate.connection.url">jdbc:mysql://149.56.241.15/mc2162?autoReconnect=true</property>
         <property name="hibernate.connection.username">mc2162</property>
-        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>-->
 
         <mapping class="com.battlegroundspvp.administration.data.sql.EssencesEntity"/>
         <mapping class="com.battlegroundspvp.administration.data.sql.GameProfilesEntity"/>
@@ -24,9 +32,6 @@
         <mapping class="com.battlegroundspvp.administration.data.sql.KitPvpDataEntity"/>
         <mapping class="com.battlegroundspvp.administration.data.sql.PunishmentsEntity"/>
         <mapping class="com.battlegroundspvp.administration.data.sql.SettingsEntity"/>
-
-        <!-- <property name="connection.username"/> -->
-        <!-- <property name="connection.password"/> -->
 
         <!-- DB schema will be updated if needed -->
         <!-- <property name="hbm2ddl.auto">update</property> -->

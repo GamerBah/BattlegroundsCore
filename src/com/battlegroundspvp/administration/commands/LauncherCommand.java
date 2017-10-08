@@ -76,10 +76,10 @@ public class LauncherCommand implements CommandExecutor {
                 EventSound.playSound(player, EventSound.ACTION_FAIL);
                 return true;
             } else if (args[0].equalsIgnoreCase("list")) {
-                player.sendMessage(ColorBuilder.AQUA.bold().create() + "Upwards Launchers:");
+                player.sendMessage(new ColorBuilder(ChatColor.AQUA).bold().create() + "Upwards Launchers:");
                 for (int x = 0; x < plugin.getULaunchers().size(); x++)
                     player.spigot().sendMessage(TextComponentMessages.launcherLocation(player, plugin.getULaunchers().get(x)));
-                player.sendMessage(ColorBuilder.AQUA.bold().create() + "Forwards Launchers:");
+                player.sendMessage(new ColorBuilder(ChatColor.AQUA).bold().create() + "Forwards Launchers:");
                 for (int x = 0; x < plugin.getFLaunchers().size(); x++)
                     player.spigot().sendMessage(TextComponentMessages.launcherLocation(player, plugin.getFLaunchers().get(x)));
                 return true;

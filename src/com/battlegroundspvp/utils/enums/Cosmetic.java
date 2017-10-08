@@ -32,19 +32,19 @@ public enum Cosmetic {
 
         // Epic
         TRAIL_RAIN_STORM(20, PARTICLE_PACK, "Rain Storm", new ItemBuilder(Material.WATER_BUCKET)
-                .name(ColorBuilder.GOLD.bold().create() + "Rain Storm")
+                .name(new ColorBuilder(ChatColor.GOLD).bold().create() + "Rain Storm")
                 .lore(ChatColor.YELLOW + "Idle Effect: " + ChatColor.GRAY + "A rain cloud over your head")
                 .lore(ChatColor.YELLOW + "Moving Effect: " + ChatColor.GRAY + "Water splashes and rain drops"),
                 Rarity.EPIC, null, 0, 0),
         TRAIL_LAVA_RAIN(21, PARTICLE_PACK, "Lava Rain", new ItemBuilder(Material.LAVA_BUCKET)
-                .name(ColorBuilder.GOLD.bold().create() + "Lava Rain")
+                .name(new ColorBuilder(ChatColor.GOLD).bold().create() + "Lava Rain")
                 .lore(ChatColor.YELLOW + "Idle Effect: " + ChatColor.GRAY + "A smoke cloud raining lava over your head")
                 .lore(ChatColor.YELLOW + "Moving Effect: " + ChatColor.GRAY + "Lava bubbles and lava drops"),
                 Rarity.EPIC, null, 0, 0),
 
         // Legendary
         TRAIL_FLAME_WARRIOR(40, PARTICLE_PACK, "Flame Warrior", new ItemBuilder(Material.FLINT_AND_STEEL)
-                .name(ColorBuilder.PINK.bold().create() + "Flame Warrior")
+                .name(new ColorBuilder(ChatColor.LIGHT_PURPLE).bold().create() + "Flame Warrior")
                 .lore(ChatColor.YELLOW + "Idle Effect: " + ChatColor.GRAY + "A flame helix rotating around you")
                 .lore(ChatColor.YELLOW + "Moving Effect: " + ChatColor.GRAY + "Flames and smoke"),
                 Rarity.LEGENDARY, null, 0, 0),
@@ -69,13 +69,13 @@ public enum Cosmetic {
 
         // Epic
         SOUND_EXPLODE(130, KILL_SOUND, "Explosion", new ItemBuilder(Material.TNT)
-                .name(ColorBuilder.GOLD.bold().create() + "Explosion")
+                .name(new ColorBuilder(ChatColor.GOLD).bold().create() + "Explosion")
                 .lore(ChatColor.GRAY + "" + ChatColor.ITALIC + "Kaboom!"),
                 Rarity.EPIC, Sound.ENTITY_GENERIC_EXPLODE, 1, 1),
 
         //Legendary
         SOUND_CAT_MEOW(160, KILL_SOUND, "Meow", new ItemBuilder(Material.DIAMOND)
-                .name(ColorBuilder.PINK.bold().create() + "Meow")
+                .name(new ColorBuilder(ChatColor.LIGHT_PURPLE).bold().create() + "Meow")
                 .lore(ChatColor.GRAY + "" + ChatColor.ITALIC + "A cute and cuddly death!"),
                 Rarity.LEGENDARY, Sound.ENTITY_CAT_AMBIENT, 1.3F, 1),
 

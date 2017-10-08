@@ -127,7 +127,7 @@ public class ReportMenu extends GameInventory {
         ItemBuilder item = new ItemBuilder(Material.ENCHANTED_BOOK).name(ChatColor.GREEN + ChatColor.stripColor(itemStack.getItemMeta().getDisplayName()));
         for (String lore : itemStack.getItemMeta().getLore())
             item.lore(lore);
-        item.lore(" ").lore(ColorBuilder.GREEN.bold().create() + "SELECTED").lore(ChatColor.AQUA + "Click to remove!");
+        item.lore(" ").lore(new ColorBuilder(ChatColor.GREEN).bold().create() + "SELECTED").lore(ChatColor.AQUA + "Click to remove!");
     }
 
     public void setUnselected(Inventory inventory, ItemStack itemStack) {

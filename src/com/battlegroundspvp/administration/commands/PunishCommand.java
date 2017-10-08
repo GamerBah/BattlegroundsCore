@@ -37,7 +37,8 @@ public class PunishCommand implements CommandExecutor {
         }
 
         if (args.length == 0) {
-            new InventoryBuilder(player, new PunishmentMenus().new PunishMenu(player)).page(0).open();
+            new InventoryBuilder(player, new PunishmentMenus().new PunishMenu(player)).open();
+            EventSound.playSound(player, EventSound.INVENTORY_OPEN_MENU);
             return true;
         }
 
@@ -61,8 +62,8 @@ public class PunishCommand implements CommandExecutor {
             EventSound.playSound(player, EventSound.ACTION_FAIL);
             return true;
         }
-        new InventoryBuilder(player, new PunishmentMenus().new PunishMenu(player)).open();
         EventSound.playSound(player, EventSound.INVENTORY_OPEN_MENU);
+        new InventoryBuilder(player, new PunishmentMenus().new PunishMenu(player)).open();
 
         return false;
     }

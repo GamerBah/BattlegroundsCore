@@ -91,11 +91,13 @@ public class InventoryBuilder {
                 throw new IllegalArgumentException("Number must be <= maxPage and >= 0");
             page = number;
             int index = number * 36;
-            for (int i = 0; i < 36; i++) {
-                if (index >= this.items.size()) {
-                    inventory.setItem(i, null);
-                } else {
-                    inventory.setItem(i, this.items.get(index++));
+            if (this.items.size() > 0) {
+                for (int i = 0; i < 36; i++) {
+                    if (index >= this.items.size()) {
+                        inventory.setItem(i, null);
+                    } else {
+                        inventory.setItem(i, this.items.get(index++));
+                    }
                 }
             }
 
@@ -110,14 +112,7 @@ public class InventoryBuilder {
                     EventSound.playSound(player, EventSound.INVENTORY_OPEN_SUBMENU);
                 })));
             if (page == 0)
-                gameInventory.addClickableItem(45, InventoryItems.back.clone().clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
-                    if (this.gameInventory.getPreviousInventory() != null) {
-                        this.previousInventory().open();
-                    } else {
-                        player.closeInventory();
-                    }
-                    EventSound.playSound(player, EventSound.INVENTORY_GO_BACK);
-                })));
+                gameInventory.addClickableItem(45, InventoryItems.back.clone().clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> this.gameInventory.openPreviousInventory(player))));
             online(onlineOnly);
         }
         return this;

@@ -41,7 +41,7 @@ public class AFKCommand implements CommandExecutor {
             player.getInventory().clear();
             player.sendMessage(ChatColor.GRAY + "You are now AFK");
             EventSound.playSound(player, EventSound.CLICK);
-            TTA_Methods.sendTitle(player, ColorBuilder.AQUA.bold().create() + "You are AFK!",10, Integer.MAX_VALUE, 20,
+            TTA_Methods.sendTitle(player, new ColorBuilder(ChatColor.AQUA).bold().create() + "You are AFK!", 10, Integer.MAX_VALUE, 20,
                     ChatColor.YELLOW + "Move to start playing again!", 10, Integer.MAX_VALUE, 20);
             player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true, false));
             plugin.getServer().getScheduler().runTaskLater(plugin, () -> BattlegroundsCore.getAfk().add(player.getUniqueId()), 5L);

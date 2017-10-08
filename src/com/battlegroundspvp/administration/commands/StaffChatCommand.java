@@ -43,11 +43,11 @@ public class StaffChatCommand implements CommandExecutor {
             if (args.length == 0) {
                 if (!toggled.contains(player.getUniqueId())) {
                     toggled.add(player.getUniqueId());
-                    player.sendMessage(ChatColor.GRAY + "Staff Chat toggled " + ColorBuilder.GREEN.bold().create() + "ON");
+                    player.sendMessage(ChatColor.GRAY + "Staff Chat toggled " + new ColorBuilder(ChatColor.GREEN).bold().create() + "ON");
                     EventSound.playSound(player, EventSound.ACTION_SUCCESS);
                 } else {
                     toggled.remove(player.getUniqueId());
-                    player.sendMessage(ChatColor.GRAY + "Staff Chat toggled " + ColorBuilder.RED.bold().create() + "OFF");
+                    player.sendMessage(ChatColor.GRAY + "Staff Chat toggled " + new ColorBuilder(ChatColor.RED).bold().create() + "OFF");
                     EventSound.playSound(player, EventSound.ACTION_SUCCESS);
                 }
             } else {
@@ -55,7 +55,7 @@ public class StaffChatCommand implements CommandExecutor {
 
                 plugin.getServer().getOnlinePlayers().stream().filter(players ->
                         plugin.getGameProfile(players.getUniqueId()).hasRank(Rank.HELPER))
-                        .forEach(players -> players.sendMessage(ColorBuilder.YELLOW.bold().create() + "[STAFF] "
+                        .forEach(players -> players.sendMessage(new ColorBuilder(ChatColor.YELLOW).bold().create() + "[STAFF] "
                                 + ChatColor.RED + player.getName() + ": " + message));
             }
         }

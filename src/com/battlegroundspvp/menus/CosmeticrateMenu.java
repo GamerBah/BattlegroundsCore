@@ -26,7 +26,7 @@ public class CosmeticrateMenu {
         GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
 
         inv.setItem(12, new ItemBuilder(Material.STAINED_GLASS_PANE).name(" ").durability(15));
-        inv.setItem(13, new ItemBuilder(Material.CHEST).name((gameProfile.getCoins() >= 500 ? ColorBuilder.GREEN.bold().create() + "Click to buy!" : ColorBuilder.RED.bold().create() + "Need more coins!"))
+        inv.setItem(13, new ItemBuilder(Material.CHEST).name((gameProfile.getCoins() >= 500 ? new ColorBuilder(ChatColor.GREEN).bold().create() + "Click to buy!" : new ColorBuilder(ChatColor.RED).bold().create() + "Need more coins!"))
                 .lore(ChatColor.GRAY + "Cost: " + ChatColor.AQUA + "500 Coins"));
         inv.setItem(14, new ItemBuilder(Material.STAINED_GLASS_PANE).name(" ").durability(15));
 
@@ -179,7 +179,7 @@ public class CosmeticrateMenu {
                     player.sendMessage(ChatColor.GRAY + "You already have the " + finalCosmetic.getRarity().getColor() + (finalCosmetic.getRarity() == Rarity.EPIC
                             || finalCosmetic.getRarity() == Rarity.LEGENDARY ? "" + ChatColor.BOLD : "") + finalCosmetic.getName()
                             + ChatColor.GRAY + (finalCosmetic.getGroup().equals(Cosmetic.PARTICLE_PACK) ? " Particle Pack" : finalCosmetic.getGroup().equals(Cosmetic.KILL_EFFECT)
-                            ? " Gore" : " Warcry") + ",\n" + ChatColor.GRAY + " so you got " + ColorBuilder.AQUA.bold().create() + souls + " Souls");
+                            ? " Gore" : " Warcry") + ",\n" + ChatColor.GRAY + " so you got " + new ColorBuilder(ChatColor.AQUA).bold().create() + souls + " Souls");
                     scoreboardListener.updateScoreboardSouls(player, souls);
                 }
             }

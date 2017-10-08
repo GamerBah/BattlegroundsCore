@@ -2,6 +2,8 @@ package com.battlegroundspvp.utils.inventories;
 /* Created by GamerBah on 7/22/2017 */
 
 import com.battlegroundspvp.BattlegroundsCore;
+import com.battlegroundspvp.utils.enums.EventSound;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 import java.util.ArrayList;
@@ -69,6 +71,15 @@ public class GameInventory {
 
     protected GameInventory getPreviousInventory() {
         return previousInventory;
+    }
+
+    public void openPreviousInventory(final Player player) {
+        if (this.getPreviousInventory() != null) {
+            new InventoryBuilder(player, this.getPreviousInventory()).open();
+        } else {
+            player.closeInventory();
+        }
+        EventSound.playSound(player, EventSound.INVENTORY_GO_BACK);
     }
 
     protected void setItemCount(int amount) {

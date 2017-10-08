@@ -80,8 +80,8 @@ public class MessageCommand implements CommandExecutor {
             EventSound.playSound(player, EventSound.COMMAND_NEEDS_CONFIRMATION);
         }
 
-        player.sendMessage(ChatColor.DARK_AQUA + "You" + ChatColor.RED + " \u00BB " + ColorBuilder.AQUA.bold().create() + target.getName() + ChatColor.WHITE + ": " + ChatColor.AQUA + message.trim());
-        target.sendMessage(ColorBuilder.AQUA.bold().create() + player.getName() + ChatColor.RED + " \u00BB " + ChatColor.DARK_AQUA + "You" + ChatColor.WHITE + ": " + ChatColor.AQUA + message);
+        player.sendMessage(ChatColor.DARK_AQUA + "You" + ChatColor.RED + " \u00BB " + new ColorBuilder(ChatColor.AQUA).bold().create() + target.getName() + ChatColor.WHITE + ": " + ChatColor.AQUA + message.trim());
+        target.sendMessage(new ColorBuilder(ChatColor.AQUA).bold().create() + player.getName() + ChatColor.RED + " \u00BB " + ChatColor.DARK_AQUA + "You" + ChatColor.WHITE + ": " + ChatColor.AQUA + message);
 
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_HARP, 2, 2);
         target.playSound(target.getLocation(), Sound.BLOCK_NOTE_HARP, 2, 2);

@@ -69,6 +69,10 @@ public class InventoryClickListener implements Listener {
                         }
                     }
                 }
+            } else {
+                if (InventoryBuilder.getInventoryUsers().keySet().contains(player)) {
+                    event.setCancelled(true);
+                }
             }
         }
     }

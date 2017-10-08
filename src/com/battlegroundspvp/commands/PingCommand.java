@@ -54,28 +54,28 @@ public class PingCommand implements CommandExecutor {
 
         String status = "";
         if (ping <= 20) {
-            status = ColorBuilder.PINK.bold().create() + "AWESOME! ";
+            status = new ColorBuilder(ChatColor.LIGHT_PURPLE).bold().create() + "AWESOME! ";
         }
         if (ping > 20 && ping <= 50) {
-            status = ColorBuilder.PURPLE.bold().create() + "GREAT! ";
+            status = new ColorBuilder(ChatColor.DARK_PURPLE).bold().create() + "GREAT! ";
         }
         if (ping > 50 && ping <= 80) {
-            status = ColorBuilder.GREEN.bold().create() + "Good! ";
+            status = new ColorBuilder(ChatColor.GREEN).bold().create() + "Good! ";
         }
         if (ping > 80 && ping <= 110) {
-            status = ColorBuilder.DARK_GREEN.bold().create() + "Okay. ";
+            status = new ColorBuilder(ChatColor.DARK_GREEN).bold().create() + "Okay. ";
         }
         if (ping > 110 && ping <= 140) {
-            status = ColorBuilder.RED.bold().create() + "Eh... ";
+            status = new ColorBuilder(ChatColor.RED).bold().create() + "Eh... ";
         }
         if (ping > 140 && ping <= 200) {
-            status = ColorBuilder.RED.bold().create() + "Bad. ";
+            status = new ColorBuilder(ChatColor.RED).bold().create() + "Bad. ";
         }
         if (ping > 200 && ping <= 275) {
-            status = ColorBuilder.RED.bold().create() + "AWFUL! ";
+            status = new ColorBuilder(ChatColor.RED).bold().create() + "AWFUL! ";
         }
         if (ping > 275) {
-            status = ColorBuilder.RED.bold().create() + "RIP. ";
+            status = new ColorBuilder(ChatColor.RED).bold().create() + "RIP. ";
         }
 
         if (player == target) {

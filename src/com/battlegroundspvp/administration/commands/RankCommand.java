@@ -40,8 +40,8 @@ public class RankCommand implements CommandExecutor, TabCompleter {
             }
 
         if (args.length != 2) {
-            sender.sendMessage(ChatColor.RED + "/rank <player> <rank>");
-            if (sender instanceof Player) EventSound.playSound((Player) sender, EventSound.ACTION_FAIL);
+            if (sender instanceof Player) plugin.sendIncorrectUsage((Player) sender, "/rank <player> <rank>");
+            else sender.sendMessage("/rank <player> <rank>");
             return true;
         }
 
@@ -49,8 +49,8 @@ public class RankCommand implements CommandExecutor, TabCompleter {
             OfflinePlayer target = plugin.getServer().getOfflinePlayer(args[0]);
 
             if (target == null) {
-                sender.sendMessage(ChatColor.RED + "That player doesn't exist!");
-                if (sender instanceof Player) EventSound.playSound((Player) sender, EventSound.ACTION_FAIL);
+                if (sender instanceof Player) plugin.sendNoResults((Player) sender, "find that player");
+                else sender.sendMessage(ChatColor.RED + "That player doesn't exist!");
                 return;
             }
 
@@ -59,25 +59,30 @@ public class RankCommand implements CommandExecutor, TabCompleter {
                     GameProfile gameProfile = plugin.getGameProfile(target.getUniqueId());
                     //ScoreboardListener scoreboardListener = new ScoreboardListener(plugin);
                     if (gameProfile != null) {
+                        if (gameProfile.getRank() == rank) {
+                            sender.sendMessage(ChatColor.RED + gameProfile.getName() + " already has that rank");
+                            if (sender instanceof Player) EventSound.playSound((Player) sender, EventSound.ACTION_FAIL);
+                            return;
+                        }
+                        gameProfile.setRank(rank);
                         if (target.isOnline()) {
                             //scoreboardListener.updateScoreboardRank((Player) target, rank);
-                            gameProfile.setRank(rank);
-                            ((Player) target).setPlayerListName((gameProfile.hasRank(Rank.WARRIOR) ? gameProfile.getRank().getColor() + "" + ChatColor.BOLD + gameProfile.getRank().getName().toUpperCase() + " " : "")
+                            ((Player) target).setPlayerListName((gameProfile.hasRank(Rank.WARRIOR) ? gameProfile.getRank().getColor().create() + gameProfile.getRank().getName().toUpperCase() + " " : "")
                                     + (gameProfile.hasRank(Rank.WARRIOR) ? ChatColor.WHITE : ChatColor.GRAY) + target.getName());
-                        } else {
-                            gameProfile.setRank(rank);
+                            ((Player) target).sendMessage(ChatColor.GRAY + "Your rank was changed to " + rank.getColor().create() + WordUtils.capitalizeFully(rank.toString())
+                                    + (sender instanceof Player ? ChatColor.GRAY + " by " + sender.getName() : ""));
+                            EventSound.playSound((Player) target, EventSound.ACTION_SUCCESS);
                         }
-                        if (!gameProfile.hasRank(Rank.MODERATOR)) {
+                        if (!gameProfile.hasRank(Rank.MODERATOR))
                             gameProfile.getPlayerSettings().setStealthyJoin(false);
-                        }
-                        sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Success! " + ChatColor.GRAY + target.getName() + "'s rank was changed to " + WordUtils.capitalizeFully(rank.toString()));
+                        sender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "Success! " + ChatColor.GRAY + target.getName() + "'s rank was changed to "
+                                + rank.getColor().create() + WordUtils.capitalizeFully(rank.toString()));
+                        if (sender instanceof Player) EventSound.playSound((Player) sender, EventSound.ACTION_SUCCESS);
                         return;
                     } else {
-                        sender.sendMessage(ChatColor.RED + "That player doesn't exist!");
-                        if (sender instanceof Player) {
-                            Player player = (Player) sender;
-                            EventSound.playSound(player, EventSound.ACTION_FAIL);
-                        }
+                        if (sender instanceof Player)
+                            plugin.sendNoResults((Player) sender, "find data for that player");
+                        else sender.sendMessage(ChatColor.RED + "That player doesn't exist!");
                         return;
                     }
                 }

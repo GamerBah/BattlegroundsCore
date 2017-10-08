@@ -50,7 +50,7 @@ public class DailyRewardCommand implements CommandExecutor {
         scoreboardListener.updateScoreboardSouls(player, 50);
         scoreboardListener.updateScoreboardCoins(player, 10);*/
 
-        TTA_Methods.sendTitle(player, ColorBuilder.GREEN.bold().create() + "Daily Reward Claimed!",5, 60, 20,
+        TTA_Methods.sendTitle(player, new ColorBuilder(ChatColor.GREEN).bold().create() + "Daily Reward Claimed!", 5, 60, 20,
                 ChatColor.AQUA + "+50 Souls   " + ChatColor.LIGHT_PURPLE + "+10 Battle Coins", 5, 60, 20);
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.2F, 1F);
 

@@ -7,6 +7,7 @@ import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.punishments.Punishment;
 import com.battlegroundspvp.utils.enums.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -92,7 +93,7 @@ public class ChatFilter implements Listener {
 
         if (!isClean(event.getMessage())) {
             event.setCancelled(true);
-            player.sendMessage(ColorBuilder.RED.bold().create() + "Please refrain from using profane language!");
+            player.sendMessage(new ColorBuilder(ChatColor.RED).bold().create() + "Please refrain from using profane language!");
             EventSound.playSound(player, EventSound.ACTION_FAIL);
             if (!attempts.containsKey(player)) {
                 if (!plugin.getGameProfile(player.getUniqueId()).hasRank(Rank.HELPER)) {

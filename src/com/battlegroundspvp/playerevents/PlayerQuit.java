@@ -47,11 +47,11 @@ public class PlayerQuit implements Listener {
             event.setQuitMessage(null);
             plugin.getServer().getOnlinePlayers().stream().filter(staff ->
                     plugin.getGameProfile(staff.getUniqueId()).hasRank(Rank.ADMIN)).forEach(staff ->
-                    staff.sendMessage(ColorBuilder.DARK_GRAY.bold().create() + "[" + ColorBuilder.RED.bold().create() + "-"
-                            + ColorBuilder.DARK_GRAY.bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName()));
+                    staff.sendMessage(new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "[" + new ColorBuilder(ChatColor.RED).bold().create() + "-"
+                            + new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName()));
         } else {*/
-            event.setQuitMessage(ColorBuilder.DARK_GRAY.bold().create() + "[" + ColorBuilder.RED.bold().create() + "-"
-                    + ColorBuilder.DARK_GRAY.bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName());
+        event.setQuitMessage(new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "[" + new ColorBuilder(ChatColor.RED).bold().create() + "-"
+                + new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName());
         //}
 
         gameProfile.setLastOnline(LocalDateTime.now());

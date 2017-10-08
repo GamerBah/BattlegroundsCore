@@ -37,25 +37,25 @@ public class HelpCommand implements CommandExecutor {
             player.sendMessage("§m------------------§f[ " + ChatColor.RED + "Command Help " + ChatColor.WHITE + "]§m------------------");
             if (gameProfile.hasRank(Rank.HELPER))
                 player.sendMessage(ChatColor.GOLD + " You can use §e/help staff §6for Staff-related commands");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /afk " + ChatColor.GRAY + "- Sets you as away-from-keyboard");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /crates " + ChatColor.GRAY + "- Opens the Cosmeticrate Menu");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /dailyreward " + ChatColor.GRAY + "- Claims an available Daily Reward");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /essences " + ChatColor.GRAY + "- Shows you your purchased Battle Essences");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /friend " + ChatColor.GRAY + "- Add, remove, and view friends!");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /message " + ChatColor.GRAY + "- Sends a private message to a player");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /options " + ChatColor.GRAY + "- Shows options for a specified player");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /ping " + ChatColor.GRAY + "- Shows you your connection to BattlegroundsCore");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /refer " + ChatColor.GRAY + "- Refer the player who invited you to BattlegroundsCore!");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /reply " + ChatColor.GRAY + "- Replies to the most recent private message");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /report " + ChatColor.GRAY + "- Reports a player to Staff members");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /rules " + ChatColor.GRAY + "- Displays the server rules");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /slots " + ChatColor.GRAY + "- Opens the \"K-Slots\" Machine");
+            player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /afk " + ChatColor.GRAY + "- Sets you as away-from-keyboard");
+            player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /crates " + ChatColor.GRAY + "- Opens the Cosmeticrate Menu");
+            player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /dailyreward " + ChatColor.GRAY + "- Claims an available Daily Reward");
+            player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /essences " + ChatColor.GRAY + "- Shows you your purchased Battle Essences");
+            player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /friend " + ChatColor.GRAY + "- Add, remove, and view friends!");
+            player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /message " + ChatColor.GRAY + "- Sends a private message to a player");
+            player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /options " + ChatColor.GRAY + "- Shows options for a specified player");
+            player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /ping " + ChatColor.GRAY + "- Shows you your connection to BattlegroundsCore");
+            player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /refer " + ChatColor.GRAY + "- Refer the player who invited you to BattlegroundsCore!");
+            player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /reply " + ChatColor.GRAY + "- Replies to the most recent private message");
+            player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /report " + ChatColor.GRAY + "- Reports a player to Staff members");
+            player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /rules " + ChatColor.GRAY + "- Displays the server rules");
+            player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /slots " + ChatColor.GRAY + "- Opens the \"K-Slots\" Machine");
             if (gameProfile.hasRank(Rank.WARRIOR))
-                player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /spectate " + ChatColor.GRAY + "- Puts you into spectator mode");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /spawn " + ChatColor.GRAY + "- Teleports you back to the spawn");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /staffreq " + ChatColor.GRAY + "- Sends a message to offline Staff members");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /team " + ChatColor.GRAY + "- Team up with another player");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /thanks " + ChatColor.GRAY + "- Thanks the player with the active Battle Essence");
+                player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /spectate " + ChatColor.GRAY + "- Puts you into spectator mode");
+            player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /spawn " + ChatColor.GRAY + "- Teleports you back to the spawn");
+            player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /staffreq " + ChatColor.GRAY + "- Sends a message to offline Staff members");
+            player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /team " + ChatColor.GRAY + "- Team up with another player");
+            player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /thanks " + ChatColor.GRAY + "- Thanks the player with the active Battle Essence");
             return true;
         }
 
@@ -65,26 +65,26 @@ public class HelpCommand implements CommandExecutor {
                 return true;
             }
             player.sendMessage("§m---------------§f[ " + ChatColor.RED + "Staff Command Help " + ChatColor.WHITE + "]§m---------------");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /cmdspy " + ChatColor.GRAY + "- Allows you to see all executed commands");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /mute " + ChatColor.GRAY + "- Mutes a player");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /kick " + ChatColor.GRAY + "- Kicks a player from the server");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /punish " + ChatColor.GRAY + "- Views a player's punishment history");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /staff " + ChatColor.GRAY + "- Sends a message to the Staff chat channel");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /unmute " + ChatColor.GRAY + "- unmutes a player");
-            player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /warn " + ChatColor.GRAY + "- warns a player");
+            player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /cmdspy " + ChatColor.GRAY + "- Allows you to see all executed commands");
+            player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /mute " + ChatColor.GRAY + "- Mutes a player");
+            player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /kick " + ChatColor.GRAY + "- Kicks a player from the server");
+            player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /punish " + ChatColor.GRAY + "- Views a player's punishment history");
+            player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /staff " + ChatColor.GRAY + "- Sends a message to the Staff chat channel");
+            player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /unmute " + ChatColor.GRAY + "- unmutes a player");
+            player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /warn " + ChatColor.GRAY + "- warns a player");
             if (gameProfile.hasRank(Rank.MODERATOR)) {
-                player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /clearchat " + ChatColor.GRAY + "- Clears the chat");
-                player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /flyspeed " + ChatColor.GRAY + "- Changes your flying speed");
-                player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /freeze " + ChatColor.GRAY + "- Freezes players");
-                player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /lockchat " + ChatColor.GRAY + "- Locks the chat");
-                player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /skull " + ChatColor.GRAY + "- Gets a players head");
-                player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /temp-ban " + ChatColor.GRAY + "- Bans a player temporarily");
-                player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /unban " + ChatColor.GRAY + "- Unbans a player");
+                player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /clearchat " + ChatColor.GRAY + "- Clears the chat");
+                player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /flyspeed " + ChatColor.GRAY + "- Changes your flying speed");
+                player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /freeze " + ChatColor.GRAY + "- Freezes players");
+                player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /lockchat " + ChatColor.GRAY + "- Locks the chat");
+                player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /skull " + ChatColor.GRAY + "- Gets a players head");
+                player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /temp-ban " + ChatColor.GRAY + "- Bans a player temporarily");
+                player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /unban " + ChatColor.GRAY + "- Unbans a player");
             }
             if (gameProfile.hasRank(Rank.ADMIN))
-                player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /ban " + ChatColor.GRAY + "- Permanently bans a player");
+                player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /ban " + ChatColor.GRAY + "- Permanently bans a player");
             if (gameProfile.hasRank(Rank.OWNER))
-                player.sendMessage(ColorBuilder.DARK_AQUA.bold().create() + " /maintenance " + ChatColor.GRAY + "- Puts the server into Maintenance Mode");
+                player.sendMessage(new ColorBuilder(ChatColor.DARK_AQUA).bold().create() + " /maintenance " + ChatColor.GRAY + "- Puts the server into Maintenance Mode");
             return true;
         }
 

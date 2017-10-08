@@ -49,7 +49,7 @@ public class MaintenanceCommand implements CommandExecutor {
             for (Player players : plugin.getServer().getOnlinePlayers()) {
                 GameProfile gameProfile1 = plugin.getGameProfile(players.getUniqueId());
                 if (!gameProfile1.hasRank(Rank.HELPER)) {
-                    players.kickPlayer(ChatColor.RED + "You were kicked because the server was put into\n" + ColorBuilder.GOLD.bold().create()
+                    players.kickPlayer(ChatColor.RED + "You were kicked because the server was put into\n" + new ColorBuilder(ChatColor.GOLD).bold().create()
                             + "MAINTENANCE MODE\n\n" + ChatColor.AQUA + "This means that we are fixing bugs, or found another issue we needed to take care of\n\n"
                             + ChatColor.GRAY + "We put the server into Maintenance Mode in order to reduce the risk of\n§7corrupting player data, etc. The server should be open shortly!");
                 }
@@ -57,12 +57,12 @@ public class MaintenanceCommand implements CommandExecutor {
             }
             plugin.getConfig().set("developmentMode", true);
             plugin.saveConfig();
-            plugin.getServer().broadcastMessage(ColorBuilder.RED.bold().create() + "\nSERVER HAS BEEN PUT INTO " + ColorBuilder.GOLD.bold().create() + "MAINTENANCE MODE\n ");
+            plugin.getServer().broadcastMessage(new ColorBuilder(ChatColor.RED).bold().create() + "\nSERVER HAS BEEN PUT INTO " + new ColorBuilder(ChatColor.GOLD).bold().create() + "MAINTENANCE MODE\n ");
         } else {
             plugin.getConfig().set("developmentMode", false);
             plugin.saveConfig();
             for (Player players : plugin.getServer().getOnlinePlayers()) {
-                players.sendMessage(ColorBuilder.RED.bold().create() + "\nSERVER IS NO LONGER IN " + ColorBuilder.GOLD.bold().create() + "MAINTENANCE MODE\n ");
+                players.sendMessage(new ColorBuilder(ChatColor.RED).bold().create() + "\nSERVER IS NO LONGER IN " + new ColorBuilder(ChatColor.GOLD).bold().create() + "MAINTENANCE MODE\n ");
                 EventSound.playSound(players, EventSound.ACTION_SUCCESS);
             }
         }

@@ -21,12 +21,6 @@ import org.bukkit.potion.PotionEffectType;
 
 public class PlayerRespawn implements Listener {
 
-    private BattlegroundsCore plugin;
-
-    public PlayerRespawn(BattlegroundsCore plugin) {
-        this.plugin = plugin;
-    }
-
     @EventHandler
     public void onPlayerRegainHealth(EntityRegainHealthEvent event) {
         if (event.getRegainReason() == EntityRegainHealthEvent.RegainReason.SATIATED)
@@ -38,7 +32,6 @@ public class PlayerRespawn implements Listener {
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         event.setRespawnLocation(event.getPlayer().getWorld().getSpawnLocation().add(0.5, 0.0, 0.5));
-        player.setGameMode(GameMode.ADVENTURE);
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
         player.setHealth(20F);
@@ -48,6 +41,7 @@ public class PlayerRespawn implements Listener {
         player.setLevel(0);
         player.setFlying(false);
         player.setAllowFlight(false);
+        player.setGameMode(GameMode.ADVENTURE);
         if (!BattlegroundsCore.getFallDmg().contains(player)) {
             BattlegroundsCore.getFallDmg().add(player);
         }
@@ -61,7 +55,7 @@ public class PlayerRespawn implements Listener {
             player.setLevel(0);
 
         player.getInventory().setItem(0, new I(Material.NETHER_STAR)
-                .name(ColorBuilder.AQUA.bold().create() + "Kit Selector" + ChatColor.GRAY + " (Right-Click)")
+                .name(new ColorBuilder(ChatColor.AQUA).bold().create() + "Kit Selector" + ChatColor.GRAY + " (Right-Click)")
                 .lore(ChatColor.GRAY + "Choose which kit you'll use!"));
 
         if (KitManager.getPreviousKit().containsKey(player.getUniqueId())) {
@@ -85,7 +79,7 @@ public class PlayerRespawn implements Listener {
         }
 
         ItemStack head = new ItemBuilder(Material.SKULL_ITEM)
-                .name(ColorBuilder.YELLOW.bold().create() + "Player Profile" + ChatColor.GRAY + " (Right-Click)")
+                .name(new ColorBuilder(ChatColor.YELLOW).bold().create() + "Player Profile" + ChatColor.GRAY + " (Right-Click)")
                 .lore(ChatColor.GRAY + "View your unlocked cosmetics,").lore(ChatColor.GRAY + "achievements, and more!")
                 .durability(3);
         SkullMeta meta = (SkullMeta) head.getItemMeta();
@@ -95,7 +89,7 @@ public class PlayerRespawn implements Listener {
         player.getInventory().setItem(7, head);
 
         player.getInventory().setItem(8, new ItemBuilder(Material.REDSTONE_COMPARATOR)
-                .name(ColorBuilder.RED.bold().create() + "Settings" + ChatColor.GRAY + " (Right-Click)")
+                .name(new ColorBuilder(ChatColor.RED).bold().create() + "Settings" + ChatColor.GRAY + " (Right-Click)")
                 .lore(ChatColor.GRAY + "Change your personal settings!"));
 
     }

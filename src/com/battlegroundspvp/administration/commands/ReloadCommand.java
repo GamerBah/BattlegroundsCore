@@ -41,7 +41,7 @@ public class ReloadCommand implements CommandExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("server")) {
-                plugin.getServer().broadcastMessage(ColorBuilder.RED.bold().create() + "SERVER: " + ChatColor.GRAY + "Reloading in 5 seconds. Hang in there!");
+                plugin.getServer().broadcastMessage(new ColorBuilder(ChatColor.RED).bold().create() + "SERVER: " + ChatColor.GRAY + "Reloading in 5 seconds. Hang in there!");
                 plugin.getServer().broadcastMessage(ChatColor.GRAY + "(You'll get sent back to the spawn once the reload is complete)");
                 UpdateRunnable.updating = true;
                 //ScoreboardListener scoreboardListener = new ScoreboardListener(plugin);
@@ -53,7 +53,7 @@ public class ReloadCommand implements CommandExecutor {
                         scoreboardListener.updateScoreboardSouls(players, KSlotsMenu.usingSlots.get(player) * 400);
                         players.sendMessage(" ");
                         players.sendMessage(ChatColor.YELLOW + "To prevent data loss, your slots roll has been cancelled,");
-                        players.sendMessage(ChatColor.YELLOW + "and you've been refunded " + ColorBuilder.AQUA.bold().create() + KSlotsMenu.usingSlots.get(players) * 400 + " Souls");
+                        players.sendMessage(ChatColor.YELLOW + "and you've been refunded " + new ColorBuilder(ChatColor.AQUA).bold().create() + KSlotsMenu.usingSlots.get(players) * 400 + " Souls");
                     }*/
                     FreezeCommand.reloadFreeze = true;
                     players.setWalkSpeed(0F);
@@ -70,8 +70,8 @@ public class ReloadCommand implements CommandExecutor {
                         EventSound.playSound(players, EventSound.ACTION_SUCCESS);
                         players.setWalkSpeed(0.2F);
                     }
-                    plugin.getServer().broadcastMessage(ColorBuilder.RED.bold().create() + "SERVER: " + ChatColor.GRAY
-                            + "Server Reload was a " + ColorBuilder.GREEN.bold().create() + "success" + ChatColor.GRAY + "! Now go have fun!");
+                    plugin.getServer().broadcastMessage(new ColorBuilder(ChatColor.RED).bold().create() + "SERVER: " + ChatColor.GRAY
+                            + "Server Reload was a " + new ColorBuilder(ChatColor.GREEN).bold().create() + "success" + ChatColor.GRAY + "! Now go have fun!");
                     UpdateRunnable.updating = false;
                 }, 100);
             }

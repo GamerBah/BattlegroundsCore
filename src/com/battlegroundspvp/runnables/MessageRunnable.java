@@ -29,7 +29,7 @@ public class MessageRunnable implements Runnable {
 
             if (!ChatCommands.chatSilenced && plugin.getServer().getOnlinePlayers().size() > 1) {
                 plugin.getServer().broadcastMessage(" ");
-                plugin.getServer().broadcastMessage(ChatColor.RED + "[" + ColorBuilder.GOLD.bold().create() + "*" + ChatColor.RED + "] "
+                plugin.getServer().broadcastMessage(ChatColor.RED + "[" + new ColorBuilder(ChatColor.GOLD).bold().create() + "*" + ChatColor.RED + "] "
                         + ChatColor.YELLOW + ChatColor.translateAlternateColorCodes('&',
                         messageConfig.getStringList("Messages").get(amount++)));
                 plugin.getServer().broadcastMessage(" ");
