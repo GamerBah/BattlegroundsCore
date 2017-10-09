@@ -17,7 +17,7 @@ public enum Advancements {
             false, false, TexturePath.CONCRETE_GRAY, FrameType.TASK, null)),
 
     RECRUITER_I(new CustomAdvancement(ChatColor.YELLOW + "Recruiter I", "Recruit a friend", new ItemBuilder(Material.SKULL).durability(3),
-            true, true, TexturePath.NONE, FrameType.TASK, BASE)),
+            false, true, TexturePath.NONE, FrameType.TASK, BASE)),
     RECRUITER_II(new CustomAdvancement(ChatColor.YELLOW + "Recruiter II", "Recruit 5 friends", new ItemBuilder(Material.SKULL).durability(0),
             false, true, TexturePath.NONE, FrameType.TASK, RECRUITER_I)),
     RECRUITER_III(new CustomAdvancement(ChatColor.YELLOW + "Recruiter III", "Recruit 10 friends", new ItemBuilder(Material.SKULL).durability(1),
@@ -32,7 +32,7 @@ public enum Advancements {
             true, true, TexturePath.NONE, FrameType.GOAL, RECRUITER_MASTERY)),
 
     SHOWMANSHIP_I(new CustomAdvancement(ChatColor.YELLOW + "Showmanship I", "Unlock a particle pack!", new ItemBuilder(Material.DIAMOND),
-            true, true, TexturePath.NONE, FrameType.TASK, BASE));
+            false, true, TexturePath.NONE, FrameType.TASK, BASE));
 
     private CustomAdvancement customAdvancement;
 
