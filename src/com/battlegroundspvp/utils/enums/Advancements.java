@@ -29,7 +29,10 @@ public enum Advancements {
     RECRUITER_MASTERY(new CustomAdvancement(new ColorBuilder(ChatColor.YELLOW).bold().create() + "Recruiter Master", "Recruit 30 friends", new ItemBuilder(Material.SKULL).durability(5),
             false, true, TexturePath.NONE, FrameType.GOAL, RECRUITER_V)),
     RECRUITER_WIZARD(new CustomAdvancement(new ColorBuilder(ChatColor.LIGHT_PURPLE).bold().create() + "Recruiter Wizard", ChatColor.ITALIC + "\"You're a wizard, Harry!\"\n" + "Recruit 50 friends!", new ItemBuilder(Material.NETHER_STAR).durability(5),
-            true, true, TexturePath.NONE, FrameType.GOAL, RECRUITER_MASTERY));
+            true, true, TexturePath.NONE, FrameType.GOAL, RECRUITER_MASTERY)),
+
+    SHOWMANSHIP_I(new CustomAdvancement(ChatColor.YELLOW + "Showmanship I", "Unlock a particle pack!", new ItemBuilder(Material.DIAMOND),
+            true, true, TexturePath.NONE, FrameType.TASK, BASE));
 
     private CustomAdvancement customAdvancement;
 
