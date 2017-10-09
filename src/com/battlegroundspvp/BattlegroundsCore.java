@@ -199,8 +199,6 @@ public class BattlegroundsCore extends JavaPlugin {
     }
 
     public void onDisable() {
-        for (Advancements advancements : Advancements.values())
-            advancements.getCustomAdvancement().getApi().remove();
         uLaunchers.add(0, new Location(getServer().getWorlds().get(0), 3.1415, 3.1415, 3.1415));
         fLaunchers.add(0, new Location(getServer().getWorlds().get(0), 3.1415, 3.1415, 3.1415));
         getConfig().set("launchersUp", uLaunchers);
@@ -249,8 +247,6 @@ public class BattlegroundsCore extends JavaPlugin {
                             }
                         }
                     }).syncStart();
-        for (Advancements advancement : Advancements.values())
-            advancement.getCustomAdvancement().register();
     }
 
     private void registerCommands() {
