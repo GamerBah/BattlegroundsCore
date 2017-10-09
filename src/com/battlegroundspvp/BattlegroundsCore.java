@@ -18,6 +18,7 @@ import com.battlegroundspvp.punishments.Punishment;
 import com.battlegroundspvp.punishments.commands.*;
 import com.battlegroundspvp.runnables.*;
 import com.battlegroundspvp.utils.ChatFilter;
+import com.battlegroundspvp.utils.enums.Advancements;
 import com.battlegroundspvp.utils.enums.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
 import com.battlegroundspvp.utils.enums.Time;
@@ -32,9 +33,11 @@ import de.Herbystar.TTA.TTA_Methods;
 import lombok.Getter;
 import net.gpedro.integrations.slack.SlackApi;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.advancement.Advancement;
 import org.bukkit.block.Sign;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
@@ -196,6 +199,8 @@ public class BattlegroundsCore extends JavaPlugin {
     }
 
     public void onDisable() {
+        for (Advancements advancements : Advancements.values())
+            advancements.getCustomAdvancement().getApi().remove();
         uLaunchers.add(0, new Location(getServer().getWorlds().get(0), 3.1415, 3.1415, 3.1415));
         fLaunchers.add(0, new Location(getServer().getWorlds().get(0), 3.1415, 3.1415, 3.1415));
         getConfig().set("launchersUp", uLaunchers);
@@ -244,6 +249,9 @@ public class BattlegroundsCore extends JavaPlugin {
                             }
                         }
                     }).syncStart();
+
+        for (Advancements advancement : Advancements.values())
+            advancement.getCustomAdvancement().register();
     }
 
     private void registerCommands() {
@@ -395,6 +403,12 @@ public class BattlegroundsCore extends JavaPlugin {
     public void sendNoResults(Player player, String msg) {
         player.sendMessage(new ColorBuilder(ChatColor.RED).bold().create() + "Sorry! " + ChatColor.GRAY + "I wasn't able to ");
         EventSound.playSound(player, EventSound.ACTION_FAIL);
+    }
+
+    public boolean hasAdvancement(Player player, Advancements advancements) {
+        Bukkit.reloadData();
+        Advancement advancement = Bukkit.getAdvancement(advancements.getCustomAdvancement().getKey());
+        return player.getAdvancementProgress(advancement).getRemainingCriteria().size() <= 0;
     }
 
     public void warnPlayer(Player player, GameProfile targetData, Punishment.Reason reason) {

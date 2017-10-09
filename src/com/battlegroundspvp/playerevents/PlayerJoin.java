@@ -7,6 +7,7 @@ import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.punishments.Punishment;
 import com.battlegroundspvp.runnables.UpdateRunnable;
+import com.battlegroundspvp.utils.enums.Advancements;
 import com.battlegroundspvp.utils.enums.ColorBuilder;
 import com.battlegroundspvp.utils.enums.Time;
 import de.Herbystar.TTA.TTA_Methods;
@@ -88,7 +89,13 @@ public class PlayerJoin implements Listener {
         if (!player.hasPlayedBefore()) {
             event.setJoinMessage(new ColorBuilder(ChatColor.GOLD).bold().create() + "New! " + new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "[" + new ColorBuilder(ChatColor.GREEN).bold().create() + "+"
                     + new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName());
+            if (!plugin.hasAdvancement(player, Advancements.BASE)) {
+                Advancements.BASE.getCustomAdvancement().reward(player, null);
+            }
         } else {
+            if (!plugin.hasAdvancement(player, Advancements.BASE)) {
+                Advancements.BASE.getCustomAdvancement().reward(player, null);
+            }
             if (gameProfile.getPlayerSettings().isStealthyJoin()) {
                 event.setJoinMessage(null);
                 plugin.getServer().getOnlinePlayers().stream().filter(staff ->
