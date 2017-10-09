@@ -8,7 +8,6 @@ import lombok.Getter;
 public enum TexturePath {
 
     NONE(""),
-
     BEDROCK("bedrock"),
     BONE_BLOCK_SIDE("bone_block_side"),
     BONE_BLOCK_TOP("bone_block_top"),

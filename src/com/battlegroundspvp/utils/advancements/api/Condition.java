@@ -23,7 +23,6 @@ public class Condition {
         return Condition.builder(name, convertItemToJSON(itemStack));
     }
 
-
     //BEGIN UTIL
     private static JsonObject convertItemToJSON(ItemStack item) {
         JsonObject itemJSON = new JsonObject();

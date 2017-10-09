@@ -95,4 +95,5 @@ public class CustomAdvancement {
         }
         reward.run();
     }
+
 }

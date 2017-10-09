@@ -375,6 +375,7 @@ public class AdvancementAPI {
             return this;
         }
 
+
         public AdvancementAPIBuilder trigger(Trigger.TriggerBuilder trigger) {
             if (this.triggers == null)
                 this.triggers = new ArrayList<Trigger.TriggerBuilder>();

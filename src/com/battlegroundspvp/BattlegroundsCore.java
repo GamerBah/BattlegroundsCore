@@ -249,7 +249,6 @@ public class BattlegroundsCore extends JavaPlugin {
                             }
                         }
                     }).syncStart();
-
         for (Advancements advancement : Advancements.values())
             advancement.getCustomAdvancement().register();
     }

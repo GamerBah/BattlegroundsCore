@@ -43,7 +43,6 @@ public class Trigger {
 
     }
 
-
     public enum TriggerType {
         ARBITRARY_PLAYER_TICK,
         BRED_ANIMALS,

@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
  * Created by ysl3000
  */
 public enum FrameType {
+
     TASK("task"),
     GOAL("goal"),
     CHALLENGE("challenge");

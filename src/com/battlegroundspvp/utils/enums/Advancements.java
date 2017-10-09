@@ -11,7 +11,6 @@ import org.bukkit.Material;
 @AllArgsConstructor
 @Getter
 public enum Advancements {
-
     //String name, String description, ItemStack icon, boolean hidden, boolean toast, String background, FrameType frameType, String key, @Nullable Advancements parent
 
     BASE(new CustomAdvancement("Battlegrounds", "Welcome to Battlegrounds!", new ItemBuilder(Material.END_CRYSTAL),
