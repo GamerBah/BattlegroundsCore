@@ -31,8 +31,19 @@ public enum Advancements {
     RECRUITER_WIZARD(new CustomAdvancement(new ColorBuilder(ChatColor.LIGHT_PURPLE).bold().create() + "Recruiter Wizard", ChatColor.ITALIC + "\"You're a wizard, Harry!\"\n" + "Recruit 50 friends!", new ItemBuilder(Material.NETHER_STAR).durability(5),
             true, true, TexturePath.NONE, FrameType.GOAL, RECRUITER_MASTERY)),
 
-    SHOWMANSHIP_I(new CustomAdvancement(ChatColor.YELLOW + "Showmanship I", "Unlock a particle pack!", new ItemBuilder(Material.DIAMOND),
-            false, true, TexturePath.NONE, FrameType.TASK, BASE));
+    SHOWMANSHIP_I(new CustomAdvancement(ChatColor.YELLOW + "Showmanship I", "Unlock a particle pack", new ItemBuilder(Material.DIAMOND),
+            false, true, TexturePath.NONE, FrameType.TASK, BASE)),
+    SHOWMANSHIP_II(new CustomAdvancement(ChatColor.YELLOW + "Showmanship II", "Unlock 3 particle packs", new ItemBuilder(Material.DIAMOND),
+            false, true, TexturePath.NONE, FrameType.TASK, SHOWMANSHIP_I)),
+    SHOWMANSHIP_III(new CustomAdvancement(ChatColor.YELLOW + "Showmanship III", "Unlock 6 particle packs", new ItemBuilder(Material.DIAMOND),
+            false, true, TexturePath.NONE, SHOWMANSHIP_II)),
+    SHOWMANSHIP_IV(new CustomAdvancement(ChatColor.YELLOW + "Showmanship IV", "Unlock 9 particle packs", new ItemBuilder(Material.DIAMOND),
+            false, true, TexturePath.NONE, SHOWMANSHIP_III)),
+    SHOWMANSHIP_V(new CustomAdvancement(ChatColor.YELLOW + "Showmanship V", "Unlock 12 particle packs", new ItemBuilder(Material.DIAMOND),
+            false, true, TexturePath.NONE, SHOWMANSHIP_IV)),
+    SHOWMANSHIP_MASTERY(new CustomAdvancement(new ColorBuilder(ChatColor.YELLOW).bold().create() + "Showmanship Mastery", "Unlock all particle packs", new ItemBuilder(Material.DIAMOND),
+            false, true, TexturePath.NONE, SHOWMANSHIP_V));
+
 
     private CustomAdvancement customAdvancement;
 
