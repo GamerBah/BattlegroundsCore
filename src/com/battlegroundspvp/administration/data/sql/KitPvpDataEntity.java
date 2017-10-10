@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Table(name = "KitPvpData", schema = "mc2162")
 public class KitPvpDataEntity {
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @PrimaryKeyJoinColumn
     private GameProfilesEntity gameProfile;
 

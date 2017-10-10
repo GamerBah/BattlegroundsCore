@@ -12,6 +12,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -40,13 +42,15 @@ public class InventoryBuilder {
     private boolean onlineOnly = false;
     @Getter
     private ArrayList<ItemBuilder> items = new ArrayList<>();
+    private int itemsPerPage;
 
     public InventoryBuilder(Player player, GameInventory gameInventory) {
         this.player = player;
         this.gameInventory = gameInventory;
         this.inventory = gameInventory.getInventory();
         this.items = gameInventory.getSortables();
-        this.maxPage = (items.size() <= 36 ? 0 : (int) Math.ceil(items.size() / 36));
+        this.itemsPerPage = (gameInventory.isBiDirectionalOffset() ? 36 - (2 * gameInventory.getSlotOffset()) : 36 - gameInventory.getSlotOffset());
+        this.maxPage = (items.size() <= itemsPerPage ? 0 : (int) Math.ceil(items.size() / itemsPerPage));
         if (!gameInventory.getType().equals(GameInventory.Type.STANDARD))
             for (int i = 36; i < 45; i++)
                 inventory.setItem(i, InventoryItems.border);
@@ -54,33 +58,39 @@ public class InventoryBuilder {
         inventoryUsers.put(player, this);
     }
 
-    private InventoryBuilder sort(SortType type) {
-        switch (type) {
-            case ALPHABETICALLY:
-                if (gameInventory.getType() == GameInventory.Type.PUNISH_SEARCH)
-                    throw new IllegalArgumentException("Inventories of type " + gameInventory.getType().name() + " cannot be sorted alphabetically!");
-                items.sort((ItemStack is1, ItemStack is2) -> ChatColor.stripColor(is1.getItemMeta().getDisplayName()).compareTo(ChatColor.stripColor(is2.getItemMeta().getDisplayName())));
-                sortType = SortType.ALPHABETICALLY;
+    public InventoryBuilder sort(SortType type) {
+        if (gameInventory.getType() != GameInventory.Type.PUNISH_SEARCH) {
+            switch (type) {
+                case ALPHABETICALLY:
+                    items.sort((ItemStack is1, ItemStack is2) -> ChatColor.stripColor(is1.getItemMeta().getDisplayName()).compareTo(ChatColor.stripColor(is2.getItemMeta().getDisplayName())));
+                    sortType = SortType.ALPHABETICALLY;
 
-            case REVERSE_ALPHABETICALLY:
-                if (gameInventory.getType() == GameInventory.Type.PUNISH_SEARCH)
-                    throw new IllegalArgumentException("Inventories of type " + gameInventory.getType().name() + " cannot be sorted reverse-alphabetically!");
-                items.sort((ItemStack is1, ItemStack is2) -> ChatColor.stripColor(is2.getItemMeta().getDisplayName()).compareTo(ChatColor.stripColor(is1.getItemMeta().getDisplayName())));
-                sortType = SortType.REVERSE_ALPHABETICALLY;
+                case REVERSE_ALPHABETICALLY:
+                    items.sort((ItemStack is1, ItemStack is2) -> ChatColor.stripColor(is2.getItemMeta().getDisplayName()).compareTo(ChatColor.stripColor(is1.getItemMeta().getDisplayName())));
+                    sortType = SortType.REVERSE_ALPHABETICALLY;
 
-            case RANK_HIGH_LOW:
-                if (gameInventory.getType() == GameInventory.Type.PUNISH_SEARCH)
-                    throw new IllegalArgumentException("Inventories of type " + gameInventory.getType().name() + " cannot be sorted by rank!");
-                items.sort((ItemStack is1, ItemStack is2) -> Rank.valueOf(ChatColor.stripColor(BattlegroundsCore.getLore(is1, 1)).replace("Rank: ", "").toUpperCase())
-                        .compareTo(Rank.valueOf(ChatColor.stripColor(BattlegroundsCore.getLore(is2, 1)).replace("Rank: ", "").toUpperCase())));
-                sortType = SortType.RANK_HIGH_LOW;
+                case RANK_HIGH_LOW:
+                    items.sort((ItemStack is1, ItemStack is2) -> Rank.valueOf(ChatColor.stripColor(BattlegroundsCore.getLore(is1, 1)).replace("Rank: ", "").toUpperCase())
+                            .compareTo(Rank.valueOf(ChatColor.stripColor(BattlegroundsCore.getLore(is2, 1)).replace("Rank: ", "").toUpperCase())));
+                    sortType = SortType.RANK_HIGH_LOW;
 
-            case RANK_LOW_HIGH:
-                if (gameInventory.getType() == GameInventory.Type.PUNISH_SEARCH)
-                    throw new IllegalArgumentException("Inventories of type " + gameInventory.getType().name() + " cannot be sorted by rank!");
-                items.sort((ItemStack is1, ItemStack is2) -> Rank.valueOf(ChatColor.stripColor(BattlegroundsCore.getLore(is2, 1)).replace("Rank: ", "").toUpperCase())
-                        .compareTo(Rank.valueOf(ChatColor.stripColor(BattlegroundsCore.getLore(is1, 1)).replace("Rank: ", "").toUpperCase())));
-                sortType = SortType.RANK_LOW_HIGH;
+                case RANK_LOW_HIGH:
+                    items.sort((ItemStack is1, ItemStack is2) -> Rank.valueOf(ChatColor.stripColor(BattlegroundsCore.getLore(is2, 1)).replace("Rank: ", "").toUpperCase())
+                            .compareTo(Rank.valueOf(ChatColor.stripColor(BattlegroundsCore.getLore(is1, 1)).replace("Rank: ", "").toUpperCase())));
+                    sortType = SortType.RANK_LOW_HIGH;
+            }
+        } else {
+            switch (type) {
+                case NEWEST:
+                    items.sort((ItemStack is1, ItemStack is2) -> LocalDateTime.parse(ChatColor.stripColor(is1.getItemMeta().getDisplayName()), DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a '(PST)'"))
+                            .isAfter(LocalDateTime.parse(ChatColor.stripColor(is2.getItemMeta().getDisplayName()), DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a '(PST)'"))) ? 1 : 0);
+                    sortType = SortType.NEWEST;
+
+                case OLDEST:
+                    items.sort((ItemStack is1, ItemStack is2) -> LocalDateTime.parse(ChatColor.stripColor(is1.getItemMeta().getDisplayName()), DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a '(PST)'"))
+                            .isBefore(LocalDateTime.parse(ChatColor.stripColor(is2.getItemMeta().getDisplayName()), DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a '(PST)'"))) ? 1 : 0);
+                    sortType = SortType.OLDEST;
+            }
         }
         return this;
     }
@@ -89,10 +99,10 @@ public class InventoryBuilder {
         if (gameInventory.getType() != GameInventory.Type.STANDARD) {
             if (number > maxPage || number < 0)
                 throw new IllegalArgumentException("Number must be <= maxPage and >= 0");
-            page = number;
-            int index = number * 36;
+            this.page = number;
+            int index = number * itemsPerPage;
             if (this.items.size() > 0) {
-                for (int i = 0; i < 36; i++) {
+                for (int i = gameInventory.getSlotOffset(); i < itemsPerPage; i++) {
                     if (index >= this.items.size()) {
                         inventory.setItem(i, null);
                     } else {
@@ -127,7 +137,7 @@ public class InventoryBuilder {
         for (ItemBuilder item : items)
             if (!StringUtils.containsIgnoreCase(ChatColor.stripColor(item.getItemMeta().getDisplayName()), search))
                 items.remove(item);
-        maxPage = (int) Math.ceil(items.size() / 36);
+        maxPage = (int) Math.ceil(items.size() / itemsPerPage);
         page(0);
         return this;
     }
@@ -140,7 +150,7 @@ public class InventoryBuilder {
             for (ItemBuilder item : items)
                 if (!plugin.getServer().getPlayer(ChatColor.stripColor(item.getItemMeta().getDisplayName())).isOnline())
                     items.remove(item);
-            maxPage = (int) Math.ceil(items.size() / 36);
+            maxPage = (int) Math.ceil(items.size() / itemsPerPage);
             sort(sortType);
         } else {
             items = gameInventory.getSortables();
@@ -172,8 +182,11 @@ public class InventoryBuilder {
     public enum SortType {
         ALPHABETICALLY("Alphabetically"),
         REVERSE_ALPHABETICALLY("Reverse Alphabetically"),
-        RANK_LOW_HIGH("Low to High"),
-        RANK_HIGH_LOW("High to Low");
+        RANK_LOW_HIGH("Rank: Low to High"),
+        RANK_HIGH_LOW("Rank: High to Low"),
+        NEWEST("Newest First"),
+        OLDEST("Oldest First");
+
 
         private String name;
     }

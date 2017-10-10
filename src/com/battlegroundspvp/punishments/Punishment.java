@@ -6,19 +6,19 @@ import lombok.Data;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import static com.battlegroundspvp.punishments.Punishment.Type.*;
 
 @Data
 @AllArgsConstructor
 public class Punishment {
+
     private final int id;
     private final Type type;
     private final LocalDateTime date;
     private final int duration;
     private final LocalDateTime expiration;
-    private final UUID enforcer;
+    private final int enforcerId;
     private final Reason reason;
     private boolean pardoned;
 
@@ -39,6 +39,20 @@ public class Punishment {
         }
 
         return null;
+    }
+
+    @Override
+    public int hashCode() {
+        int code = 0;
+        code += id;
+        code += date.hashCode();
+        code += duration;
+        code += enforcerId;
+        code += expiration.hashCode();
+        code += (pardoned ? 1 : 0);
+        code += reason.toString().hashCode();
+        code += type.toString().hashCode();
+        return code;
     }
 
     @AllArgsConstructor

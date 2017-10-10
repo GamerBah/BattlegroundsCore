@@ -36,7 +36,7 @@ public class CosmeticrateMenu {
 
     /*public void beginCrates(Player player) {
         usingCrates.add(player);
-        GameProfile playerData = plugin.getGameProfile(player.getUniqueId());
+        GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
         ScoreboardListener scoreboardListener = new ScoreboardListener(plugin);
         scoreboardListener.updateScoreboardCoins(player, -500);
         Inventory inventory = player.getOpenInventory().getTopInventory();
@@ -137,8 +137,8 @@ public class CosmeticrateMenu {
                     }
                 }
                 usingCrates.remove(player);
-                if (!playerData.getOwnedCosmetics().contains("," + finalCosmetic.getId() + ",")) {
-                    playerData.setOwnedCosmetics(playerData.getOwnedCosmetics() + finalCosmetic.getId() + ",");
+                if (!gameProfile.getOwnedCosmetics().contains("," + finalCosmetic.getId() + ",")) {
+                    gameProfile.setOwnedCosmetics(gameProfile.getOwnedCosmetics() + finalCosmetic.getId() + ",");
                     player.sendMessage(ChatColor.AQUA + "You unlocked the " + finalCosmetic.getRarity().getColor() + (finalCosmetic.getRarity() == Rarity.EPIC
                             || finalCosmetic.getRarity() == Rarity.LEGENDARY ? "" + ChatColor.BOLD : "") + finalCosmetic.getName() + ChatColor.AQUA
                             + (finalCosmetic.getGroup().equals(Cosmetic.PARTICLE_PACK) ? " Particle Pack!" : finalCosmetic.getGroup().equals(Cosmetic.KILL_EFFECT)
@@ -148,7 +148,7 @@ public class CosmeticrateMenu {
                     int gores = 0;
                     for (Cosmetic.Item item : Cosmetic.Item.values()) {
                         if (item.getId() < 1000) {
-                            if (playerData.getOwnedCosmetics().contains(item.getId() + ",")) {
+                            if (gameProfile.getOwnedCosmetics().contains(item.getId() + ",")) {
                                 if (item.getGroup().equals(Cosmetic.PARTICLE_PACK)) particles++;
                                 if (item.getGroup().equals(Cosmetic.KILL_SOUND)) warcries++;
                                 if (item.getGroup().equals(Cosmetic.KILL_EFFECT)) gores++;

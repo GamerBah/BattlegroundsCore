@@ -22,7 +22,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 
 public class PlayerJoin implements Listener {
 
@@ -36,35 +35,32 @@ public class PlayerJoin implements Listener {
     public void onLogin(AsyncPlayerPreLoginEvent event) {
         if (plugin.getGameProfile(event.getUniqueId()) == null) {
             BattlegroundsCore.createNewGameProfile(event.getName(), event.getUniqueId());
-            //plugin.getGlobalStats().addUniqueJoin();
+            plugin.getGlobalStats().setTotalUniqueJoins(plugin.getGlobalStats().getTotalUniqueJoins() + 1);
         }
 
-        ArrayList<Punishment> punishments = plugin.getPlayerPunishments().get(event.getUniqueId());
-        if (punishments != null) {
-            for (int i = 0; i < punishments.size(); i++) {
-                Punishment punishment = punishments.get(i);
-                if (punishment.getType().equals(Punishment.Type.BAN)) {
-                    if (!punishment.isPardoned()) {
-                        GameProfile gameProfile = plugin.getGameProfile(punishment.getEnforcer());
-                        event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, ChatColor.RED + "You were banned by " + ChatColor.GOLD + gameProfile.getPlayer().getName()
-                                + ChatColor.RED + " for " + ChatColor.GOLD + punishment.getReason().getName() + "\n" + ChatColor.AQUA
-                                + punishment.getDate().format(DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a '(CST)'")) + "\n\n" + ChatColor.YELLOW
-                                + punishment.getReason().getMessage() + "\n\n" + ChatColor.GRAY + "Appeal your ban on the forums: battlegroundspvp.com/forums");
-                        return;
-                    }
-                }
-                if (punishment.getType().equals(Punishment.Type.TEMP_BAN)) {
-                    if (!punishment.isPardoned()) {
-                        GameProfile gameProfile = plugin.getGameProfile(punishment.getEnforcer());
-                        event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, ChatColor.RED + "You were temporarily banned by " + ChatColor.GOLD + gameProfile.getPlayer().getName()
-                                + ChatColor.RED + " for " + ChatColor.GOLD + punishment.getReason().getName() + "\n" + ChatColor.AQUA
-                                + punishment.getDate().format(DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a '(CST)'")) + "\n\n"
-                                + ChatColor.GRAY + "Time Remaining in Ban: " + ChatColor.RED + Time.toString(Time.punishmentTimeRemaining(punishment.getExpiration()), true) + "\n" + ChatColor.YELLOW
-                                + punishment.getReason().getMessage() + "\n\n" + ChatColor.GRAY + "You can appeal your ban on the forums: battlegroundspvp.com/forums");
-                        return;
-                    }
-                }
+        GameProfile gameProfile = plugin.getGameProfile(event.getUniqueId());
+
+        for (Punishment punishment : gameProfile.getPunishmentData().getBans()) {
+            if (!punishment.isPardoned()) {
+                GameProfile enforcerProfile = plugin.getGameProfile(punishment.getEnforcerId());
+                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, ChatColor.RED + "You were banned by " + ChatColor.GOLD + enforcerProfile.getName()
+                        + ChatColor.RED + " for " + ChatColor.GOLD + punishment.getReason().getName() + "\n" + ChatColor.AQUA
+                        + punishment.getDate().minusHours(9).format(DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a '(PST)'")) + "\n\n" + ChatColor.YELLOW
+                        + punishment.getReason().getMessage() + "\n\n" + ChatColor.GRAY + "Appeal your ban on the forums: battlegroundspvp.com/forums");
+                return;
             }
+        }
+        for (Punishment punishment : gameProfile.getPunishmentData().getTempBans()) {
+            if (!punishment.isPardoned()) {
+                GameProfile enforcerProfile = plugin.getGameProfile(punishment.getEnforcerId());
+                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, ChatColor.RED + "You were temporarily banned by " + ChatColor.GOLD + enforcerProfile.getName()
+                        + ChatColor.RED + " for " + ChatColor.GOLD + punishment.getReason().getName() + "\n" + ChatColor.AQUA
+                        + punishment.getDate().minusHours(9).format(DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a '(PST)'")) + "\n\n"
+                        + ChatColor.GRAY + "Time Remaining in Ban: " + ChatColor.RED + Time.toString(Time.punishmentTimeRemaining(punishment.getExpiration()), true) + "\n" + ChatColor.YELLOW
+                        + punishment.getReason().getMessage() + "\n\n" + ChatColor.GRAY + "You can appeal your ban on the forums: battlegroundspvp.com/forums");
+                return;
+            }
+
         }
 
         if (plugin.getConfig().getBoolean("developmentMode")) {

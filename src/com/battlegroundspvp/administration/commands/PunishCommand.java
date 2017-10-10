@@ -48,15 +48,15 @@ public class PunishCommand implements CommandExecutor {
         }
 
         @SuppressWarnings("deprecation")
-        GameProfile targetData = plugin.getGameProfile(args[0]);
+        GameProfile targetProfile = plugin.getGameProfile(args[0]);
 
-        if (targetData == null) {
+        if (targetProfile == null) {
             player.sendMessage(ChatColor.RED + "That player has never joined before!");
             EventSound.playSound(player, EventSound.ACTION_FAIL);
             return true;
         }
 
-        OfflinePlayer target = plugin.getServer().getOfflinePlayer(targetData.getUuid());
+        OfflinePlayer target = plugin.getServer().getOfflinePlayer(targetProfile.getUuid());
         if (target == null) {
             player.sendMessage(ChatColor.RED + "That player isn't online!");
             EventSound.playSound(player, EventSound.ACTION_FAIL);
