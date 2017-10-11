@@ -1,23 +1,16 @@
 package com.battlegroundspvp.commands;
 
 import com.battlegroundspvp.BattlegroundsCore;
-import com.battlegroundspvp.punishments.Punishment;
+import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.utils.enums.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
-import com.battlegroundspvp.utils.enums.Time;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.util.ArrayList;
 
 public class ReplyCommand implements CommandExecutor {
     private BattlegroundsCore plugin;
@@ -33,22 +26,11 @@ public class ReplyCommand implements CommandExecutor {
         }
 
         Player player = (Player) sender;
+        GameProfile gameProfile = BattlegroundsCore.getInstance().getGameProfile(player.getUniqueId());
 
-        if (plugin.getPlayerPunishments().containsKey(player.getUniqueId())) {
-            ArrayList<Punishment> punishments = plugin.getPlayerPunishments().get(player.getUniqueId());
-            for (int i = 0; i < punishments.size(); i++) {
-                Punishment punishment = punishments.get(i);
-                if (!punishment.isPardoned()) {
-                    BaseComponent baseComponent = new TextComponent(ChatColor.RED + "You are muted! " + ChatColor.GRAY + "(Hover to view details)");
-                    baseComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GRAY + "Muted by: "
-                            + ChatColor.WHITE + plugin.getServer().getPlayer(punishment.getEnforcer()).getName() + "\n" + ChatColor.GRAY + "Reason: "
-                            + ChatColor.WHITE + punishment.getReason().getName() + "\n" + ChatColor.GRAY + "Time Remaining: " + ChatColor.WHITE +
-                            Time.toString(Time.punishmentTimeRemaining(punishment.getExpiration()), true)).create()));
-                    player.spigot().sendMessage(baseComponent);
-                    EventSound.playSound(player, EventSound.ACTION_FAIL);
-                    return true;
-                }
-            }
+        if (gameProfile.isMuted()) {
+            MessageCommand.sendErrorMessage(gameProfile);
+            return true;
         }
 
         if (!plugin.getMessagers().containsKey(player.getUniqueId())) {

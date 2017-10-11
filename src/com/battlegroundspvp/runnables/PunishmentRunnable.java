@@ -2,13 +2,12 @@ package com.battlegroundspvp.runnables;
 /* Created by GamerBah on 8/25/2016 */
 
 import com.battlegroundspvp.BattlegroundsCore;
+import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.punishments.Punishment;
 import com.battlegroundspvp.utils.enums.EventSound;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.entity.Player;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 
 public class PunishmentRunnable implements Runnable {
 
@@ -20,24 +19,19 @@ public class PunishmentRunnable implements Runnable {
 
     @Override
     public void run() {
-        for (Player player : plugin.getServer().getOnlinePlayers()) {
-            if (plugin.getPlayerPunishments().containsKey(player.getUniqueId())) {
-                ArrayList<Punishment> punishments = plugin.getPlayerPunishments().get(player.getUniqueId());
-                for (int i = 0; i < punishments.size(); i++) {
-                    LocalDateTime date = punishments.get(i).getDate();
-                    LocalDateTime expiration = punishments.get(i).getExpiration();
-                    Punishment.Type type = punishments.get(i).getType();
-                    if (!punishments.get(i).isPardoned()) {
-                        if (!punishments.get(i).getType().equals(Punishment.Type.BAN)) {
-                            if (expiration.isBefore(LocalDateTime.now())) {
-                                //BattlegroundsCore.getSql().executeUpdate(Query.UPDATE_PUNISHMENT_PARDONED, true, player.getUniqueId().toString(), type.toString(), date.toString());
-                                punishments.get(i).setPardoned(true);
-                                if (type.equals(Punishment.Type.MUTE)) {
-                                    player.sendMessage(ChatColor.RED + " \nYou are now able to chat again");
-                                    player.sendMessage(ChatColor.GRAY + punishments.get(i).getReason().getMessage() + "\n ");
-                                }
-                                EventSound.playSound(player, EventSound.ACTION_SUCCESS);
+        for (GameProfile gameProfile : BattlegroundsCore.getGameProfiles()) {
+            for (Punishment punishment : gameProfile.getPunishmentData().getPunishments()) {
+                if (!punishment.isPardoned()) {
+                    LocalDateTime expiration = punishment.getExpiration();
+                    Punishment.Type type = punishment.getType();
+                    if (!punishment.getType().equals(Punishment.Type.BAN)) {
+                        if (expiration.isBefore(LocalDateTime.now())) {
+                            punishment.setPardoned(true);
+                            if (type.equals(Punishment.Type.MUTE)) {
+                                gameProfile.sendMessage(ChatColor.RED + " \nYou are now able to chat again");
+                                gameProfile.sendMessage(ChatColor.GRAY + punishment.getReason().getMessage() + "\n ");
                             }
+                            EventSound.playSound(gameProfile.getPlayer(), EventSound.ACTION_SUCCESS);
                         }
                     }
                 }

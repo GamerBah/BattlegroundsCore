@@ -27,8 +27,8 @@ public class ReportMenu extends GameInventory {
     @Getter private String message;
     @Getter private List<ItemBuilder> selected;
 
-    public ReportMenu(Player player, GameProfile targetData) {
-        super("Reporting: " + targetData.getName(), null /*TODO: PLAYER OPTIONS MENU*/);
+    public ReportMenu(Player player, GameProfile targetProfile) {
+        super("Reporting: " + targetProfile.getName(), null /*TODO: PLAYER OPTIONS MENU*/);
 
         ItemBuilder killAura = new ItemBuilder(Material.BOOK).name(ChatColor.RED + "Kill Aura / Forcefield")
                 .lore(ChatColor.AQUA + "Click to add to your report!").lore(" ")
@@ -85,11 +85,11 @@ public class ReportMenu extends GameInventory {
 
         ItemBuilder wool = new ItemBuilder(Material.WOOL)
                 .name(ChatColor.GREEN + "" + ChatColor.BOLD + "ACCEPT & SEND")
-                .lore(ChatColor.GRAY + "Reporting: " + ChatColor.YELLOW + targetData.getName())
+                .lore(ChatColor.GRAY + "Reporting: " + ChatColor.YELLOW + targetProfile.getName())
                 .durability(5);
 
         if (message != null) {
-            //wool.lore(ChatColor.GRAY + "For: " + ChatColor.GOLD + message).clickEvent(new ClickEvent(ClickEvent.ClickType.ANY, new Action(player, this.getClass(), "report", player, targetData, getMessage())));
+            //wool.lore(ChatColor.GRAY + "For: " + ChatColor.GOLD + message).clickEvent(new ClickEvent(ClickEvent.ClickType.ANY, new Action(player, this.getClass(), "report", player, targetProfile, getMessage())));
         } else {
            // wool.lore(ChatColor.GRAY + "For: " + ChatColor.RED + "Nothing here yet! Click the books").lore(ChatColor.RED + "        to add reasons to your report!");
         }
@@ -147,18 +147,18 @@ public class ReportMenu extends GameInventory {
     public void setWool(Inventory inventory, Player target, String message) {
     }
 
-    public void report(Player player, GameProfile targetData, String message) {
+    public void report(Player player, GameProfile targetProfile, String message) {
         player.sendMessage(ChatColor.GREEN + "You have successfully reported "
-                + ChatColor.DARK_AQUA + targetData.getName() + ChatColor.GREEN + "!");
+                + ChatColor.DARK_AQUA + targetProfile.getName() + ChatColor.GREEN + "!");
 
         plugin.getServer().getOnlinePlayers().stream().filter(staff -> plugin.getGameProfile(staff.getUniqueId())
                 .hasRank(Rank.HELPER)).forEach(staff -> staff.sendMessage(ChatColor.RED + player.getName()
-                + " has reported " + ChatColor.BOLD + targetData.getName() + ChatColor.RED + " for: " + message + "!"));
+                + " has reported " + ChatColor.BOLD + targetProfile.getName() + ChatColor.RED + " for: " + message + "!"));
 
         plugin.getServer().getOnlinePlayers().stream().filter(staff -> plugin.getGameProfile(staff.getUniqueId())
                 .hasRank(Rank.HELPER)).forEach(staff -> staff.playSound(staff.getLocation(), Sound.BLOCK_NOTE_HARP, 2, 2));
 
-        plugin.slackReports.call(new SlackMessage(">>>*" + player.getName() + "* _has reported_ *" + targetData.getName() + "* _for:_ " + message));
+        plugin.slackReports.call(new SlackMessage(">>>*" + player.getName() + "* _has reported_ *" + targetProfile.getName() + "* _for:_ " + message));
 
         player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 1);
 

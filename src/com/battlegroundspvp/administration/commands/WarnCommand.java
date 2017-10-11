@@ -54,46 +54,46 @@ public class WarnCommand implements CommandExecutor {
 
         if (args.length == 1) {
             @SuppressWarnings("deprecation")
-            GameProfile targetData = plugin.getGameProfile(args[0]);
+            GameProfile targetProfile = plugin.getGameProfile(args[0]);
 
-            if (targetData == null) {
+            if (targetProfile == null) {
                 player.sendMessage(ChatColor.RED + "That player has never joined before!");
                 EventSound.playSound(player, EventSound.ACTION_FAIL);
                 return true;
             }
 
-            if (targetData.getName().equals(gameProfile.getName())) {
+            if (targetProfile.getName().equals(gameProfile.getName())) {
                 player.sendMessage(ChatColor.RED + "You aren't able to warn yourself!");
                 EventSound.playSound(player, EventSound.ACTION_FAIL);
                 return true;
             }
 
-            OfflinePlayer target = plugin.getServer().getOfflinePlayer(targetData.getUuid());
+            OfflinePlayer target = plugin.getServer().getOfflinePlayer(targetProfile.getUuid());
             WarnMenu warnMenu = new WarnMenu(plugin);
             //warnMenu.openInventory(player, target, null);
         }
 
         if (args.length == 2) {
-            GameProfile targetData = plugin.getGameProfile(args[0]);
+            GameProfile targetProfile = plugin.getGameProfile(args[0]);
 
-            if (targetData == null) {
+            if (targetProfile == null) {
                 player.sendMessage(ChatColor.RED + "That player has never joined before!");
                 EventSound.playSound(player, EventSound.ACTION_FAIL);
                 return true;
             }
 
-            if (targetData.getName().equals(gameProfile.getName())) {
+            if (targetProfile.getName().equals(gameProfile.getName())) {
                 player.sendMessage(ChatColor.RED + "You can't clear your own warnings!");
                 EventSound.playSound(player, EventSound.ACTION_FAIL);
                 return true;
             }
 
-            if (warned.containsKey(targetData.getUuid())) {
+            if (warned.containsKey(targetProfile.getUuid())) {
                 plugin.getServer().getOnlinePlayers().stream().filter(players ->
                         plugin.getGameProfile(players.getUniqueId()).hasRank(Rank.HELPER))
                         .forEach(players -> players.sendMessage(ChatColor.GRAY + player.getName() + ChatColor.RED + " cleared "
-                                + ChatColor.GOLD + targetData.getName() + "'s (" + warned.get(targetData.getUuid()) + ")" + ChatColor.RED + " warnings"));
-                warned.remove(targetData.getUuid());
+                                + ChatColor.GOLD + targetProfile.getName() + "'s (" + warned.get(targetProfile.getUuid()) + ")" + ChatColor.RED + " warnings"));
+                warned.remove(targetProfile.getUuid());
                 return true;
             } else {
                 player.sendMessage(ChatColor.RED + "That player doesn't have any warnings!");

@@ -4,7 +4,6 @@ package com.battlegroundspvp.utils;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
-import com.battlegroundspvp.punishments.Punishment;
 import com.battlegroundspvp.utils.enums.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
 import net.md_5.bungee.api.ChatColor;
@@ -103,7 +102,7 @@ public class ChatFilter implements Listener {
                 attempts.put(player, attempts.get(player) + 1);
                 if (attempts.get(player) == 10) {
                     attempts.remove(player);
-                    plugin.warnPlayer(null, gameProfile, Punishment.Reason.ATTEMPT_SWEARING);
+                    //plugin.warnPlayer(null, gameProfile, Punishment.Reason.ATTEMPT_SWEARING);
                 }
             }
         }

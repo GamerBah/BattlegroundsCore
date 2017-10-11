@@ -23,26 +23,26 @@ public class FriendUtils {
 
     public void addFriend(Player sender, Player target) {
         GameProfile gameProfile = plugin.getGameProfile(sender.getUniqueId());
-        GameProfile targetData = plugin.getGameProfile(target.getUniqueId());
+        GameProfile targetProfile = plugin.getGameProfile(target.getUniqueId());
         if (gameProfile.getFriends() == null) {
-            gameProfile.setFriends(targetData.getUuid() + ",");
+            gameProfile.setFriends(targetProfile.getUuid() + ",");
         } else {
-            gameProfile.setFriends(gameProfile.getFriends() + targetData.getUuid() + ",");
+            gameProfile.setFriends(gameProfile.getFriends() + targetProfile.getUuid() + ",");
         }
-        if (targetData.getFriends() == null) {
-            targetData.setFriends(gameProfile.getUuid() + ",");
+        if (targetProfile.getFriends() == null) {
+            targetProfile.setFriends(gameProfile.getUuid() + ",");
         } else {
-            targetData.setFriends(targetData.getFriends() + gameProfile.getUuid() + ",");
+            targetProfile.setFriends(targetProfile.getFriends() + gameProfile.getUuid() + ",");
         }
         removePendingRequest(target, true);
     }
 
     public void deleteFriend(Player player, Player target) {
         GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
-        GameProfile targetData = plugin.getGameProfile(target.getUniqueId());
-        if (gameProfile.getFriends().contains(targetData.getUuid() + ",")) {
-            gameProfile.setFriends(gameProfile.getFriends().replace(targetData.getName() + ",", ""));
-            targetData.setFriends(targetData.getFriends().replace(gameProfile.getName() + ",", ""));
+        GameProfile targetProfile = plugin.getGameProfile(target.getUniqueId());
+        if (gameProfile.getFriends().contains(targetProfile.getUuid() + ",")) {
+            gameProfile.setFriends(gameProfile.getFriends().replace(targetProfile.getName() + ",", ""));
+            targetProfile.setFriends(targetProfile.getFriends().replace(gameProfile.getName() + ",", ""));
         }
     }
 
@@ -55,11 +55,11 @@ public class FriendUtils {
 
     public boolean areFriends(Player player, Player target) {
         GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
-        GameProfile targetData = plugin.getGameProfile(target.getUniqueId());
+        GameProfile targetProfile = plugin.getGameProfile(target.getUniqueId());
         if (gameProfile.getFriends() == null) {
             return false;
         }
-        return gameProfile.getFriends().contains(targetData.getUuid() + ",");
+        return gameProfile.getFriends().contains(targetProfile.getUuid() + ",");
     }
 
     public void removePendingRequest(Player target, boolean accepted) {

@@ -5,32 +5,37 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 @Entity
 @Table(name = "Punishments", schema = "mc2162")
 public class PunishmentsEntity {
 
-    @ManyToOne
-    @JoinColumn(name = "id", insertable = false, updatable = false)
-    private GameProfilesEntity gameProfile;
-
     @Id
-    @Column
-    private int id;
-    @Column(insertable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(insertable = false, updatable = false)
+    private int punishmentId;
     private LocalDateTime date;
-    @Column(insertable = false)
     private int duration;
-    @Column(insertable = false)
-    private UUID enforcer;
-    @Column(insertable = false)
+    private int enforcerId;
     private LocalDateTime expiration;
-    @Column(insertable = false)
     private boolean pardoned;
-    @Column(insertable = false)
     private String reason;
-    @Column(insertable = false)
     private String type;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id", nullable = false)
+    private GameProfilesEntity gameProfilesEntity;
+
+    public int hashCode() {
+        int code = 0;
+        code += punishmentId;
+        code += date.hashCode();
+        code += duration;
+        code += enforcerId;
+        code += expiration.hashCode();
+        code += (pardoned ? 1 : 0);
+        code += reason.hashCode();
+        code += type.hashCode();
+        return code;
+    }
 }

@@ -87,14 +87,15 @@ public class UpdateRunnable implements Runnable {
                         + "Update was a " + new ColorBuilder(ChatColor.GREEN).bold().create() + "success" + ChatColor.GRAY + "! Now go have fun!");
             } catch (Throwable throwable) {
                 plugin.getLogger().severe("Error during pre-update, sticking with the current version");
-                plugin.getLogger().severe(throwable.getCause().toString());
+                plugin.getLogger().severe(throwable.getMessage());
                 plugin.getServer().broadcastMessage(new ColorBuilder(ChatColor.RED).bold().create() + "SERVER: " + ChatColor.GRAY
-                        + "Stuck to current version due to issues with the update.");
+                        + "Stuck with current version due to issues with the update.");
                 deleteUpdateFile();
             } finally {
                 for (Player player : plugin.getServer().getOnlinePlayers()) {
                     EventSound.playSound(player, EventSound.ACTION_SUCCESS);
                     player.setWalkSpeed(0.2F);
+                    player.spigot().respawn();
                 }
                 updating = false;
             }

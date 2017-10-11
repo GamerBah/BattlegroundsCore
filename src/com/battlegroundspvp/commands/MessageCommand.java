@@ -1,7 +1,7 @@
 package com.battlegroundspvp.commands;
 
 import com.battlegroundspvp.BattlegroundsCore;
-import com.battlegroundspvp.punishments.Punishment;
+import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.utils.enums.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
 import com.battlegroundspvp.utils.enums.Time;
@@ -17,8 +17,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-
 public class MessageCommand implements CommandExecutor {
     private BattlegroundsCore plugin;
 
@@ -33,22 +31,11 @@ public class MessageCommand implements CommandExecutor {
         }
 
         Player player = (Player) sender;
+        GameProfile gameProfile = BattlegroundsCore.getInstance().getGameProfile(player.getUniqueId());
 
-        if (plugin.getPlayerPunishments().containsKey(player.getUniqueId())) {
-            ArrayList<Punishment> punishments = plugin.getPlayerPunishments().get(player.getUniqueId());
-            for (int i = 0; i < punishments.size(); i++) {
-                Punishment punishment = punishments.get(i);
-                if (!punishment.isPardoned()) {
-                    BaseComponent baseComponent = new TextComponent(ChatColor.RED + "You are muted! " + ChatColor.GRAY + "(Hover to view details)");
-                    baseComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GRAY + "Muted by: "
-                            + ChatColor.WHITE + plugin.getServer().getPlayer(punishment.getEnforcer()).getName() + "\n" + ChatColor.GRAY + "Reason: "
-                            + ChatColor.WHITE + punishment.getReason().getName() + "\n" + ChatColor.GRAY + "Time Remaining: " + ChatColor.WHITE +
-                            Time.toString(Time.punishmentTimeRemaining(punishment.getExpiration()), true)).create()));
-                    player.spigot().sendMessage(baseComponent);
-                    EventSound.playSound(player, EventSound.ACTION_FAIL);
-                    return true;
-                }
-            }
+        if (gameProfile.isMuted()) {
+            MessageCommand.sendErrorMessage(gameProfile);
+            return true;
         }
 
         if (args.length <= 1) {
@@ -87,5 +74,15 @@ public class MessageCommand implements CommandExecutor {
         target.playSound(target.getLocation(), Sound.BLOCK_NOTE_HARP, 2, 2);
 
         return true;
+    }
+
+    public static void sendErrorMessage(GameProfile gameProfile) {
+        BaseComponent baseComponent = new TextComponent(ChatColor.RED + "You are muted! " + ChatColor.GRAY + "(Hover to view details)");
+        baseComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GRAY + "Muted by: "
+                + ChatColor.WHITE + BattlegroundsCore.getInstance() + "\n" + ChatColor.GRAY + "Reason: "
+                + ChatColor.WHITE + gameProfile.getCurrentMute().getReason().getName() + "\n" + ChatColor.GRAY + "Time Remaining: " + ChatColor.WHITE +
+                Time.toString(Time.punishmentTimeRemaining(gameProfile.getCurrentMute().getExpiration()), true)).create()));
+        gameProfile.getPlayer().spigot().sendMessage(baseComponent);
+        EventSound.playSound(gameProfile.getPlayer(), EventSound.ACTION_FAIL);
     }
 }

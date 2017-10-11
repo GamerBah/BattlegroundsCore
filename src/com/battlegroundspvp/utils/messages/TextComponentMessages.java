@@ -78,39 +78,39 @@ public class TextComponentMessages {
     }
 
     /*public BaseComponent[] playerStats(Player player) {
-        GameProfile playerData = plugin.getGameProfile(player.getUniqueId());
+        GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
         KDRatio kdRatio = new KDRatio(plugin);
         ChatColor ratioColor = kdRatio.getRatioColor(player);
-        double ratio = ((double) playerData.getKitPvpData().getKills() / (double) playerData.getKitPvpData().getDeaths());
+        double ratio = ((double) gameProfile.getKitPvpData().getKills() / (double) gameProfile.getKitPvpData().getDeaths());
         ratio = Math.round(ratio * 100.00D) / 100.00D;
-        if (playerData.getKitPvpData().getDeaths() == 0) {
-            ratio = playerData.getKitPvpData().getKills();
+        if (gameProfile.getKitPvpData().getDeaths() == 0) {
+            ratio = gameProfile.getKitPvpData().getKills();
         }
 
         return new ComponentBuilder(
-                playerData.getRank().getColor() + "" + (playerData.hasRank(Rank.WARRIOR) ? ChatColor.BOLD + playerData.getRank().getName().toUpperCase() + " " : "")
-                        + (playerData.hasRank(Rank.WARRIOR) ? ChatColor.WHITE : ChatColor.GRAY) + playerData.getName() + "\n\n"
-                        + ChatColor.GRAY + "Kills: " + ChatColor.GREEN + playerData.getKitPvpData().getKills() + "\n"
-                        + ChatColor.GRAY + "Deaths: " + ChatColor.RED + playerData.getKitPvpData().getDeaths() + "\n"
+                gameProfile.getRank().getColor() + "" + (gameProfile.hasRank(Rank.WARRIOR) ? ChatColor.BOLD + gameProfile.getRank().getName().toUpperCase() + " " : "")
+                        + (gameProfile.hasRank(Rank.WARRIOR) ? ChatColor.WHITE : ChatColor.GRAY) + gameProfile.getName() + "\n\n"
+                        + ChatColor.GRAY + "Kills: " + ChatColor.GREEN + gameProfile.getKitPvpData().getKills() + "\n"
+                        + ChatColor.GRAY + "Deaths: " + ChatColor.RED + gameProfile.getKitPvpData().getDeaths() + "\n"
                         + ChatColor.GRAY + "K/D Ratio: " + ratioColor + ratio
                         + "\n\n" + ChatColor.YELLOW + "Click to open player options....").create();
     }
 
     public BaseComponent[] playerStats(OfflinePlayer player) {
-        GameProfile playerData = plugin.getGameProfile(player.getUniqueId());
+        GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
         KDRatio kdRatio = new KDRatio(plugin);
         ChatColor ratioColor = kdRatio.getRatioColor(player);
-        double ratio = ((double) playerData.getKitPvpData().getKills() / (double) playerData.getKitPvpData().getDeaths());
+        double ratio = ((double) gameProfile.getKitPvpData().getKills() / (double) gameProfile.getKitPvpData().getDeaths());
         ratio = Math.round(ratio * 100.00D) / 100.00D;
-        if (playerData.getKitPvpData().getDeaths() == 0) {
-            ratio = playerData.getKitPvpData().getKills();
+        if (gameProfile.getKitPvpData().getDeaths() == 0) {
+            ratio = gameProfile.getKitPvpData().getKills();
         }
         return new ComponentBuilder(
-                playerData.getRank().getColor() + "" + (playerData.hasRank(Rank.WARRIOR) ? ChatColor.BOLD + playerData.getRank().getName().toUpperCase() + " " : "")
-                        + (playerData.hasRank(Rank.WARRIOR) ? ChatColor.WHITE : ChatColor.GRAY) + playerData.getName() + "\n"
-                        + ChatColor.GRAY + "Was last online " + Time.toString(Time.timeDifference(playerData.getLastOnline()), true) + " ago\n\n"
-                        + ChatColor.GRAY + "Kills: " + ChatColor.GREEN + playerData.getKitPvpData().getKills() + "\n"
-                        + ChatColor.GRAY + "Deaths: " + ChatColor.RED + playerData.getKitPvpData().getDeaths() + "\n"
+                gameProfile.getRank().getColor() + "" + (gameProfile.hasRank(Rank.WARRIOR) ? ChatColor.BOLD + gameProfile.getRank().getName().toUpperCase() + " " : "")
+                        + (gameProfile.hasRank(Rank.WARRIOR) ? ChatColor.WHITE : ChatColor.GRAY) + gameProfile.getName() + "\n"
+                        + ChatColor.GRAY + "Was last online " + Time.toString(Time.timeDifference(gameProfile.getLastOnline()), true) + " ago\n\n"
+                        + ChatColor.GRAY + "Kills: " + ChatColor.GREEN + gameProfile.getKitPvpData().getKills() + "\n"
+                        + ChatColor.GRAY + "Deaths: " + ChatColor.RED + gameProfile.getKitPvpData().getDeaths() + "\n"
                         + ChatColor.GRAY + "K/D Ratio: " + ratioColor + ratio).create();
     }*/
 

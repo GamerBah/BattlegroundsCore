@@ -3,25 +3,19 @@ package com.battlegroundspvp;
 
 import com.battlegroundspvp.administration.commands.*;
 import com.battlegroundspvp.administration.data.GameProfile;
-import com.battlegroundspvp.administration.data.Rank;
-import com.battlegroundspvp.administration.data.sql.EssencesEntity;
-import com.battlegroundspvp.administration.data.sql.GameProfilesEntity;
-import com.battlegroundspvp.administration.data.sql.KitPvpDataEntity;
-import com.battlegroundspvp.administration.data.sql.SettingsEntity;
+import com.battlegroundspvp.administration.data.sql.*;
 import com.battlegroundspvp.commands.FriendCommand;
 import com.battlegroundspvp.commands.PingCommand;
 import com.battlegroundspvp.listeners.InventoryClickListener;
 import com.battlegroundspvp.listeners.ServerListPingListener;
 import com.battlegroundspvp.listeners.WeatherChangeListener;
 import com.battlegroundspvp.playerevents.*;
-import com.battlegroundspvp.punishments.Punishment;
 import com.battlegroundspvp.punishments.commands.*;
 import com.battlegroundspvp.runnables.*;
 import com.battlegroundspvp.utils.ChatFilter;
 import com.battlegroundspvp.utils.enums.Advancements;
 import com.battlegroundspvp.utils.enums.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
-import com.battlegroundspvp.utils.enums.Time;
 import com.battlegroundspvp.utils.inventories.InventoryBuilder;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -36,7 +30,6 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.block.Sign;
 import org.bukkit.boss.BarColor;
@@ -64,8 +57,6 @@ public class BattlegroundsCore extends JavaPlugin {
 
     @Getter
     public static Map<Player, Player> pendingFriends = new HashMap<>();
-    @Getter
-    public static HashMap<Player, HashMap<Punishment.Reason, Integer>> punishmentCreation = new HashMap<>();
 
     @Getter
     private static BattlegroundsCore instance = null;
@@ -83,10 +74,8 @@ public class BattlegroundsCore extends JavaPlugin {
     @Getter
     private static List<GameProfile> gameProfiles = new ArrayList<>();
 
-    //@Getter private GlobalStats globalStats = null;
-
     @Getter
-    private HashMap<UUID, ArrayList<Punishment>> playerPunishments = new HashMap<>();
+    private GlobalStatsEntity globalStats = null;
 
     @Getter
     private Map<UUID, UUID> messagers = new HashMap<>();
@@ -135,7 +124,6 @@ public class BattlegroundsCore extends JavaPlugin {
             if (player != null) {
                 TTA_Methods.createBossBar(player, "", 0.0, BarStyle.SOLID, BarColor.WHITE, BarFlag.CREATE_FOG, false);
                 TTA_Methods.removeBossBar(player);
-                //GameProfile gameProfile = getGameProfile(player.getUniqueId());
                 respawn(player);
                 TTA_Methods.sendTitle(player, null, 0, 0, 0, null, 0, 0, 0);
             }
@@ -196,11 +184,14 @@ public class BattlegroundsCore extends JavaPlugin {
         slackErrorReporting = new SlackApi("https://hooks.slack.com/services/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");
 
         setUpPacketHandlers();
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        this.globalStats = session.createQuery("from GlobalStatsEntity where id = 1", GlobalStatsEntity.class).getSingleResult();
+        session.getTransaction().commit();
+        session.close();
     }
 
     public void onDisable() {
-        for (Advancements advancements : Advancements.values())
-            advancements.getCustomAdvancement().getApi().remove();
         uLaunchers.add(0, new Location(getServer().getWorlds().get(0), 3.1415, 3.1415, 3.1415));
         fLaunchers.add(0, new Location(getServer().getWorlds().get(0), 3.1415, 3.1415, 3.1415));
         getConfig().set("launchersUp", uLaunchers);
@@ -241,16 +232,14 @@ public class BattlegroundsCore extends JavaPlugin {
                                     EventSound.playSound(player, EventSound.INVENTORY_OPEN_MENU);
                                     Location loc = new Location(player.getWorld(), 0, 0, 0);
                                     Sign sign = (Sign) loc.getBlock().getState();
-                                    sign.setLine(1, "§e§l^ ^ ^");
-                                    sign.setLine(2, "§cEnter your search");
-                                    sign.setLine(3, "§cterm here!");
+                                    sign.setLine(1, "§f§l^ ^ ^");
+                                    sign.setLine(2, "§bEnter your search");
+                                    sign.setLine(3, "§bterm here!");
                                     sign.update();
                                 }
                             }
                         }
                     }).syncStart();
-        for (Advancements advancement : Advancements.values())
-            advancement.getCustomAdvancement().register();
     }
 
     private void registerCommands() {
@@ -346,6 +335,31 @@ public class BattlegroundsCore extends JavaPlugin {
         }
     }
 
+    public GameProfile getGameProfile(int id) {
+        Optional<GameProfile> playerDataStream = gameProfiles.stream().filter(gameProfile ->
+                gameProfile.getId() == id).findFirst();
+
+        if (playerDataStream.isPresent()) {
+            return playerDataStream.get();
+        } else {
+            GameProfilesEntity dbGameProfile = null;
+            Session session = sessionFactory.openSession();
+            session.beginTransaction();
+            if (!session.createQuery("from GameProfilesEntity where id = :id", GameProfilesEntity.class)
+                    .setParameter("id", id).getResultList().isEmpty())
+                dbGameProfile = session.createQuery("from GameProfilesEntity where id = :id", GameProfilesEntity.class)
+                        .setParameter("id", id).getSingleResult();
+            session.getTransaction().commit();
+            session.close();
+            if (dbGameProfile != null) {
+                gameProfiles.add(new GameProfile(dbGameProfile));
+                return getGameProfile(id);
+            } else {
+                return null;
+            }
+        }
+    }
+
     private void reloadGameProfiles() {
         Session session = sessionFactory.openSession();
         session.beginTransaction();
@@ -410,18 +424,18 @@ public class BattlegroundsCore extends JavaPlugin {
         return player.getAdvancementProgress(advancement).getRemainingCriteria().size() <= 0;
     }
 
-    public void warnPlayer(Player player, GameProfile targetData, Punishment.Reason reason) {
-        if (!WarnCommand.getWarned().containsKey(targetData.getUuid())) {
-            WarnCommand.getWarned().put(targetData.getUuid(), 1);
+    /*public void warnPlayer(Player player, GameProfile targetProfile, Punishment.Reason reason) {
+        if (!WarnCommand.getWarned().containsKey(targetProfile.getUuid())) {
+            WarnCommand.getWarned().put(targetProfile.getUuid(), 1);
         } else {
-            WarnCommand.getWarned().put(targetData.getUuid(), WarnCommand.getWarned().get(targetData.getUuid()) + 1);
+            WarnCommand.getWarned().put(targetProfile.getUuid(), WarnCommand.getWarned().get(targetProfile.getUuid()) + 1);
         }
-        int warns = WarnCommand.getWarned().get(targetData.getUuid());
-        if (WarnCommand.getWarned().get(targetData.getUuid()) == 5) {
+        int warns = WarnCommand.getWarned().get(targetProfile.getUuid());
+        if (WarnCommand.getWarned().get(targetProfile.getUuid()) == 5) {
             getServer().getOnlinePlayers().stream().filter(players ->
                     getGameProfile(players.getUniqueId()).hasRank(Rank.HELPER))
                     .forEach(players -> players.sendMessage(
-                            new ColorBuilder(ChatColor.DARK_RED).bold().create() + " [ARES] " + ChatColor.GOLD + targetData.getName() + new ColorBuilder(ChatColor.DARK_RED).bold().create() + " (5)"
+                            new ColorBuilder(ChatColor.DARK_RED).bold().create() + " [ARES] " + ChatColor.GOLD + targetProfile.getName() + new ColorBuilder(ChatColor.DARK_RED).bold().create() + " (5)"
                                     + ChatColor.RED + "was " + (reason.getType().equals(Punishment.Type.MUTE) || reason.getType().equals(Punishment.Type.ALL) ? "muted" : "kicked")
                                     + " for " + ChatColor.GRAY + reason.getName() + (reason.getType().equals(Punishment.Type.MUTE)
                                     || reason.getType().equals(Punishment.Type.ALL) ? " for " + ChatColor.GRAY + Time.toString(reason.getLength() * 1000, true) : "")));
@@ -435,22 +449,22 @@ public class BattlegroundsCore extends JavaPlugin {
             if (reason.getType().equals(Punishment.Type.MUTE) || reason.getType().equals(Punishment.Type.ALL)) {
                 HashMap<Punishment.Reason, Integer> punishment = new HashMap<>();
                 punishment.put(reason, reason.getLength());
-                MuteCommand.mutePlayer(targetData.getUuid(), player, punishment);
+                targetProfile.mute(reason, player, punishment);
             } else {
                 HashMap<Punishment.Reason, Integer> punishment = new HashMap<>();
                 punishment.put(reason, -1);
-                KickCommand.kickPlayer(targetData.getUuid(), player, punishment);
+                KickCommand.kickPlayer(targetProfile.getUuid(), player, punishment);
             }
             return;
         }
-        if (WarnCommand.getWarned().get(targetData.getUuid()) >= 3) {
+        if (WarnCommand.getWarned().get(targetProfile.getUuid()) >= 3) {
             getServer().getOnlinePlayers().stream().filter(players ->
                     getGameProfile(players.getUniqueId()).hasRank(Rank.HELPER))
                     .forEach(players -> players.sendMessage(player != null ?
                             new ColorBuilder(ChatColor.DARK_RED).bold().create() + " !!! " + ChatColor.GRAY + player.getName() + ChatColor.RED + " warned "
-                                    + ChatColor.GOLD + targetData.getName() + " (" + warns + ")" + ChatColor.RED + " for " + ChatColor.GRAY + reason.getName()
+                                    + ChatColor.GOLD + targetProfile.getName() + " (" + warns + ")" + ChatColor.RED + " for " + ChatColor.GRAY + reason.getName()
                             : new ColorBuilder(ChatColor.DARK_RED).bold().create() + " !!! " + new ColorBuilder(ChatColor.AQUA).bold().create() + "Ares" + ChatColor.GRAY + ": " + ChatColor.RED + "ItemBuilder automatically warned "
-                            + ChatColor.GOLD + targetData.getName() + " (" + warns + ")" + ChatColor.RED + " for you " + ChatColor.GRAY + "(" + reason.getName() + ")"));
+                            + ChatColor.GOLD + targetProfile.getName() + " (" + warns + ")" + ChatColor.RED + " for you " + ChatColor.GRAY + "(" + reason.getName() + ")"));
             getServer().getOnlinePlayers().stream().filter(players ->
                     getGameProfile(players.getUniqueId()).hasRank(Rank.HELPER))
                     .forEach(players -> players.playSound(players.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 1));
@@ -466,13 +480,13 @@ public class BattlegroundsCore extends JavaPlugin {
                 getGameProfile(players.getUniqueId()).hasRank(Rank.HELPER))
                 .forEach(players -> players.sendMessage(player != null ?
                         ChatColor.GRAY + player.getName() + ChatColor.RED + " warned "
-                                + ChatColor.GOLD + targetData.getName() + " (" + warns + ")" + ChatColor.RED + " for " + ChatColor.GRAY + reason.getName()
+                                + ChatColor.GOLD + targetProfile.getName() + " (" + warns + ")" + ChatColor.RED + " for " + ChatColor.GRAY + reason.getName()
                         : new ColorBuilder(ChatColor.AQUA).bold().create() + "Ares" + ChatColor.GRAY + ": " + ChatColor.RED + "ItemBuilder automatically warned "
-                        + ChatColor.GOLD + targetData.getName() + " (" + warns + ")" + ChatColor.RED + " for you " + ChatColor.GRAY + "(" + reason.getName() + ")"));
+                        + ChatColor.GOLD + targetProfile.getName() + " (" + warns + ")" + ChatColor.RED + " for you " + ChatColor.GRAY + "(" + reason.getName() + ")"));
         getServer().getOnlinePlayers().stream().filter(players ->
                 getGameProfile(players.getUniqueId()).hasRank(Rank.HELPER))
                 .forEach(players -> players.playSound(players.getLocation(), Sound.BLOCK_LEVER_CLICK, 1, 1));
-    }
+    }*/
 
     // Respawn at location
     public void respawn(Player player, Location location) {
@@ -502,54 +516,6 @@ public class BattlegroundsCore extends JavaPlugin {
 
     public static String getLore(ItemStack itemStack, int line) {
         return itemStack.getItemMeta().getLore().get(line - 1);
-    }
-
-    public ArrayList<Punishment> getMutes(GameProfile targetData) {
-        ArrayList<Punishment> mutes = new ArrayList<>();
-        if (this.getPlayerPunishments().get(targetData.getUuid()) != null) {
-            for (int i = 0; i < this.getPlayerPunishments().get(targetData.getUuid()).size(); i++)
-                if (this.getPlayerPunishments().get(targetData.getUuid()).get(i).getType().equals(Punishment.Type.MUTE))
-                    mutes.add(this.getPlayerPunishments().get(targetData.getUuid()).get(i));
-            if (mutes.isEmpty())
-                return null;
-        } else return null;
-        return mutes;
-    }
-
-    public ArrayList<Punishment> getKicks(GameProfile targetData) {
-        ArrayList<Punishment> kicks = new ArrayList<>();
-        if (this.getPlayerPunishments().get(targetData.getUuid()) != null) {
-            for (int i = 0; i < this.getPlayerPunishments().get(targetData.getUuid()).size(); i++)
-                if (this.getPlayerPunishments().get(targetData.getUuid()).get(i).getType().equals(Punishment.Type.KICK))
-                    kicks.add(this.getPlayerPunishments().get(targetData.getUuid()).get(i));
-            if (kicks.isEmpty())
-                return null;
-        } else return null;
-        return kicks;
-    }
-
-    public ArrayList<Punishment> getBans(GameProfile targetData) {
-        ArrayList<Punishment> bans = new ArrayList<>();
-        if (this.getPlayerPunishments().get(targetData.getUuid()) != null) {
-            for (int i = 0; i < this.getPlayerPunishments().get(targetData.getUuid()).size(); i++)
-                if (this.getPlayerPunishments().get(targetData.getUuid()).get(i).getType().equals(Punishment.Type.BAN))
-                    bans.add(this.getPlayerPunishments().get(targetData.getUuid()).get(i));
-            if (bans.isEmpty())
-                return null;
-        } else return null;
-        return bans;
-    }
-
-    public ArrayList<Punishment> getTempBans(GameProfile targetData) {
-        ArrayList<Punishment> tempBans = new ArrayList<>();
-        if (this.getPlayerPunishments().get(targetData.getUuid()) != null) {
-            for (int i = 0; i < this.getPlayerPunishments().get(targetData.getUuid()).size(); i++)
-                if (this.getPlayerPunishments().get(targetData.getUuid()).get(i).getType().equals(Punishment.Type.TEMP_BAN))
-                    tempBans.add(this.getPlayerPunishments().get(targetData.getUuid()).get(i));
-            if (tempBans.isEmpty())
-                return null;
-        } else return null;
-        return tempBans;
     }
 
 }

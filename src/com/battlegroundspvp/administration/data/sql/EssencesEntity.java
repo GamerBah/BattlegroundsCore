@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Table(name = "Essences", schema = "mc2162")
 public class EssencesEntity {
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @PrimaryKeyJoinColumn
     private GameProfilesEntity gameProfile;
 

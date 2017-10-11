@@ -27,7 +27,6 @@ public class GameProfilesEntity {
     private String cosmetics;
     @Column(insertable = false)
     private boolean dailyReward;
-    @Column(insertable = false)
     private LocalDateTime dailyRewardLast;
     @Column(insertable = false)
     private String friends;
@@ -53,12 +52,12 @@ public class GameProfilesEntity {
     @Generated(value = GenerationTime.INSERT)
     private String warcry;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "gameProfile", cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, mappedBy = "gameProfile", cascade = CascadeType.ALL)
     private SettingsEntity settings;
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "gameProfile", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "gameProfilesEntity")
     private List<PunishmentsEntity> punishments;
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "gameProfile", cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, mappedBy = "gameProfile", cascade = CascadeType.ALL)
     private KitPvpDataEntity kitPvpData = new KitPvpDataEntity();
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "gameProfile", cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER, mappedBy = "gameProfile", cascade = CascadeType.ALL)
     private EssencesEntity essences;
 }

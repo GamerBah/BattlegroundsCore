@@ -78,8 +78,8 @@ public class FriendCommand implements CommandExecutor {
                     friendMessages.sendFriendList(player, Integer.parseInt(args[1]));
                     return true;
                 }
-                GameProfile targetData = plugin.getGameProfile(args[1]);
-                if (!plugin.getServer().getPlayer(targetData.getUuid()).isOnline()) {
+                GameProfile targetProfile = plugin.getGameProfile(args[1]);
+                if (!plugin.getServer().getPlayer(targetProfile.getUuid()).isOnline()) {
                     player.sendMessage(ChatColor.RED + "That player isn't online!");
                     EventSound.playSound(player, EventSound.ACTION_FAIL);
                     return true;

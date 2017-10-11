@@ -34,37 +34,37 @@ public class WarnMenu {
                     }
                 }
             });
-            GameProfile playerData = plugin.getGameProfile().get(i);
-            if (playerData.getId() != pData.getId()) {
+            GameProfile gameProfile = plugin.getGameProfile().get(i);
+            if (gameProfile.getId() != pData.getId()) {
                 if (i < 45) {
                     if (sortType.equals(PunishmentMenus.SortType.ONLINE_ONLY)) {
-                        if (plugin.getServer().getPlayer(playerData.getUuid()) != null) {
-                            ItemStack head = new ItemBuilder(Material.SKULL_ITEM).durability(3).name(playerData.getRank().getColor() + playerData.getName())
-                                    .lore(ChatColor.GRAY + "Rank: " + playerData.getRank().getColor() + (playerData.getRank().equals(Rank.DEFAULT) ? "" : "" + ChatColor.BOLD) + playerData.getRank().getName())
-                                    .lore(ChatColor.RED + "Warnings: " + ChatColor.GRAY + (!WarnCommand.getWarned().containsKey(playerData.getUuid()) ? "0" : WarnCommand.getWarned().get(playerData.getUuid())));
+                        if (plugin.getServer().getPlayer(gameProfile.getUuid()) != null) {
+                            ItemStack head = new ItemBuilder(Material.SKULL_ITEM).durability(3).name(gameProfile.getRank().getColor() + gameProfile.getName())
+                                    .lore(ChatColor.GRAY + "Rank: " + gameProfile.getRank().getColor() + (gameProfile.getRank().equals(Rank.DEFAULT) ? "" : "" + ChatColor.BOLD) + gameProfile.getRank().getName())
+                                    .lore(ChatColor.RED + "Warnings: " + ChatColor.GRAY + (!WarnCommand.getWarned().containsKey(gameProfile.getUuid()) ? "0" : WarnCommand.getWarned().get(gameProfile.getUuid())));
                             SkullMeta meta = (SkullMeta) head.getItemMeta();
-                            meta.setOwner(playerData.getName());
+                            meta.setOwner(gameProfile.getName());
                             head.setItemMeta(meta);
 
                             inv.setItem(a++, head);
                         }
                     } else if (sortType.equals(PunishmentMenus.SortType.SEARCH) && searchTerm != null) {
-                        if (StringUtils.containsIgnoreCase(playerData.getName(), searchTerm)) {
-                            ItemStack head = new ItemBuilder(Material.SKULL_ITEM).durability(3).name(playerData.getRank().getColor() + playerData.getName())
-                                    .lore(ChatColor.GRAY + "Rank: " + playerData.getRank().getColor() + (playerData.getRank().equals(Rank.DEFAULT) ? "" : "" + ChatColor.BOLD) + playerData.getRank().getName())
-                                    .lore(ChatColor.RED + "Warnings: " + ChatColor.GRAY + (!WarnCommand.getWarned().containsKey(playerData.getUuid()) ? "0" : WarnCommand.getWarned().get(playerData.getUuid())));
+                        if (StringUtils.containsIgnoreCase(gameProfile.getName(), searchTerm)) {
+                            ItemStack head = new ItemBuilder(Material.SKULL_ITEM).durability(3).name(gameProfile.getRank().getColor() + gameProfile.getName())
+                                    .lore(ChatColor.GRAY + "Rank: " + gameProfile.getRank().getColor() + (gameProfile.getRank().equals(Rank.DEFAULT) ? "" : "" + ChatColor.BOLD) + gameProfile.getRank().getName())
+                                    .lore(ChatColor.RED + "Warnings: " + ChatColor.GRAY + (!WarnCommand.getWarned().containsKey(gameProfile.getUuid()) ? "0" : WarnCommand.getWarned().get(gameProfile.getUuid())));
                             SkullMeta meta = (SkullMeta) head.getItemMeta();
-                            meta.setOwner(playerData.getName());
+                            meta.setOwner(gameProfile.getName());
                             head.setItemMeta(meta);
 
                             inv.setItem(a++, head);
                         }
                     } else {
-                        ItemStack head = new ItemBuilder(Material.SKULL_ITEM).durability(3).name(playerData.getRank().getColor() + playerData.getName())
-                                .lore(ChatColor.GRAY + "Rank: " + playerData.getRank().getColor() + (playerData.getRank().equals(Rank.DEFAULT) ? "" : "" + ChatColor.BOLD) + playerData.getRank().getName())
-                                .lore(ChatColor.RED + "Warnings: " + ChatColor.GRAY + (!WarnCommand.getWarned().containsKey(playerData.getUuid()) ? "0" : WarnCommand.getWarned().get(playerData.getUuid())));
+                        ItemStack head = new ItemBuilder(Material.SKULL_ITEM).durability(3).name(gameProfile.getRank().getColor() + gameProfile.getName())
+                                .lore(ChatColor.GRAY + "Rank: " + gameProfile.getRank().getColor() + (gameProfile.getRank().equals(Rank.DEFAULT) ? "" : "" + ChatColor.BOLD) + gameProfile.getRank().getName())
+                                .lore(ChatColor.RED + "Warnings: " + ChatColor.GRAY + (!WarnCommand.getWarned().containsKey(gameProfile.getUuid()) ? "0" : WarnCommand.getWarned().get(gameProfile.getUuid())));
                         SkullMeta meta = (SkullMeta) head.getItemMeta();
-                        meta.setOwner(playerData.getName());
+                        meta.setOwner(gameProfile.getName());
                         head.setItemMeta(meta);
 
                         inv.setItem(a++, head);
@@ -86,8 +86,8 @@ public class WarnMenu {
     }
 
     public void openInventory(Player player, OfflinePlayer target, Punishment.Reason reason) {
-        GameProfile targetData = plugin.getGameProfile(target.getUniqueId());
-        Inventory inv = plugin.getServer().createInventory(null, 36, "Warning: " + targetData.getName());
+        GameProfile targetProfile = plugin.getGameProfile(target.getUniqueId());
+        Inventory inv = plugin.getServer().createInventory(null, 36, "Warning: " + targetProfile.getName());
 
         int i = 10;
         for (Punishment.Reason reasons : Punishment.Reason.values()) {

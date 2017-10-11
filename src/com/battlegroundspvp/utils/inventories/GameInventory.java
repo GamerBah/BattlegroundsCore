@@ -3,6 +3,7 @@ package com.battlegroundspvp.utils.inventories;
 
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.utils.enums.EventSound;
+import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
@@ -17,12 +18,36 @@ public class GameInventory {
     private HashMap<Integer, ItemBuilder> clickables = new HashMap<>();
     private Type type;
     private GameInventory previousInventory;
+    @Getter
+    private int slotOffset;
+    @Getter
+    private boolean biDirectionalOffset;
 
     public GameInventory(String name, int itemCount, Type type, GameInventory previousInventory) {
         this.inventory = BattlegroundsCore.getInstance().getServer().createInventory(null, 54, name);
         this.itemCount = itemCount;
         this.type = type;
         this.previousInventory = previousInventory;
+        this.slotOffset = 0;
+        this.biDirectionalOffset = false;
+    }
+
+    public GameInventory(String name, int itemCount, Type type, GameInventory previousInventory, int slotOffest) {
+        this.inventory = BattlegroundsCore.getInstance().getServer().createInventory(null, 54, name);
+        this.itemCount = itemCount;
+        this.type = type;
+        this.previousInventory = previousInventory;
+        this.slotOffset = slotOffest;
+        this.biDirectionalOffset = false;
+    }
+
+    public GameInventory(String name, int itemCount, Type type, GameInventory previousInventory, int slotOffest, boolean biDirectionalOffset) {
+        this.inventory = BattlegroundsCore.getInstance().getServer().createInventory(null, 54, name);
+        this.itemCount = itemCount;
+        this.type = type;
+        this.previousInventory = previousInventory;
+        this.slotOffset = slotOffest;
+        this.biDirectionalOffset = biDirectionalOffset;
     }
 
     public GameInventory(String name, GameInventory previousInventory) {
@@ -46,8 +71,6 @@ public class GameInventory {
 
     public ArrayList<ItemBuilder> getSortables() {
         ArrayList<ItemBuilder> items = new ArrayList<>();
-        if (this.sortables == null)
-            return items;
         for (ItemBuilder item : this.sortables)
             items.add(item.clone());
         return items;

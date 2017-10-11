@@ -30,16 +30,16 @@ public class InventoryItems {
         if (type.equals(GameInventory.Type.PUNISH_SEARCH)) {
             head.lore("")
                     .lore(new ColorBuilder(ChatColor.YELLOW).bold().italic().create()
-                            + (BattlegroundsCore.getInstance().getMutes(gameProfile) != null ? BattlegroundsCore.getInstance().getMutes(gameProfile).size() : 0)
+                            + gameProfile.getPunishmentData().getMutes().size()
                             + new ColorBuilder(ChatColor.YELLOW).italic().create() + " Mutes " + new ColorBuilder(ChatColor.GRAY).italic().create() + "on record")
                     .lore(new ColorBuilder(ChatColor.GOLD).bold().italic().create()
-                            + (BattlegroundsCore.getInstance().getKicks(gameProfile) != null ? BattlegroundsCore.getInstance().getKicks(gameProfile).size() : 0)
+                            + gameProfile.getPunishmentData().getKicks().size()
                             + new ColorBuilder(ChatColor.GOLD).italic().create() + " Kicks " + new ColorBuilder(ChatColor.GRAY).italic().create() + "on record")
                     .lore(new ColorBuilder(ChatColor.RED).bold().italic().create()
-                            + (BattlegroundsCore.getInstance().getTempBans(gameProfile) != null ? BattlegroundsCore.getInstance().getTempBans(gameProfile).size() : 0)
+                            + gameProfile.getPunishmentData().getTempBans().size()
                             + new ColorBuilder(ChatColor.RED).italic().create() + " Temp-Bans " + new ColorBuilder(ChatColor.GRAY).italic().create() + "on record")
                     .lore(new ColorBuilder(ChatColor.DARK_RED).bold().italic().create()
-                            + (BattlegroundsCore.getInstance().getBans(gameProfile) != null ? BattlegroundsCore.getInstance().getBans(gameProfile).size() : 0)
+                            + gameProfile.getPunishmentData().getBans().size()
                             + new ColorBuilder(ChatColor.DARK_RED).italic().create() + " Bans " + new ColorBuilder(ChatColor.GRAY).italic().create() + "on record");
         }
 
@@ -50,16 +50,16 @@ public class InventoryItems {
     }
 
     public static ItemBuilder punishItem(Punishment punishment) {
-        GameProfile gameProfile = BattlegroundsCore.getInstance().getGameProfile(punishment.getEnforcer());
+        GameProfile gameProfile = BattlegroundsCore.getInstance().getGameProfile(punishment.getEnforcerId());
         String prefix = (punishment.getType() == Punishment.Type.BAN || punishment.getType() == Punishment.Type.TEMP_BAN ? "Banned" : punishment.getType() == Punishment.Type.KICK ? "Kicked " : "Muted");
 
-        ItemBuilder item = new ItemBuilder(Material.MAP).name(ChatColor.AQUA + punishment.getDate().format(DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a '(EST)'")))
-                .lore(ChatColor.GRAY + prefix + " by: " + gameProfile.getRank().getColor() + gameProfile.getRank().getName().toUpperCase()
+        ItemBuilder item = new ItemBuilder(Material.MAP).name(ChatColor.AQUA + punishment.getDate().minusHours(9).format(DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a '(PST)'")))
+                .lore(ChatColor.GRAY + prefix + " by: " + gameProfile.getRank().getColor().create() + gameProfile.getRank().getName().toUpperCase()
                         + ChatColor.WHITE + " " + gameProfile.getName())
                 .lore(ChatColor.GRAY + "Reason: " + ChatColor.GOLD + punishment.getReason().getName());
         if (punishment.getType() != Punishment.Type.KICK)
-            item = new ItemBuilder(item).lore(ChatColor.GRAY + "Duration: " + ChatColor.YELLOW + Time.toString(punishment.getDuration() * 1000, false))
-                    .lore(ChatColor.GRAY + "Active: " + (punishment.isPardoned() ? ChatColor.GREEN + "Yes" : ChatColor.RED + "No"));
+            item = new ItemBuilder(item).lore(ChatColor.GRAY + "Duration: " + ChatColor.YELLOW + Time.toString(punishment.getDuration(), false))
+                    .lore(ChatColor.GRAY + "Active: " + (!punishment.isPardoned() ? new ColorBuilder(ChatColor.GREEN).bold().create() + "Yes" : ChatColor.RED + "No"));
 
         return item;
     }
