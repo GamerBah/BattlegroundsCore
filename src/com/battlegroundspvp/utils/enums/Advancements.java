@@ -42,8 +42,20 @@ public enum Advancements {
     SHOWMANSHIP_V(new CustomAdvancement(ChatColor.YELLOW + "Showmanship V", "Unlock 12 particle packs", new ItemBuilder(Material.DIAMOND),
             false, true, TexturePath.NONE, SHOWMANSHIP_IV)),
     SHOWMANSHIP_MASTERY(new CustomAdvancement(new ColorBuilder(ChatColor.YELLOW).bold().create() + "Showmanship Mastery", "Unlock all particle packs", new ItemBuilder(Material.DIAMOND),
-            false, true, TexturePath.NONE, SHOWMANSHIP_V));
+            false, true, TexturePath.NONE, SHOWMANSHIP_V)),
 
+    WARCRY_I(new CustomAdvancement(ChatColor.YELLOW + "Warcry I", "Acquire 1 warcry.", new ItemBuilder(Material.HOPPER),
+            false, true, TexturePath.NONE, FrameType.TASK, BASE)),
+    WARCRY_II(new CustomAdvancement(ChatColor.YELLOW + "Warcry II", "Acquire 3 warcries.", new ItemBuilder(Material.HOPPER),
+            false, true, TexturePath.NONE, FrameType.TASK, WARCRY_I)),
+    WARCRY_III(new CustomAdvancement(ChatColor.YELLOW + "Warcry III", "Acquire 6 warcries.", new ItemBuilder(Material.HOPPER),
+            false, true, TexturePath.NONE, FrameType.TASK, WARCRY_II)),
+    WARCRY_IV(new CustomAdvancement(ChatColor.YELLOW + "Warcry IV", "Acquire 9 warcries.", new ItemBuilder(Material.HOPPER),
+            false, true, TexturePath.NONE, FrameType.TASK, WARCRY_III)),
+    WARCRY_V(new CustomAdvancement(ChatColor.YELLOW + "Warcry V", "Acquire 12 warcries.", new ItemBuilder(Material.HOPPER),
+            false, true, TexturePath.NONE, FrameType.TASK, WARCRY_IV)),
+    WARCRY_MASTERY(new CustomAdvancement(ChatColor.YELLOW + "Warcry Mastery", "Acquire all warcries.", new ItemBuilder(Material.HOPPER),
+            false, true, TexturePath.NONE, FrameType.TASK, WARCRY_V)),
 
     private CustomAdvancement customAdvancement;
 
