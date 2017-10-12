@@ -1,7 +1,7 @@
 package com.battlegroundspvp.administration.data;
 /* Created by GamerBah on 8/7/2016 */
 
-import com.battlegroundspvp.utils.enums.ColorBuilder;
+import com.battlegroundspvp.utils.ColorBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;

@@ -3,7 +3,7 @@ package com.battlegroundspvp.commands;
 
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
-import com.battlegroundspvp.utils.enums.ColorBuilder;
+import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
 import de.Herbystar.TTA.TTA_Methods;
 import net.md_5.bungee.api.ChatColor;

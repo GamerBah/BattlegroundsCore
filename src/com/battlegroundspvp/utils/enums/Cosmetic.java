@@ -1,6 +1,7 @@
 package com.battlegroundspvp.utils.enums;
 /* Created by GamerBah on 9/8/2016 */
 
+import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.inventories.ItemBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

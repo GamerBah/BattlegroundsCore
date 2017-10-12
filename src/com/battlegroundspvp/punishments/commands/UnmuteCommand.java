@@ -42,7 +42,7 @@ public class UnmuteCommand implements CommandExecutor {
         GameProfile targetProfile = plugin.getGameProfile(args[0]);
 
         if (targetProfile == null) {
-            player.sendMessage(ChatColor.RED + "That player is not online or doesn't exist!");
+            player.sendMessage(ChatColor.RED + "That player doesn't exist!");
             EventSound.playSound(player, EventSound.ACTION_FAIL);
             return true;
         }
@@ -59,13 +59,13 @@ public class UnmuteCommand implements CommandExecutor {
             return true;
         }
 
-        targetProfile.getCurrentMute().setPardoned(true);
 
         plugin.getServer().getOnlinePlayers().stream().filter(staff -> plugin.getGameProfile(staff.getUniqueId()).hasRank(Rank.HELPER)).forEach(staff ->
                 staff.sendMessage(ChatColor.RED + player.getName() + " unmuted " + targetProfile.getName()));
 
         targetProfile.sendMessage(ChatColor.RED + " \nYou were unmuted by " + ChatColor.GOLD + player.getName());
         targetProfile.sendMessage(ChatColor.GRAY + targetProfile.getCurrentMute().getReason().getMessage() + "\n ");
+        targetProfile.getCurrentMute().setPardoned(true);
 
         return true;
     }

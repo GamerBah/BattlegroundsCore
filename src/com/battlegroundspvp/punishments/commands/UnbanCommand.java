@@ -5,7 +5,6 @@ import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.utils.enums.EventSound;
-import net.gpedro.integrations.slack.SlackMessage;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -47,7 +46,7 @@ public class UnbanCommand implements CommandExecutor {
             return true;
         }
 
-        if (!targetProfile.isMuted()) {
+        if (!targetProfile.isBanned()) {
             player.sendMessage(ChatColor.RED + "That player isn't banned!");
             EventSound.playSound(player, EventSound.ACTION_FAIL);
             return true;
@@ -55,8 +54,8 @@ public class UnbanCommand implements CommandExecutor {
 
         targetProfile.getCurrentBan().setPardoned(true);
 
-        plugin.slackPunishments.call(new SlackMessage(">>> _*" + player.getName() + "* unbanned *" + targetProfile.getName() + "*_\n*Reason for Ban:* _"
-                + targetProfile.getCurrentBan().getReason().getName() + "_"));
+        //plugin.slackPunishments.call(new SlackMessage(">>> _*" + player.getName() + "* unbanned *" + targetProfile.getName() + "*_\n*Reason for Ban:* _"
+        //        + targetProfile.getCurrentBan().getReason().getName() + "_"));
 
         plugin.getServer().getOnlinePlayers().stream().filter(staff -> plugin.getGameProfile(staff.getUniqueId()).hasRank(Rank.HELPER)).forEach(staff ->
                 staff.sendMessage(ChatColor.RED + player.getName() + " unbanned " + targetProfile.getName()));

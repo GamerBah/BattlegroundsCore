@@ -7,8 +7,8 @@ import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.punishments.Punishment;
 import com.battlegroundspvp.runnables.UpdateRunnable;
+import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.enums.Advancements;
-import com.battlegroundspvp.utils.enums.ColorBuilder;
 import com.battlegroundspvp.utils.enums.Time;
 import de.Herbystar.TTA.TTA_Methods;
 import net.md_5.bungee.api.ChatColor;
@@ -91,6 +91,7 @@ public class PlayerJoin implements Listener {
         } else {
             if (Advancements.BASE.getCustomAdvancement().getAdvancement() != null)
                 player.getAdvancementProgress(Bukkit.getAdvancement(Advancements.BASE.getCustomAdvancement().getAdvancement().getKey())).awardCriteria("impossible");
+
             if (gameProfile.getPlayerSettings().isStealthyJoin()) {
                 event.setJoinMessage(null);
                 plugin.getServer().getOnlinePlayers().stream().filter(staff ->
@@ -98,7 +99,7 @@ public class PlayerJoin implements Listener {
                         staff.sendMessage(new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "[" + new ColorBuilder(ChatColor.GREEN).bold().create() + "+"
                                 + new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GRAY + " (Stealth Join)"));
             } else {
-                if (!player.getName().equals(gameProfile.getPlayer().getName())) {
+                if (!gameProfile.getName().equals(player.getName())) {
                     String oldName = gameProfile.getPlayer().getName();
                     gameProfile.setName(player.getName());
                     event.setJoinMessage(new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "[" + new ColorBuilder(ChatColor.GREEN).bold().create() + "+"
@@ -119,7 +120,7 @@ public class PlayerJoin implements Listener {
             player.setWalkSpeed(0.2F);
         }
 
-        player.setPlayerListName((gameProfile.hasRank(Rank.WARRIOR) ? gameProfile.getRank().getColor() + "" + ChatColor.BOLD + gameProfile.getRank().getName().toUpperCase() + " " : "")
+        player.setPlayerListName((gameProfile.hasRank(Rank.WARRIOR) ? gameProfile.getRank().getColor().create() + "" + ChatColor.BOLD + gameProfile.getRank().getName().toUpperCase() + " " : "")
                 + (gameProfile.hasRank(Rank.WARRIOR) ? ChatColor.WHITE : ChatColor.GRAY) + player.getName());
 
         TTA_Methods.sendTablist(player, ChatColor.AQUA + "You're playing on " + new ColorBuilder(ChatColor.GOLD).bold().create() + "BATTLEGROUNDS",

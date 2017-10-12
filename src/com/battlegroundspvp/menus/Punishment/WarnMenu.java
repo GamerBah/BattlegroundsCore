@@ -39,8 +39,8 @@ public class WarnMenu {
                 if (i < 45) {
                     if (sortType.equals(PunishmentMenus.SortType.ONLINE_ONLY)) {
                         if (plugin.getServer().getPlayer(gameProfile.getUuid()) != null) {
-                            ItemStack head = new ItemBuilder(Material.SKULL_ITEM).durability(3).name(gameProfile.getRank().getColor() + gameProfile.getName())
-                                    .lore(ChatColor.GRAY + "Rank: " + gameProfile.getRank().getColor() + (gameProfile.getRank().equals(Rank.DEFAULT) ? "" : "" + ChatColor.BOLD) + gameProfile.getRank().getName())
+                            ItemStack head = new ItemBuilder(Material.SKULL_ITEM).durability(3).name(gameProfile.getRank().getColor().create() + gameProfile.getName())
+                                    .lore(ChatColor.GRAY + "Rank: " + gameProfile.getRank().getColor().create() + (gameProfile.getRank().equals(Rank.DEFAULT) ? "" : "" + ChatColor.BOLD) + gameProfile.getRank().getName())
                                     .lore(ChatColor.RED + "Warnings: " + ChatColor.GRAY + (!WarnCommand.getWarned().containsKey(gameProfile.getUuid()) ? "0" : WarnCommand.getWarned().get(gameProfile.getUuid())));
                             SkullMeta meta = (SkullMeta) head.getItemMeta();
                             meta.setOwner(gameProfile.getName());
@@ -50,8 +50,8 @@ public class WarnMenu {
                         }
                     } else if (sortType.equals(PunishmentMenus.SortType.SEARCH) && searchTerm != null) {
                         if (StringUtils.containsIgnoreCase(gameProfile.getName(), searchTerm)) {
-                            ItemStack head = new ItemBuilder(Material.SKULL_ITEM).durability(3).name(gameProfile.getRank().getColor() + gameProfile.getName())
-                                    .lore(ChatColor.GRAY + "Rank: " + gameProfile.getRank().getColor() + (gameProfile.getRank().equals(Rank.DEFAULT) ? "" : "" + ChatColor.BOLD) + gameProfile.getRank().getName())
+                            ItemStack head = new ItemBuilder(Material.SKULL_ITEM).durability(3).name(gameProfile.getRank().getColor().create() + gameProfile.getName())
+                                    .lore(ChatColor.GRAY + "Rank: " + gameProfile.getRank().getColor().create() + (gameProfile.getRank().equals(Rank.DEFAULT) ? "" : "" + ChatColor.BOLD) + gameProfile.getRank().getName())
                                     .lore(ChatColor.RED + "Warnings: " + ChatColor.GRAY + (!WarnCommand.getWarned().containsKey(gameProfile.getUuid()) ? "0" : WarnCommand.getWarned().get(gameProfile.getUuid())));
                             SkullMeta meta = (SkullMeta) head.getItemMeta();
                             meta.setOwner(gameProfile.getName());
@@ -60,8 +60,8 @@ public class WarnMenu {
                             inv.setItem(a++, head);
                         }
                     } else {
-                        ItemStack head = new ItemBuilder(Material.SKULL_ITEM).durability(3).name(gameProfile.getRank().getColor() + gameProfile.getName())
-                                .lore(ChatColor.GRAY + "Rank: " + gameProfile.getRank().getColor() + (gameProfile.getRank().equals(Rank.DEFAULT) ? "" : "" + ChatColor.BOLD) + gameProfile.getRank().getName())
+                        ItemStack head = new ItemBuilder(Material.SKULL_ITEM).durability(3).name(gameProfile.getRank().getColor().create() + gameProfile.getName())
+                                .lore(ChatColor.GRAY + "Rank: " + gameProfile.getRank().getColor().create() + (gameProfile.getRank().equals(Rank.DEFAULT) ? "" : "" + ChatColor.BOLD) + gameProfile.getRank().getName())
                                 .lore(ChatColor.RED + "Warnings: " + ChatColor.GRAY + (!WarnCommand.getWarned().containsKey(gameProfile.getUuid()) ? "0" : WarnCommand.getWarned().get(gameProfile.getUuid())));
                         SkullMeta meta = (SkullMeta) head.getItemMeta();
                         meta.setOwner(gameProfile.getName());

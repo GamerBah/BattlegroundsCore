@@ -12,6 +12,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.material.MaterialData;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -28,6 +29,8 @@ public class ItemBuilder extends ItemStack {
 
     @Getter
     private HashSet<ClickEvent> clickEvents = new HashSet<>();
+    @Getter
+    private HashMap<Class, Object> storedObjects = new HashMap<>();
     /**
      * Initializes the builder with the given {@link Material}
      *
@@ -56,27 +59,14 @@ public class ItemBuilder extends ItemStack {
         setDurability(ib.getDurability());
         for (ClickEvent clickEvent : ib.clickEvents)
             clickEvent(clickEvent);
+        storedObjects.putAll(ib.getStoredObjects());
     }
 
-    /**
-     * Changes the amount of the {@link ItemStack}
-     *
-     * @param amount the new amount to set
-     * @return this builder for chaining
-     * @since 1.0
-     */
     public ItemBuilder amount(final int amount) {
         setAmount(amount);
         return this;
     }
 
-    /**
-     * Changes the display name of the {@link ItemStack}
-     *
-     * @param name the new display name to set
-     * @return this builder for chaining
-     * @since 1.0
-     */
     public ItemBuilder name(final String name) {
         final ItemMeta meta = getItemMeta();
         meta.setDisplayName(name);
@@ -84,13 +74,6 @@ public class ItemBuilder extends ItemStack {
         return this;
     }
 
-    /**
-     * Adds a new line to the lore of the {@link ItemStack}
-     *
-     * @param text the new line to add
-     * @return this builder for chaining
-     * @since 1.0
-     */
     public ItemBuilder lore(final String text) {
         final ItemMeta meta = getItemMeta();
         List<String> lore = meta.getLore();
@@ -103,74 +86,32 @@ public class ItemBuilder extends ItemStack {
         return this;
     }
 
-    /**
-     * Changes the durability of the {@link ItemStack}
-     *
-     * @param durability the new durability to set
-     * @return this builder for chaining
-     * @since 1.0
-     */
     public ItemBuilder durability(final int durability) {
         setDurability((short) durability);
         return this;
     }
 
-    /**
-     * Changes the data of the {@link ItemStack}
-     *
-     * @param data the new data to set
-     * @return this builder for chaining
-     * @since 1.0
-     */
     @SuppressWarnings("deprecation")
     public ItemBuilder data(final int data) {
         setData(new MaterialData(getType(), (byte) data));
         return this;
     }
 
-    /**
-     * Adds an {@link Enchantment} with the given level to the {@link ItemStack}
-     *
-     * @param enchantment the enchantment to add
-     * @param level       the level of the enchantment
-     * @return this builder for chaining
-     * @since 1.0
-     */
     public ItemBuilder enchantment(final Enchantment enchantment, final int level) {
         addUnsafeEnchantment(enchantment, level);
         return this;
     }
 
-    /**
-     * Adds an {@link Enchantment} with the level 1 to the {@link ItemStack}
-     *
-     * @param enchantment the enchantment to add
-     * @return this builder for chaining
-     * @since 1.0
-     */
     public ItemBuilder enchantment(final Enchantment enchantment) {
         addUnsafeEnchantment(enchantment, 1);
         return this;
     }
 
-    /**
-     * Changes the {@link Material} of the {@link ItemStack}
-     *
-     * @param material the new material to set
-     * @return this builder for chaining
-     * @since 1.0
-     */
     public ItemBuilder type(final Material material) {
         setType(material);
         return this;
     }
 
-    /**
-     * Clears the lore of the {@link ItemStack}
-     *
-     * @return this builder for chaining
-     * @since 1.0
-     */
     public ItemBuilder clearLore() {
         final ItemMeta meta = getItemMeta();
         meta.setLore(new ArrayList<>());
@@ -178,24 +119,11 @@ public class ItemBuilder extends ItemStack {
         return this;
     }
 
-    /**
-     * Clears the list of {@link Enchantment}s of the {@link ItemStack}
-     *
-     * @return this builder for chaining
-     * @since 1.0
-     */
     public ItemBuilder clearEnchantments() {
         getEnchantments().keySet().forEach(this::removeEnchantment);
         return this;
     }
 
-    /**
-     * Sets the {@link Color} of a part of leather armor
-     *
-     * @param color the {@link Color} to use
-     * @return this builder for chaining
-     * @since 1.1
-     */
     public ItemBuilder color(Color color) {
         if (getType() == Material.LEATHER_BOOTS || getType() == Material.LEATHER_CHESTPLATE || getType() == Material.LEATHER_HELMET
                 || getType() == Material.LEATHER_LEGGINGS) {
@@ -208,12 +136,6 @@ public class ItemBuilder extends ItemStack {
         }
     }
 
-    /**
-     * Adds an {@link ItemFlag} to the {@link ItemStack}
-     *
-     * @param flag the flag to add
-     * @return this builder for chaining
-     */
     public ItemBuilder flag(ItemFlag flag) {
         final ItemMeta meta = getItemMeta();
         meta.addItemFlags(flag);
@@ -221,11 +143,6 @@ public class ItemBuilder extends ItemStack {
         return this;
     }
 
-    /**
-     * Clears the list of {@link ItemFlag}s of the {@link ItemStack}
-     *
-     * @return this builder for chaining
-     */
     public ItemBuilder clearFlags() {
         final ItemMeta meta = getItemMeta();
         meta.getItemFlags().forEach(meta::removeItemFlags);
@@ -242,6 +159,11 @@ public class ItemBuilder extends ItemStack {
 
     public ItemBuilder clickEvent(ClickEvent event) {
         getClickEvents().add(event);
+        return this;
+    }
+
+    public ItemBuilder storeObject(Class holdingClass, Object object) {
+        this.storedObjects.put(holdingClass, object);
         return this;
     }
 

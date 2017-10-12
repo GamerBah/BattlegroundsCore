@@ -3,7 +3,7 @@ package com.battlegroundspvp.playerevents;
 
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.commands.FreezeCommand;
-import com.battlegroundspvp.utils.enums.ColorBuilder;
+import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.inventories.ItemBuilder;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;

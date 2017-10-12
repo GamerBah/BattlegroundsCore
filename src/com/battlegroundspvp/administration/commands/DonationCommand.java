@@ -6,7 +6,7 @@ import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.administration.donations.DonationMessages;
 import com.battlegroundspvp.administration.donations.Essence;
-import net.gpedro.integrations.slack.SlackMessage;
+import com.battlegroundspvp.utils.DiscordBot;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -31,34 +31,34 @@ public class DonationCommand implements CommandExecutor {
 
         if (args.length == 0) {
             plugin.getLogger().severe("Error Processing Donation Request: Invalid Arguments!");
-            plugin.slackErrorReporting.call(new SlackMessage("Invalid Arguments while attempting to process new donation!\nIssue: 0 arguments"));
+            DiscordBot.errorLoggingChannel.sendMessage("Invalid Arguments while attempting to process new donation!\nIssue: 0 arguments").queue();
             return true;
         }
 
         if (args[0].equals("rank")) {
             if (args.length != 3) {
                 plugin.getLogger().severe("Error Processing Donation Request: \"Rank\" donation set incorrectly filled");
-                plugin.slackErrorReporting.call(new SlackMessage("Invalid Arguments while attempting to process new donation!\nIssue: \"Rank\" info not filled out correctly."));
+                DiscordBot.errorLoggingChannel.sendMessage("Invalid Arguments while attempting to process new donation!\nIssue: \"Rank\" info not filled out correctly.").queue();
                 return true;
             }
             GameProfile gameProfile = plugin.getGameProfile(UUID.fromString(args[1]));
             if (gameProfile == null) {
                 plugin.getLogger().severe("Error Processing Donation Request: Requested UUID not found in database!");
-                plugin.slackErrorReporting.call(new SlackMessage("Error while attempting to process new donation!\nIssue: Requested UUID was not found in server database."));
+                DiscordBot.errorLoggingChannel.sendMessage("Error while attempting to process new donation!\nIssue: Requested UUID was not found in server database.").queue();
                 return true;
             }
 
             for (Rank rank : Rank.values()) {
                 if (!args[2].equalsIgnoreCase(rank.getName())) {
                     plugin.getLogger().severe("Error Processing Donation Request: Requested rank change invalid");
-                    plugin.slackErrorReporting.call(new SlackMessage("Error while attempting to process new donation!\nIssue: Requested Rank was invalid."));
+                    DiscordBot.errorLoggingChannel.sendMessage("Error while attempting to process new donation!\nIssue: Requested Rank was invalid.").queue();
                     return true;
                 }
             }
             plugin.getLogger().info("Success! Donation for Rank registered!");
             Rank rank = Rank.valueOf(args[2]);
             gameProfile.setRank(rank);
-            plugin.slackDonations.call(new SlackMessage(">>> _*" + gameProfile.getName() + "* purchased the *" + rank.getName() + "* rank!_"));
+            //plugin.slackDonations.call(new SlackMessage(">>> _*" + gameProfile.getName() + "* purchased the *" + rank.getName() + "* rank!_"));
             Player player = plugin.getServer().getPlayer(gameProfile.getUuid());
             if (player.isOnline()) {
                 DonationMessages donationMessages = new DonationMessages(plugin);
@@ -69,24 +69,24 @@ public class DonationCommand implements CommandExecutor {
         if (args[0].equals("essence")) {
             if (args.length != 4) {
                 plugin.getLogger().severe("Error Processing Donation Request: \"Essence\" donation set incorrectly filled");
-                plugin.slackErrorReporting.call(new SlackMessage("Invalid Arguments while attempting to process new donation!\nIssue: \"Essence\" info not filled out correctly."));
+                DiscordBot.errorLoggingChannel.sendMessage("Invalid Arguments while attempting to process new donation!\nIssue: \"Essence\" info not filled out correctly.").queue();
                 return true;
             }
             GameProfile gameProfile = plugin.getGameProfile(UUID.fromString(args[1]));
             if (gameProfile == null) {
                 plugin.getLogger().severe("Error Processing Donation Request: Requested UUID not found in database!");
-                plugin.slackErrorReporting.call(new SlackMessage("Error while attempting to process new donation!\nIssue: Requested UUID was not found in server database."));
+                DiscordBot.errorLoggingChannel.sendMessage("Error while attempting to process new donation!\nIssue: Requested UUID was not found in server database.").queue();
                 return true;
             }
             if (!args[2].matches("[1,3,6]")) {
                 plugin.getLogger().severe("Error Processing Donation Request: Time value invalid");
-                plugin.slackErrorReporting.call(new SlackMessage("Error while attempting to process new donation!\nIssue: Requested Essence time was invalid."));
+                DiscordBot.errorLoggingChannel.sendMessage("Error while attempting to process new donation!\nIssue: Requested Essence time was invalid.").queue();
                 return true;
             }
 
             if (Integer.parseInt(args[3]) != 50 && Integer.parseInt(args[3]) != 100 && Integer.parseInt(args[3]) != 150) {
                 plugin.getLogger().severe("Error Processing Donation Request: Invalid increase");
-                plugin.slackErrorReporting.call(new SlackMessage("Error while attempting to process new donation!\nIssue: Requested Essence increase was invalid."));
+                DiscordBot.errorLoggingChannel.sendMessage("Error while attempting to process new donation!\nIssue: Requested Essence increase was invalid.").queue();
                 return true;
             }
             Essence.Type eType = null;
@@ -96,15 +96,15 @@ public class DonationCommand implements CommandExecutor {
                 }
             }
             if (eType == null) {
-                plugin.getLogger().severe("Fatal Error Processing Donation Request!: Essence Type invalid!");
-                plugin.slackErrorReporting.call(new SlackMessage("Error while attempting to process new donation!\nIssue: Essence Type was invalid."));
+                plugin.getLogger().severe("Fatal Error Processing Donation Request! Essence Type invalid!");
+                DiscordBot.errorLoggingChannel.sendMessage("Error while attempting to process new donation!\nIssue: Essence Type was invalid.").queue();
                 return true;
             }
 
             gameProfile.getEssenceData().addEssence(eType, 1);
             plugin.getLogger().info("Success! Donation for Essence registered!");
             Player player = plugin.getServer().getPlayer(gameProfile.getUuid());
-            plugin.slackDonations.call(new SlackMessage(">>> _*" + player.getName() + "* purchased a *" + eType.getDuration() + " hour (+" + eType.getPercent() + "%) Battle Essence!*_"));
+            DiscordBot.staffChannel.sendMessage("@Staff ***" + player.getName() + "*** *purchased a* ***" + eType.getDuration() + " hour (+" + eType.getPercent() + "%) Battle Essence!***").queue();
             if (player.isOnline()) {
                 DonationMessages donationMessages = new DonationMessages(plugin);
                 donationMessages.sendEssensePurchaseMessage(player, eType);

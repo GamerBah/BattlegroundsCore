@@ -13,7 +13,7 @@ import static com.battlegroundspvp.punishments.Punishment.Type.*;
 @AllArgsConstructor
 public class Punishment {
 
-    private final int id;
+    private int id;
     private final Type type;
     private final LocalDateTime date;
     private final int duration;

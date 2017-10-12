@@ -47,7 +47,6 @@ public class PunishCommand implements CommandExecutor {
             return true;
         }
 
-        @SuppressWarnings("deprecation")
         GameProfile targetProfile = plugin.getGameProfile(args[0]);
 
         if (targetProfile == null) {

@@ -1,4 +1,4 @@
-package com.battlegroundspvp.utils.enums;
+package com.battlegroundspvp.utils;
 /* Created by GamerBah on 7/12/2017 */
 
 import net.md_5.bungee.api.ChatColor;

@@ -4,7 +4,7 @@ package com.battlegroundspvp.utils;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
-import com.battlegroundspvp.utils.enums.ColorBuilder;
+import com.battlegroundspvp.commands.MessageCommand;
 import com.battlegroundspvp.utils.enums.EventSound;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
@@ -88,7 +88,10 @@ public class ChatFilter implements Listener {
         Player player = event.getPlayer();
         GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
 
-        //if (gameProfile.isMuted(event)) return;
+        if (gameProfile.isMuted()) {
+            MessageCommand.sendErrorMessage(gameProfile);
+            return;
+        }
 
         if (!isClean(event.getMessage())) {
             event.setCancelled(true);

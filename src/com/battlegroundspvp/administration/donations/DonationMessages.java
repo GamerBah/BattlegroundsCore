@@ -4,7 +4,7 @@ package com.battlegroundspvp.administration.donations;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
-import com.battlegroundspvp.utils.enums.ColorBuilder;
+import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.enums.Time;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;

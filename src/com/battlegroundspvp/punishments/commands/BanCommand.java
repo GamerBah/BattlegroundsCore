@@ -83,12 +83,12 @@ public class BanCommand implements CommandExecutor {
         GameProfile enforcer = BattlegroundsCore.getInstance().getGameProfile(ban.getEnforcerId());
         BaseComponent baseComponent = new TextComponent(ChatColor.RED + "That player is already banned!");
         baseComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GRAY + "Banned by: "
-                + enforcer.getRank().getColor() + "" + ChatColor.BOLD + enforcer.getRank().getName().toUpperCase()
+                + enforcer.getRank().getColor().create() + "" + ChatColor.BOLD + enforcer.getRank().getName().toUpperCase()
                 + ChatColor.WHITE + " " + enforcer.getName() + "\n" + ChatColor.GRAY + "Reason: "
                 + ChatColor.GOLD + ban.getReason().getName() + "\n"
                 + (ban.getType() == Punishment.Type.TEMP_BAN ? ChatColor.GRAY + "Time Remaining: "
                 + ChatColor.YELLOW + Time.toString(Time.punishmentTimeRemaining(ban.getExpiration()), true)
-                : ChatColor.GRAY + "Date: " + ChatColor.AQUA + ban.getDate().format(DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a '(CST)'")))).create()));
+                : ChatColor.GRAY + "Date: " + ChatColor.AQUA + ban.getDate().minusHours(9).format(DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a '(PST)'")))).create()));
         gameProfile.getPlayer().spigot().sendMessage(baseComponent);
         gameProfile.playSound(EventSound.ACTION_FAIL);
     }

@@ -6,15 +6,11 @@ import com.battlegroundspvp.administration.commands.ChatCommands;
 import com.battlegroundspvp.administration.commands.StaffChatCommand;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
+import com.battlegroundspvp.commands.MessageCommand;
 import com.battlegroundspvp.runnables.AFKRunnable;
-import com.battlegroundspvp.utils.enums.ColorBuilder;
+import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
-import com.battlegroundspvp.utils.enums.Time;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -47,14 +43,7 @@ public class PlayerChat implements Listener {
         GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
 
         if (gameProfile.isMuted()) {
-            event.setCancelled(true);
-            BaseComponent baseComponent = new TextComponent(ChatColor.RED + "You are muted! " + ChatColor.GRAY + "(Hover to view details)");
-            baseComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GRAY + "Muted by: "
-                    + ChatColor.WHITE + BattlegroundsCore.getInstance() + "\n" + ChatColor.GRAY + "Reason: "
-                    + ChatColor.WHITE + gameProfile.getCurrentMute().getReason().getName() + "\n" + ChatColor.GRAY + "Time Remaining: " + ChatColor.WHITE +
-                    Time.toString(Time.punishmentTimeRemaining(gameProfile.getCurrentMute().getExpiration()), true)).create()));
-            event.getPlayer().spigot().sendMessage(baseComponent);
-            EventSound.playSound(event.getPlayer(), EventSound.ACTION_FAIL);
+            MessageCommand.sendErrorMessage(gameProfile);
             return;
         }
 
@@ -70,10 +59,10 @@ public class PlayerChat implements Listener {
         boolean hasRank = gameProfile.hasRank(Rank.WARRIOR);
 
         plugin.getServer().getOnlinePlayers().forEach(p -> {
-            if (Pattern.compile(Pattern.quote(p.getName()), Pattern.CASE_INSENSITIVE).matcher(event.getMessage()).find()) {
+            if (Pattern.compile(Pattern.quote("@" + p.getName()), Pattern.CASE_INSENSITIVE).matcher(event.getMessage()).find()) {
                 p.sendMessage(rank.getColor().create() + (hasRank ? rank.getName().toUpperCase() + ChatColor.RESET : "")
                         + " " + player.getName() + ChatColor.GRAY + " \u00BB " + (hasRank ? ChatColor.WHITE : ChatColor.GRAY)
-                        + event.getMessage().replaceAll("(?i)" + p.getName(), ChatColor.AQUA + p.getName() + (hasRank ? ChatColor.WHITE : ChatColor.GRAY)));
+                        + event.getMessage().replaceAll("@(?i)" + p.getName(), ChatColor.AQUA + "@" + p.getName() + (hasRank ? ChatColor.WHITE : ChatColor.GRAY)));
                 EventSound.playSound(p, EventSound.CHAT_TAGGED);
             } else {
                 p.sendMessage(rank.getColor().create() + (hasRank ? rank.getName().toUpperCase() + ChatColor.RESET : "")

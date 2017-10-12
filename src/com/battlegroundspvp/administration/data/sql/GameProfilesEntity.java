@@ -21,34 +21,22 @@ public class GameProfilesEntity {
     private int id;
     @Column(columnDefinition = "VARCHAR(36)")
     private UUID uuid;
-    @Column(insertable = false)
     private int coins;
-    @Column(insertable = false)
     private String cosmetics;
-    @Column(insertable = false)
     private boolean dailyReward;
     private LocalDateTime dailyRewardLast;
-    @Column(insertable = false)
     private String friends;
-    @Column(insertable = false)
     @Generated(value = GenerationTime.INSERT)
     private String gore;
-    @Column(insertable = false)
     private LocalDateTime lastOnline;
-    @Column
     private String name;
-    @Column(insertable = false)
     private int playersRecruited;
-    @Column(insertable = false)
     @Generated(value = GenerationTime.INSERT)
     private String rank;
-    @Column(insertable = false)
     @Generated(value = GenerationTime.INSERT)
     private int recruitedBy;
-    @Column(insertable = false)
     @Generated(value = GenerationTime.INSERT)
     private String trail;
-    @Column(insertable = false)
     @Generated(value = GenerationTime.INSERT)
     private String warcry;
 

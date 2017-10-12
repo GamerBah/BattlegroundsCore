@@ -3,7 +3,7 @@ package com.battlegroundspvp.menus;
 
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
-import com.battlegroundspvp.utils.enums.ColorBuilder;
+import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.inventories.ItemBuilder;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;

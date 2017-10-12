@@ -6,6 +6,7 @@ import com.battlegroundspvp.administration.commands.FreezeCommand;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.runnables.AFKRunnable;
+import com.battlegroundspvp.runnables.UpdateRunnable;
 import com.battlegroundspvp.utils.enums.EventSound;
 import de.Herbystar.TTA.TTA_Methods;
 import net.md_5.bungee.api.ChatColor;
@@ -29,7 +30,7 @@ public class PlayerCommandPreProcess implements Listener {
         GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
         String command = event.getMessage();
 
-        if (FreezeCommand.reloadFreeze) {
+        if (UpdateRunnable.updating || FreezeCommand.reloadFreeze) {
             event.setCancelled(true);
             player.sendMessage(ChatColor.RED + "No commands are available during an update!");
             EventSound.playSound(player, EventSound.ACTION_FAIL);

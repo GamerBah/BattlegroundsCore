@@ -82,7 +82,7 @@ public class MuteCommand implements CommandExecutor {
         GameProfile enforcer = BattlegroundsCore.getInstance().getGameProfile(mute.getEnforcerId());
         BaseComponent baseComponent = new TextComponent(ChatColor.RED + "That player is already muted!");
         baseComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GRAY + "Muted by: "
-                + enforcer.getRank().getColor() + "" + ChatColor.BOLD + enforcer.getRank().getName().toUpperCase()
+                + enforcer.getRank().getColor().create() + "" + ChatColor.BOLD + enforcer.getRank().getName().toUpperCase()
                 + ChatColor.WHITE + " " + enforcer.getName() + "\n" + ChatColor.GRAY + "Reason: "
                 + ChatColor.GOLD + mute.getReason().getName() + "\n" + ChatColor.GRAY + "Time Remaining: " + ChatColor.YELLOW +
                 Time.toString(Time.punishmentTimeRemaining(mute.getExpiration()), true)).create()));

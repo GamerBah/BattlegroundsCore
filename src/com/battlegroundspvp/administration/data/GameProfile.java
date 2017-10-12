@@ -7,12 +7,12 @@ import com.battlegroundspvp.administration.data.sql.GameProfilesEntity;
 import com.battlegroundspvp.punishments.Punishment;
 import com.battlegroundspvp.punishments.commands.BanCommand;
 import com.battlegroundspvp.punishments.commands.MuteCommand;
+import com.battlegroundspvp.utils.DiscordBot;
 import com.battlegroundspvp.utils.enums.Cosmetic;
 import com.battlegroundspvp.utils.enums.EventSound;
 import com.battlegroundspvp.utils.enums.Time;
 import lombok.Getter;
 import lombok.Setter;
-import net.gpedro.integrations.slack.SlackMessage;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -166,6 +166,22 @@ public class GameProfile {
                     + ChatColor.RED + " for " + ChatColor.GOLD + reason.getName());
     }
 
+    public void unmute(GameProfile gameProfile, Punishment punishment) {
+        if (punishment.isPardoned()) {
+            gameProfile.sendMessage(ChatColor.RED + "That player isn't muted!");
+            gameProfile.playSound(EventSound.ACTION_FAIL);
+            return;
+        }
+
+        BattlegroundsCore.getInstance().getServer().getOnlinePlayers().stream().filter(staff ->
+                BattlegroundsCore.getInstance().getGameProfile(staff.getUniqueId()).hasRank(Rank.HELPER)).forEach(staff ->
+                staff.sendMessage(ChatColor.RED + gameProfile.getName() + " unmuted " + this.name));
+
+        sendMessage(ChatColor.RED + " \nYou were unmuted by " + ChatColor.GOLD + gameProfile.getName());
+        sendMessage(ChatColor.GRAY + punishment.getReason().getMessage() + "\n ");
+        punishment.setPardoned(true);
+    }
+
     public boolean isMuted() {
         for (Punishment punishment : getPunishmentData().getMutes())
             if (!punishment.isPardoned())
@@ -217,8 +233,9 @@ public class GameProfile {
             return;
         }
 
-        BattlegroundsCore.getInstance().slackPunishments.call(new SlackMessage(">>> _*" + enforcerProfile.getName() + "* temporarily banned *"
-                + this.name + "*_\n*Reason:* _" + reason.getName() + "_\n*Duration:* _" + Time.toString(duration * 1000, true) + "_"));
+        DiscordBot.punishmentsChannel.sendMessageFormat("%s\n\n***" + enforcerProfile.getName() + "*** *temporarily banned* ***"
+                        + this.name + "*** *for* ***" + Time.toString(duration * 1000, true) + "*** *for* ***" + reason.getName() + "***",
+                BattlegroundsCore.getAresDiscordBot().getRolesByName("staff", true).get(0)).queue();
 
         if (!WarnCommand.getWarned().containsKey(this.uuid))
             WarnCommand.getWarned().remove(this.uuid);
@@ -252,8 +269,9 @@ public class GameProfile {
             return;
         }
 
-        BattlegroundsCore.getInstance().slackPunishments.call(new SlackMessage(">>> _*" + enforcerProfile.getName()
-                + "* banned *" + this.name + "*_\n*Reason:* _" + reason.getName() + "_"));
+        DiscordBot.punishmentsChannel.sendMessageFormat("%s\n\n***" + enforcerProfile.getName()
+                        + "*** *permanently banned* ***" + this.name + "*** *for* ***" + reason.getName() + "***",
+                BattlegroundsCore.getAresDiscordBot().getRolesByName("staff", true).get(0)).queue();
 
         if (!WarnCommand.getWarned().containsKey(this.uuid))
             WarnCommand.getWarned().remove(this.uuid);
@@ -278,6 +296,22 @@ public class GameProfile {
                     + ChatColor.RED + " for " + ChatColor.GOLD + reason.getName() + "\n"
                     + ChatColor.YELLOW + reason.getMessage() + "\n\n" + ChatColor.GRAY + "Appeal your ban on the forums: battlegroundspvp.com/forums");
 
+    }
+
+    public void unban(GameProfile gameProfile, Punishment punishment) {
+        if (punishment.isPardoned()) {
+            gameProfile.sendMessage(ChatColor.RED + "That player isn't banned!");
+            gameProfile.playSound(EventSound.ACTION_FAIL);
+            return;
+        }
+
+        DiscordBot.punishmentsChannel.sendMessageFormat("%s\n\n***" + gameProfile.getName() + "*** *unbanned* ***" + this.name + "***\n**Reason for Ban:** *"
+                + punishment.getReason().getName() + "*", BattlegroundsCore.getAresDiscordBot().getRolesByName("staff", true).get(0)).queue();
+
+        BattlegroundsCore.getInstance().getServer().getOnlinePlayers().stream().filter(staff ->
+                BattlegroundsCore.getInstance().getGameProfile(staff.getUniqueId()).hasRank(Rank.HELPER)).forEach(staff ->
+                staff.sendMessage(ChatColor.RED + gameProfile.getName() + " unbanned " + this.name));
+        punishment.setPardoned(true);
     }
 
     public boolean isBanned() {
@@ -326,7 +360,7 @@ public class GameProfile {
         entity.setSettings(this.playerSettings.getEntity());
         entity.setEssences(this.essenceData.getEntity());
         entity.setPunishments(this.punishmentData.getEntities());
-        session.merge(entity);
+        session.saveOrUpdate(entity);
         session.getTransaction().commit();
         session.close();
     }

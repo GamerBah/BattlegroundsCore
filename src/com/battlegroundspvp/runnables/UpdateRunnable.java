@@ -2,8 +2,9 @@ package com.battlegroundspvp.runnables;
 
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.commands.FreezeCommand;
+import com.battlegroundspvp.utils.ColorBuilder;
+import com.battlegroundspvp.utils.DiscordBot;
 import com.battlegroundspvp.utils.PluginUtil;
-import com.battlegroundspvp.utils.enums.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.GameMode;
@@ -71,6 +72,8 @@ public class UpdateRunnable implements Runnable {
                             + File.separator + "BattlegroundsCore.jar"), StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException exception) {
                     plugin.getLogger().severe("Unable to complete update!");
+                    DiscordBot.errorLoggingChannel.sendMessageFormat("%s There was an error trying to update BattlegroundsCore! (Code: BC-UpdRun:TrCa.67)",
+                            BattlegroundsCore.getAresDiscordBot().getRolesByName("staff", true).get(0)).queue();
                     plugin.getLogger().severe(exception.getCause().toString());
                     deleteUpdateFile();
                 }
@@ -79,6 +82,8 @@ public class UpdateRunnable implements Runnable {
                     PluginUtil.load("BattlegroundsCore");
                 } catch (Throwable throwable) {
                     plugin.getLogger().severe("Unable to preform plugin update!");
+                    DiscordBot.errorLoggingChannel.sendMessageFormat("%s There was an error while loading the update for BattlegroundsCore! (Code: BC-UpdRun:TrCa.80)",
+                            BattlegroundsCore.getAresDiscordBot().getRolesByName("staff", true).get(0)).queue();
                     plugin.getLogger().severe(throwable.getCause().toString());
                     revert();
                     return;
@@ -87,7 +92,9 @@ public class UpdateRunnable implements Runnable {
                         + "Update was a " + new ColorBuilder(ChatColor.GREEN).bold().create() + "success" + ChatColor.GRAY + "! Now go have fun!");
             } catch (Throwable throwable) {
                 plugin.getLogger().severe("Error during pre-update, sticking with the current version");
+                DiscordBot.errorLoggingChannel.sendMessage("@Staff There was an error beginning the update for BattlegroundsCore! (Code: BC-UpdRun:TrCa.64)").queue();
                 plugin.getLogger().severe(throwable.getMessage());
+                throwable.printStackTrace();
                 plugin.getServer().broadcastMessage(new ColorBuilder(ChatColor.RED).bold().create() + "SERVER: " + ChatColor.GRAY
                         + "Stuck with current version due to issues with the update.");
                 deleteUpdateFile();
@@ -98,6 +105,7 @@ public class UpdateRunnable implements Runnable {
                     player.spigot().respawn();
                 }
                 updating = false;
+                FreezeCommand.reloadFreeze = false;
             }
         }, 100);
     }
@@ -109,17 +117,22 @@ public class UpdateRunnable implements Runnable {
         plugin.getServer().broadcastMessage(new ColorBuilder(ChatColor.RED).bold().create() + "SERVER: " + ChatColor.GRAY
                 + "Reverting to the previous version, hang tight...");
         try {
-            Files.move(currentFile.toPath(), Paths.get(plugin.getDataFolder().toPath() + File.separator + "BattlegroundsCore.jar"),
+            Files.move(currentFile.toPath(), Paths.get(plugin.getServer().getUpdateFolderFile().getParentFile().getPath()
+                            + File.separator + "BattlegroundsCore.jar"),
                     StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException exception) {
             plugin.getLogger().severe("Unable to revert!");
             plugin.getLogger().severe(exception.getCause().toString());
+            DiscordBot.errorLoggingChannel.sendMessageFormat("%s There was an error reverting the update! (Code: BC-UpdRun:TrCa.117)",
+                    BattlegroundsCore.getAresDiscordBot().getRolesByName("staff", true).get(0)).queue();
         }
         try {
             PluginUtil.load("BattlegroundsCore");
         } catch (Throwable throwable) {
             plugin.getLogger().severe("Reverted jar has errors, but it'll have to do");
             plugin.getLogger().severe(throwable.getCause().toString());
+            DiscordBot.errorLoggingChannel.sendMessageFormat("%s Careful! The update was reverted but there are still errors! (Code: BC-UpdRun:TrCa.126)",
+                    BattlegroundsCore.getAresDiscordBot().getRolesByName("staff", true).get(0)).queue();
         }
         plugin.getServer().broadcastMessage(new ColorBuilder(ChatColor.RED).bold().create() + "SERVER: " + ChatColor.GRAY
                 + "Successfully reverted to the previous version.");
@@ -131,6 +144,8 @@ public class UpdateRunnable implements Runnable {
         } catch (IOException exception) {
             plugin.getLogger().severe("Unable to delete queued jarfile!");
             plugin.getLogger().severe(exception.getCause().toString());
+            DiscordBot.errorLoggingChannel.sendMessageFormat("%s The queued jarfile was unable to be deleted! (Code: BC-UpdRun:TrCa.138)",
+                    BattlegroundsCore.getAresDiscordBot().getRolesByName("staff", true).get(0)).queue();
         }
     }
 }

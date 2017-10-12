@@ -4,8 +4,8 @@ package com.battlegroundspvp.commands;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
+import com.battlegroundspvp.utils.DiscordBot;
 import com.battlegroundspvp.utils.enums.EventSound;
-import net.gpedro.integrations.slack.SlackMessage;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.Command;
@@ -40,7 +40,7 @@ public class StaffReqCommand implements CommandExecutor {
         }
 
         if (gameProfile.hasRank(Rank.HELPER)) {
-            player.sendMessage(ChatColor.RED + "You need help from a Staff member? You are a Staff member, silly! Use Slack! xD");
+            player.sendMessage(ChatColor.RED + "You need help from a Staff member? You are a Staff member, silly! Use Discord! xD");
             return true;
         }
 
@@ -56,7 +56,8 @@ public class StaffReqCommand implements CommandExecutor {
 
         String message = StringUtils.join(args, ' ', 0, args.length);
 
-        plugin.slackStaffRequests.call(new SlackMessage(">>>*" + player.getName() + ":* _" + message + "_"));
+        DiscordBot.staffChannel.sendMessageFormat("%s **" + player.getName() + ":** *" + message + "*",
+                BattlegroundsCore.getAresDiscordBot().getRolesByName("staff", true).get(0)).queue();
 
         player.sendMessage(ChatColor.GREEN + "Your message has been sent! A staff member has been notified of your request and should be able to help you shortly!");
         EventSound.playSound(player, EventSound.ACTION_SUCCESS);

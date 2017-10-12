@@ -4,12 +4,11 @@ import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.commands.ReportCommand;
-import com.battlegroundspvp.utils.enums.ColorBuilder;
+import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
 import com.battlegroundspvp.utils.inventories.GameInventory;
 import com.battlegroundspvp.utils.inventories.ItemBuilder;
 import lombok.Getter;
-import net.gpedro.integrations.slack.SlackMessage;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -158,7 +157,7 @@ public class ReportMenu extends GameInventory {
         plugin.getServer().getOnlinePlayers().stream().filter(staff -> plugin.getGameProfile(staff.getUniqueId())
                 .hasRank(Rank.HELPER)).forEach(staff -> staff.playSound(staff.getLocation(), Sound.BLOCK_NOTE_HARP, 2, 2));
 
-        plugin.slackReports.call(new SlackMessage(">>>*" + player.getName() + "* _has reported_ *" + targetProfile.getName() + "* _for:_ " + message));
+        //plugin.slackReports.call(new SlackMessage(">>>*" + player.getName() + "* _has reported_ *" + targetProfile.getName() + "* _for:_ " + message));
 
         player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 1);
 

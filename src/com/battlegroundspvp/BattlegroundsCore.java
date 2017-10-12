@@ -4,8 +4,7 @@ package com.battlegroundspvp;
 import com.battlegroundspvp.administration.commands.*;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.sql.*;
-import com.battlegroundspvp.commands.FriendCommand;
-import com.battlegroundspvp.commands.PingCommand;
+import com.battlegroundspvp.commands.*;
 import com.battlegroundspvp.listeners.InventoryClickListener;
 import com.battlegroundspvp.listeners.ServerListPingListener;
 import com.battlegroundspvp.listeners.WeatherChangeListener;
@@ -13,8 +12,9 @@ import com.battlegroundspvp.playerevents.*;
 import com.battlegroundspvp.punishments.commands.*;
 import com.battlegroundspvp.runnables.*;
 import com.battlegroundspvp.utils.ChatFilter;
+import com.battlegroundspvp.utils.ColorBuilder;
+import com.battlegroundspvp.utils.DiscordBot;
 import com.battlegroundspvp.utils.enums.Advancements;
-import com.battlegroundspvp.utils.enums.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
 import com.battlegroundspvp.utils.inventories.InventoryBuilder;
 import com.comphenix.protocol.PacketType;
@@ -25,7 +25,11 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import de.Herbystar.TTA.TTA_Methods;
 import lombok.Getter;
-import net.gpedro.integrations.slack.SlackApi;
+import net.dv8tion.jda.core.AccountType;
+import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.core.entities.Game;
+import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -46,6 +50,7 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
+import javax.security.auth.login.LoginException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -96,11 +101,8 @@ public class BattlegroundsCore extends JavaPlugin {
     @Getter
     private List<Location> uLaunchersParticle = new ArrayList<>();
 
-    public SlackApi slackReports = null;
-    public SlackApi slackStaffRequests = null;
-    public SlackApi slackDonations = null;
-    public SlackApi slackPunishments = null;
-    public SlackApi slackErrorReporting = null;
+    @Getter
+    private static JDA aresDiscordBot = null;
 
     public void onEnable() {
         instance = this;
@@ -176,12 +178,29 @@ public class BattlegroundsCore extends JavaPlugin {
             getLogger().severe("Could not get safe words!");
         }
 
-        // Initialize SlackApis
-        slackReports = new SlackApi("https://hooks.slack.com/services/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");
-        slackStaffRequests = new SlackApi("https://hooks.slack.com/services/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");
-        slackDonations = new SlackApi("https://hooks.slack.com/services/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");
-        slackPunishments = new SlackApi("https://hooks.slack.com/services/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");
-        slackErrorReporting = new SlackApi("https://hooks.slack.com/services/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");
+        // Initialize Ares Discord Bot
+        try {
+            aresDiscordBot = new JDABuilder(AccountType.BOT)
+                    .setToken("MzY3ODM0MjAzOTMwMzYxODU5.DMBPLQ.W4NuixG--wvSHHH86S3WGIXU88w")
+                    .setGame(Game.of("Battlegrounds"))
+                    .buildBlocking();
+        } catch (LoginException | RateLimitedException | InterruptedException exception) {
+            getLogger().severe("Couldn't initialize the Ares Discord bot!");
+            exception.printStackTrace();
+        }
+
+        // Initialize Discord Channels
+        if (aresDiscordBot != null) {
+            //aresDiscordBot.addEventListener(new DiscordBot(this));
+            DiscordBot.staffChannel = aresDiscordBot.getTextChannelById("367463158102753280");
+            DiscordBot.punishmentsChannel = aresDiscordBot.getTextChannelById("367871072361512961");
+            DiscordBot.announcementsChannel = aresDiscordBot.getTextChannelById("271113764923899914");
+            DiscordBot.casualChannel = aresDiscordBot.getTextChannelById("263534021110267915");
+            DiscordBot.vipCasualChannel = aresDiscordBot.getTextChannelById("364917174810443786");
+            DiscordBot.supportChannel = aresDiscordBot.getTextChannelById("367466544004988929");
+            DiscordBot.errorLoggingChannel = aresDiscordBot.getTextChannelById("367898066910445578");
+        }
+
 
         setUpPacketHandlers();
         Session session = sessionFactory.openSession();
@@ -247,6 +266,7 @@ public class BattlegroundsCore extends JavaPlugin {
         getCommand("clearchat").setExecutor(new ChatCommands(this));
         getCommand("lockchat").setExecutor(new ChatCommands(this));
         getCommand("staff").setExecutor(new StaffChatCommand(this));
+        getCommand("staffreq").setExecutor(new StaffReqCommand(this));
         getCommand("freeze").setExecutor(new FreezeCommand(this));
         getCommand("mute").setExecutor(new MuteCommand(this));
         getCommand("unmute").setExecutor(new UnmuteCommand(this));
@@ -264,6 +284,10 @@ public class BattlegroundsCore extends JavaPlugin {
         getCommand("launcher").setExecutor(new LauncherCommand(this));
         getCommand("ping").setExecutor(new PingCommand(this));
         getCommand("friend").setExecutor(new FriendCommand(this));
+        getCommand("help").setExecutor(new HelpCommand(this));
+        getCommand("message").setExecutor(new MessageCommand(this));
+        getCommand("reply").setExecutor(new ReplyCommand(this));
+        getCommand("rules").setExecutor(new RulesCommand(this));
 
     }
 

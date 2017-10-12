@@ -2,7 +2,7 @@ package com.battlegroundspvp.commands;
 /* Created by GamerBah on 8/15/2016 */
 
 import com.battlegroundspvp.BattlegroundsCore;
-import com.battlegroundspvp.utils.enums.ColorBuilder;
+import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;

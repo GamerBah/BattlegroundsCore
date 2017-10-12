@@ -23,19 +23,6 @@ public class PunishmentsEntity {
     private String reason;
     private String type;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id", nullable = false)
+    @JoinColumn(name = "id")
     private GameProfilesEntity gameProfilesEntity;
-
-    public int hashCode() {
-        int code = 0;
-        code += punishmentId;
-        code += date.hashCode();
-        code += duration;
-        code += enforcerId;
-        code += expiration.hashCode();
-        code += (pardoned ? 1 : 0);
-        code += reason.hashCode();
-        code += type.hashCode();
-        return code;
-    }
 }

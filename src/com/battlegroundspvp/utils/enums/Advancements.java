@@ -1,5 +1,6 @@
 package com.battlegroundspvp.utils.enums;/* Created by GamerBah on 10/8/2017 */
 
+import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.advancements.CustomAdvancement;
 import com.battlegroundspvp.utils.advancements.api.AdvancementBuilder;
 import com.battlegroundspvp.utils.inventories.ItemBuilder;
@@ -28,7 +29,7 @@ public enum Advancements {
     SHOWMANSHIP_III(new CustomAdvancement(ChatColor.YELLOW + "Showmanship III", "Unlock 6 particle packs", new ItemBuilder(Material.DIAMOND), false, true, AdvancementBuilder.FrameType.TASK, SHOWMANSHIP_II)),
     SHOWMANSHIP_IV(new CustomAdvancement(ChatColor.YELLOW + "Showmanship IV", "Unlock 9 particle packs", new ItemBuilder(Material.DIAMOND), false, true, AdvancementBuilder.FrameType.TASK, SHOWMANSHIP_III)),
     SHOWMANSHIP_V(new CustomAdvancement(ChatColor.YELLOW + "Showmanship V", "Unlock 12 particle packs", new ItemBuilder(Material.DIAMOND), false, true, AdvancementBuilder.FrameType.TASK, SHOWMANSHIP_IV)),
-    SHOWMANSHIP_MASTERY(new CustomAdvancement(new ColorBuilder(ChatColor.YELLOW).bold().create() + "Showmanship Mastery", "Unlock all particle packs", new ItemBuilder(Material.DIAMOND), false, true, AdvancementBuilder.FrameType.GOAL, SHOWMANSHIP_V)),
+    SHOWMANSHIP_MASTERY(new CustomAdvancement(new ColorBuilder(ChatColor.YELLOW).bold().create() + "Showmanship Mastery", "Unlock all particle packs", new ItemBuilder(Material.DIAMOND), false, true, AdvancementBuilder.FrameType.GOAL, SHOWMANSHIP_V));
 
     private CustomAdvancement customAdvancement;
 

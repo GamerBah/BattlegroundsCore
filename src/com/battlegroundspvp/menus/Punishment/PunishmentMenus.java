@@ -4,8 +4,8 @@ package com.battlegroundspvp.menus.Punishment;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.punishments.Punishment;
+import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.SignGUI;
-import com.battlegroundspvp.utils.enums.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
 import com.battlegroundspvp.utils.enums.Time;
 import com.battlegroundspvp.utils.inventories.*;
@@ -22,12 +22,20 @@ public class PunishmentMenus {
 
             if (!targetProfile.getPunishmentData().getBans().isEmpty()) {
                 for (Punishment punishment : targetProfile.getPunishmentData().getBans())
-                    addSortableItem(InventoryItems.punishItem(punishment));
+                    addSortableItem(InventoryItems.punishItem(punishment).clone()
+                            .storeObject(Punishment.class, punishment)
+                            .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
+                                new InventoryBuilder(player, new OptionsMenu(player, targetProfile, punishment)).open();
+                                EventSound.playSound(player, EventSound.INVENTORY_OPEN_SUBMENU);
+                            })));
                 setItemCount(getSortables().size());
                 addClickableItem(0, new ItemBuilder(Material.BOOK_AND_QUILL)
                         .name(ChatColor.YELLOW + "Click to ban this player!")
-                        .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> new InventoryBuilder(player, new CreationMenu(player, targetProfile,
-                                Punishment.Type.BAN, null, 0)).sort(InventoryBuilder.SortType.NEWEST).open())));
+                        .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
+                            new InventoryBuilder(player, new CreationMenu(player, targetProfile,
+                                    Punishment.Type.BAN, null, 0)).sort(InventoryBuilder.SortType.NEWEST).open();
+                            EventSound.playSound(player, EventSound.INVENTORY_OPEN_SUBMENU);
+                        })));
             } else {
                 addClickableItem(22, InventoryItems.nothing.clone()
                         .lore(ChatColor.YELLOW + "Click to ban this player!")
@@ -166,12 +174,20 @@ public class PunishmentMenus {
 
             if (!targetProfile.getPunishmentData().getKicks().isEmpty()) {
                 for (Punishment punishment : targetProfile.getPunishmentData().getKicks())
-                    addSortableItem(InventoryItems.punishItem(punishment));
+                    addSortableItem(InventoryItems.punishItem(punishment).clone()
+                            .storeObject(Punishment.class, punishment)
+                            .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
+                                new InventoryBuilder(player, new OptionsMenu(player, targetProfile, punishment)).open();
+                                EventSound.playSound(player, EventSound.INVENTORY_OPEN_SUBMENU);
+                            })));
                 setItemCount(getSortables().size());
                 addClickableItem(0, new ItemBuilder(Material.BOOK_AND_QUILL)
                         .name(ChatColor.YELLOW + "Click to kick this player!")
-                        .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> new InventoryBuilder(player, new CreationMenu(player, targetProfile,
-                                Punishment.Type.KICK, null, 0)).sort(InventoryBuilder.SortType.NEWEST).open())));
+                        .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
+                            new InventoryBuilder(player, new CreationMenu(player, targetProfile,
+                                    Punishment.Type.KICK, null, 0)).sort(InventoryBuilder.SortType.NEWEST).open();
+                            EventSound.playSound(player, EventSound.INVENTORY_OPEN_SUBMENU);
+                        })));
             } else {
                 addClickableItem(22, new ItemBuilder(InventoryItems.nothing).lore("")
                         .lore(ChatColor.YELLOW + "Click to kick this player!")
@@ -190,12 +206,20 @@ public class PunishmentMenus {
 
             if (!targetProfile.getPunishmentData().getMutes().isEmpty()) {
                 for (Punishment punishment : targetProfile.getPunishmentData().getMutes())
-                    addSortableItem(InventoryItems.punishItem(punishment).clone());
+                    addSortableItem(InventoryItems.punishItem(punishment).clone()
+                            .storeObject(Punishment.class, punishment)
+                            .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
+                                new InventoryBuilder(player, new OptionsMenu(player, targetProfile, punishment)).open();
+                                EventSound.playSound(player, EventSound.INVENTORY_OPEN_SUBMENU);
+                            })));
                 setItemCount(getSortables().size());
                 addClickableItem(0, new ItemBuilder(Material.BOOK_AND_QUILL)
                         .name(ChatColor.YELLOW + "Click to mute this player!")
-                        .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> new InventoryBuilder(player, new CreationMenu(player, targetProfile,
-                                Punishment.Type.MUTE, null, 0)).sort(InventoryBuilder.SortType.NEWEST).open())));
+                        .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
+                            new InventoryBuilder(player, new CreationMenu(player, targetProfile,
+                                    Punishment.Type.MUTE, null, 0)).open();
+                            EventSound.playSound(player, EventSound.INVENTORY_OPEN_SUBMENU);
+                        })));
             } else {
                 addClickableItem(22, InventoryItems.nothing.clone()
                         .lore(ChatColor.YELLOW + "Click to mute this player!")
@@ -241,28 +265,28 @@ public class PunishmentMenus {
                     .lore(ChatColor.GRAY + "Past Mutes: " + ChatColor.RED + (!targetProfile.getPunishmentData().getMutes().isEmpty() ? targetProfile.getPunishmentData().getMutes().size() : 0))
                     .lore(" ").lore(ChatColor.RED + "Click to view!")
                     .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
-                        new InventoryBuilder(player, new MuteMenu(player, targetProfile)).open();
+                        new InventoryBuilder(player, new MuteMenu(player, targetProfile)).sort(InventoryBuilder.SortType.NEWEST).open();
                         EventSound.playSound(player, EventSound.INVENTORY_OPEN_SUBMENU);
                     })));
-            addClickableItem(12, new ItemBuilder(Material.BOOK).name(new ColorBuilder(ChatColor.GOLD).bold().create() + "Kicks")
+            addClickableItem(12, new ItemBuilder(Material.BOOK).name(new ColorBuilder(ChatColor.GOLD).bold().create() + "KICKS")
                     .lore(ChatColor.GRAY + "Past Kicks: " + ChatColor.RED + (!targetProfile.getPunishmentData().getKicks().isEmpty() ? targetProfile.getPunishmentData().getKicks().size() : 0))
                     .lore(" ").lore(ChatColor.RED + "Click to view!")
                     .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
-                        new InventoryBuilder(player, new KickMenu(player, targetProfile)).open();
+                        new InventoryBuilder(player, new KickMenu(player, targetProfile)).sort(InventoryBuilder.SortType.NEWEST).open();
                         EventSound.playSound(player, EventSound.INVENTORY_OPEN_SUBMENU);
                     })));
             addClickableItem(14, new ItemBuilder(Material.SULPHUR).name(new ColorBuilder(ChatColor.RED).bold().create() + "TEMP-BANS")
                     .lore(ChatColor.GRAY + "Past Temp-Bans: " + ChatColor.RED + (!targetProfile.getPunishmentData().getTempBans().isEmpty() ? targetProfile.getPunishmentData().getTempBans().size() : 0))
                     .lore(" ").lore(ChatColor.RED + "Click to view!")
                     .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
-                        new InventoryBuilder(player, new TempBanMenu(player, targetProfile)).open();
+                        new InventoryBuilder(player, new TempBanMenu(player, targetProfile)).sort(InventoryBuilder.SortType.NEWEST).open();
                         EventSound.playSound(player, EventSound.INVENTORY_OPEN_SUBMENU);
                     })));
             addClickableItem(16, new ItemBuilder(Material.BARRIER).name(new ColorBuilder(ChatColor.DARK_RED).bold().create() + "BANS")
                     .lore(ChatColor.GRAY + "Past Bans: " + ChatColor.RED + (!targetProfile.getPunishmentData().getBans().isEmpty() ? targetProfile.getPunishmentData().getBans().size() : 0))
                     .lore(" ").lore(ChatColor.RED + "Click to view!")
                     .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
-                        new InventoryBuilder(player, new BanMenu(player, targetProfile)).open();
+                        new InventoryBuilder(player, new BanMenu(player, targetProfile)).sort(InventoryBuilder.SortType.NEWEST).open();
                         EventSound.playSound(player, EventSound.INVENTORY_OPEN_SUBMENU);
                     })));
             addClickableItem(27, InventoryItems.back.clone().clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> openPreviousInventory(player))));
@@ -276,12 +300,20 @@ public class PunishmentMenus {
 
             if (!targetProfile.getPunishmentData().getTempBans().isEmpty()) {
                 for (Punishment punishment : targetProfile.getPunishmentData().getTempBans())
-                    addSortableItem(InventoryItems.punishItem(punishment));
+                    addSortableItem(InventoryItems.punishItem(punishment).clone()
+                            .storeObject(Punishment.class, punishment)
+                            .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
+                                new InventoryBuilder(player, new OptionsMenu(player, targetProfile, punishment)).open();
+                                EventSound.playSound(player, EventSound.INVENTORY_OPEN_SUBMENU);
+                            })));
                 setItemCount(getSortables().size());
                 addClickableItem(0, new ItemBuilder(Material.BOOK_AND_QUILL)
                         .name(ChatColor.YELLOW + "Click to temp-ban this player!")
-                        .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> new InventoryBuilder(player, new CreationMenu(player, targetProfile,
-                                Punishment.Type.TEMP_BAN, null, 0)).sort(InventoryBuilder.SortType.NEWEST).open())));
+                        .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
+                            new InventoryBuilder(player, new CreationMenu(player, targetProfile,
+                                    Punishment.Type.TEMP_BAN, null, 0)).sort(InventoryBuilder.SortType.NEWEST).open();
+                            EventSound.playSound(player, EventSound.INVENTORY_OPEN_SUBMENU);
+                        })));
             } else {
                 addClickableItem(22, InventoryItems.nothing.clone()
                         .lore(ChatColor.YELLOW + "Click to temp-ban this player!")
@@ -293,6 +325,44 @@ public class PunishmentMenus {
         }
     }
 
+    public class OptionsMenu extends GameInventory {
+
+        public OptionsMenu(Player player, GameProfile targetProfile, Punishment punishment) {
+            super("Punishment Options", 0, Type.STANDARD,
+                    punishment.getType() == Punishment.Type.MUTE ? new MuteMenu(player, targetProfile) :
+                            punishment.getType() == Punishment.Type.KICK ? new KickMenu(player, targetProfile) :
+                                    punishment.getType() == Punishment.Type.TEMP_BAN ? new TempBanMenu(player, targetProfile) :
+                                            new BanMenu(player, targetProfile));
+            setInventory(BattlegroundsCore.getInstance().getServer().createInventory(null, 27, getInventory().getName()));
+            addClickableItem(12, new ItemBuilder(Material.EMPTY_MAP)
+                    .name(new ColorBuilder(ChatColor.AQUA).bold().create() + "Pardon")
+                    .lore(ChatColor.GRAY + "Sets this punishment as pardoned")
+                    .lore("")
+                    .lore(ChatColor.YELLOW + "Click to pardon!")
+                    .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
+                        if (punishment.getType() == Punishment.Type.MUTE)
+                            targetProfile.unmute(BattlegroundsCore.getInstance().getGameProfile(player.getUniqueId()), punishment);
+                        if (punishment.getType() == Punishment.Type.BAN || punishment.getType() == Punishment.Type.TEMP_BAN)
+                            targetProfile.unban(BattlegroundsCore.getInstance().getGameProfile(player.getUniqueId()), punishment);
+                        player.closeInventory();
+                        EventSound.playSound(player, EventSound.ACTION_SUCCESS);
+                    })));
+            addClickableItem(14, new ItemBuilder(Material.PAPER)
+                    .name(new ColorBuilder(ChatColor.AQUA).bold().create() + "Delete")
+                    .lore(ChatColor.GRAY + "Removes this punishment from")
+                    .lore(ChatColor.GRAY + "the system completely")
+                    .lore("")
+                    .lore(new ColorBuilder(ChatColor.DARK_RED).bold().create() + "WARNING: " + new ColorBuilder(ChatColor.RED).bold().create() + "This process cannot be undone!")
+                    .lore("")
+                    .lore(ChatColor.YELLOW + "Click to delete!")
+                    .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
+                        targetProfile.getPunishmentData().delete(player, targetProfile, punishment);
+                        player.closeInventory();
+                        EventSound.playSound(player, EventSound.ACTION_SUCCESS);
+                    })));
+            addClickableItem(18, InventoryItems.back.clone().clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> openPreviousInventory(player))));
+        }
+    }
 
     private void openSearch(Player player) {
         SignGUI.open(player);
