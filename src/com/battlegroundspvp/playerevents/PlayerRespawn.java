@@ -2,15 +2,18 @@ package com.battlegroundspvp.playerevents;
 /* Created by GamerBah on 8/9/2016 */
 
 import com.battlegroundspvp.BattlegroundsCore;
+import com.battlegroundspvp.BattlegroundsKitPvP;
 import com.battlegroundspvp.administration.commands.FreezeCommand;
 import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.inventories.ItemBuilder;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -28,10 +31,10 @@ public class PlayerRespawn implements Listener {
     }
 
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-        event.setRespawnLocation(event.getPlayer().getWorld().getSpawnLocation().add(0.5, 0.0, 0.5));
+        player.teleport((Location) BattlegroundsCore.getInstance().getConfig().get("spawn"));
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
         player.setHealth(20F);
@@ -42,34 +45,17 @@ public class PlayerRespawn implements Listener {
         player.setFlying(false);
         player.setAllowFlight(false);
         player.setGameMode(GameMode.ADVENTURE);
-        if (!BattlegroundsCore.getFallDmg().contains(player)) {
+        if (!BattlegroundsCore.getFallDmg().contains(player))
             BattlegroundsCore.getFallDmg().add(player);
-        }
+
         for (PotionEffect effect : player.getActivePotionEffects())
             player.removePotionEffect(effect.getType());
 
-        // TODO: RUN MODULE RESPAWN EVENTS
-        /*if (KitAbility.getPlayerStatus().containsKey(player.getName())) {
-            KitAbility.getPlayerStatus().remove(player.getName());
-            player.setExp(0);
-            player.setLevel(0);
+        if (BattlegroundsCore.checkKitPvP())
+            BattlegroundsKitPvP.runRespawn(event);
 
-        player.getInventory().setItem(0, new I(Material.NETHER_STAR)
-                .name(new ColorBuilder(ChatColor.AQUA).bold().create() + "Kit Selector" + ChatColor.GRAY + " (Right-Click)")
-                .lore(ChatColor.GRAY + "Choose which kit you'll use!"));
-
-        if (KitManager.getPreviousKit().containsKey(player.getUniqueId())) {
-            Kit kit = KitManager.getPreviousKit().get(player.getUniqueId());
-            player.getInventory().setItem(1, new I(Material.BOOK)
-                    .name(BoldColor.GREEN.getColor() + "Previous Kit: " + kit.getRarity().getColor() + (kit.getRarity() == Rarity.EPIC || kit.getRarity() == Rarity.LEGENDARY ?
-                            "" + ChatColor.BOLD : "") + kit.getName() + ChatColor.GRAY + " (Right-Click)")
-                    .lore(ChatColor.GRAY + "Equips your previous kit"));
-        }
-        }*/
-
-        for (Player players : Bukkit.getServer().getOnlinePlayers()) {
+        for (Player players : Bukkit.getServer().getOnlinePlayers())
             players.showPlayer(player);
-        }
 
         if (FreezeCommand.frozenPlayers.contains(player) || FreezeCommand.frozen) {
             player.setWalkSpeed(0F);

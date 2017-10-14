@@ -63,6 +63,8 @@ public class GameProfile {
     @Getter
     private final EssenceData essenceData;
     @Getter
+    private final CratesData cratesData;
+    @Getter
     private final PunishmentData punishmentData;
 
     public GameProfile(GameProfilesEntity entity) {
@@ -85,6 +87,7 @@ public class GameProfile {
         this.kitPvpData = new KitPvpData(entity.getKitPvpData());
         this.playerSettings = new PlayerSettings(entity.getSettings());
         this.essenceData = new EssenceData(entity.getEssences());
+        this.cratesData = new CratesData(entity.getCrates());
         this.punishmentData = new PunishmentData(entity.getPunishments(), entity);
     }
 
@@ -355,10 +358,12 @@ public class GameProfile {
         this.kitPvpData.sync();
         this.essenceData.sync();
         this.playerSettings.sync();
+        this.cratesData.sync();
         this.punishmentData.sync();
         entity.setKitPvpData(this.kitPvpData.getEntity());
         entity.setSettings(this.playerSettings.getEntity());
         entity.setEssences(this.essenceData.getEntity());
+        entity.setCrates(this.cratesData.getEntity());
         entity.setPunishments(this.punishmentData.getEntities());
         session.saveOrUpdate(entity);
         session.getTransaction().commit();

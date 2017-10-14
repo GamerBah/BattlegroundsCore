@@ -3,6 +3,7 @@ name: BattlegroundsCore
 author: GamerBah
 version: 0.3.0a
 depend: [ProtocolLib]
+softdepend: [BattlegroundsKitPvP]
 commands:
   rank:
     description: Changes a players rank
@@ -28,10 +29,6 @@ commands:
     description: Report a player
   staffreq:
     description: Requests a Staff member
-  team:
-    description: Team with another player!
-  spawn:
-    description: Takes you back to the spawn
   afk:
     description: Sets you as AFK (away-from-keyboard)
   message:
@@ -58,9 +55,6 @@ commands:
     description: Removes a player's active ban
   maintenance:
     description: Puts the in a Staff-only maintenance mode
-  slots:
-    description: Opens up the K-Slots menu
-    aliases: [kslots, kitslots]
   dailyreward:
     description: Claims available daily rewards
     aliases: [dr, daily, dreward]
@@ -86,7 +80,9 @@ commands:
     description: Warns a player
   rules:
     description: Displays the Server Rules
-  spectate:
-    description: Puts the player into spectate mode
   launcher:
     description: Adds either upwards or forwards launchers
+  crate:
+    description: Adds locations for Battle Crates
+  setspawn:
+    description: Sets the world spawn with correct yaw value

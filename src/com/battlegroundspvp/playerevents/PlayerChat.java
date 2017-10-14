@@ -8,12 +8,14 @@ import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.commands.MessageCommand;
 import com.battlegroundspvp.runnables.AFKRunnable;
+import com.battlegroundspvp.utils.ChatFilter;
 import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
@@ -27,7 +29,7 @@ public class PlayerChat implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
         event.setCancelled(true);
@@ -57,6 +59,24 @@ public class PlayerChat implements Listener {
             return;
 
         boolean hasRank = gameProfile.hasRank(Rank.WARRIOR);
+
+        if (!ChatFilter.isClean(event.getMessage())) {
+            event.setCancelled(true);
+            player.sendMessage(new ColorBuilder(ChatColor.RED).bold().create() + "Please refrain from using profane language!");
+            EventSound.playSound(player, EventSound.ACTION_FAIL);
+            if (!ChatFilter.getAttempts().containsKey(player)) {
+                if (!plugin.getGameProfile(player.getUniqueId()).hasRank(Rank.HELPER)) {
+                    ChatFilter.getAttempts().put(player, 1);
+                }
+            } else {
+                ChatFilter.getAttempts().put(player, ChatFilter.getAttempts().get(player) + 1);
+                if (ChatFilter.getAttempts().get(player) == 10) {
+                    ChatFilter.getAttempts().remove(player);
+                    //plugin.warnPlayer(null, gameProfile, Punishment.Reason.ATTEMPT_SWEARING);
+                }
+            }
+            return;
+        }
 
         plugin.getServer().getOnlinePlayers().forEach(p -> {
             if (Pattern.compile(Pattern.quote("@" + p.getName()), Pattern.CASE_INSENSITIVE).matcher(event.getMessage()).find()) {

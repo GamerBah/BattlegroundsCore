@@ -13,6 +13,7 @@ import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.potion.PotionEffectType;
@@ -24,7 +25,7 @@ public class PlayerCommandPreProcess implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
         GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
@@ -41,43 +42,53 @@ public class PlayerCommandPreProcess implements Listener {
                 || StringUtils.startsWithIgnoreCase(command, "/minecraft:")
                 || StringUtils.startsWithIgnoreCase(command, "/bukkit:")
                 || StringUtils.startsWithIgnoreCase(command, "/spigot:")
-                || StringUtils.startsWithIgnoreCase(command, "/battlegrounds:")) {
+                || StringUtils.startsWithIgnoreCase(command, "/battlegroundscore:")) {
             event.setCancelled(true);
             return;
         }
 
         if (StringUtils.equalsIgnoreCase(command, "/help")) {
             event.setCancelled(true);
-            player.performCommand("battlegrounds:help");
+            player.performCommand("battlegroundscore:help");
             return;
         }
         if (StringUtils.equalsIgnoreCase(command, "/help staff")) {
             event.setCancelled(true);
-            player.performCommand("battlegrounds:help staff");
+            player.performCommand("battlegroundscore:help staff");
             return;
         }
         if (StringUtils.equalsIgnoreCase(command, "/reload")) {
             event.setCancelled(true);
-            player.performCommand("battlegrounds:reload");
+            player.performCommand("battlegroundscore:reload");
             return;
         }
         if (StringUtils.equalsIgnoreCase(command, "/reload server")) {
             event.setCancelled(true);
-            player.performCommand("battlegrounds:reload server");
+            player.performCommand("battlegroundscore:reload server");
             return;
         }
         if (StringUtils.equalsIgnoreCase(command, "/reload messages")) {
             event.setCancelled(true);
-            player.performCommand("battlegrounds:reload messages");
+            player.performCommand("battlegroundscore:reload messages");
+            return;
+        }
+        if (StringUtils.equalsIgnoreCase(command, "/reload plugin")) {
+            event.setCancelled(true);
+            player.performCommand("battlegroundscore:reload plugin");
             return;
         }
         if (StringUtils.contains(command, "/kick")) {
             event.setCancelled(true);
             if (command.length() > 6) {
-                player.performCommand("battlegrounds:kick " + command.substring(6, command.length()));
+                player.performCommand("battlegroundscore:kick " + command.substring(6, command.length()));
             } else {
-                player.performCommand("battlegrounds:kick");
+                player.performCommand("battlegroundscore:kick");
             }
+            return;
+        }
+        if (StringUtils.equalsIgnoreCase(command, "/setworldspawn")) {
+            event.setCancelled(true);
+            player.performCommand("battlegroundscore:setspawn");
             return;
         }
 

@@ -19,7 +19,7 @@ public class InventoryClickListener implements Listener {
 
     private BattlegroundsCore plugin = BattlegroundsCore.getInstance();
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onInventoryClick(InventoryClickEvent event) {
         if (!event.isCancelled()) {
             Inventory inventory = event.getInventory();

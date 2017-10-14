@@ -113,13 +113,13 @@ public class LauncherCommand implements CommandExecutor {
                 }
                 if (args[1].equalsIgnoreCase("-u")) {
                     plugin.getULaunchers().add(block.getRelative(BlockFace.DOWN).getLocation());
-                    plugin.getULaunchersParticle().add(plugin.getULaunchers().get(plugin.getULaunchers().size() - 1).clone().add(0, 1, 0));
+                    plugin.getULaunchersParticle().add(plugin.getULaunchers().get(plugin.getULaunchers().size() - 1).clone().add(0, 1.1, 0));
                     player.sendMessage(ChatColor.GREEN + "Successfully added " + ChatColor.AQUA + "upwards launcher" + ChatColor.GREEN
                             + " at " + ChatColor.RED + block.getX() + ", " + block.getY() + ", " + block.getZ());
                     return true;
                 } else if (args[1].equalsIgnoreCase("-f")) {
                     plugin.getFLaunchers().add(block.getRelative(BlockFace.DOWN).getLocation());
-                    plugin.getFLaunchersParticle().add(plugin.getFLaunchers().get(plugin.getFLaunchers().size() - 1).clone().add(0, 1, 0));
+                    plugin.getFLaunchersParticle().add(plugin.getFLaunchers().get(plugin.getFLaunchers().size() - 1).clone().add(0, 1.1, 0));
                     player.sendMessage(ChatColor.GREEN + "Successfully added " + ChatColor.AQUA + "forwards launcher" + ChatColor.GREEN
                             + " at " + ChatColor.RED + block.getX() + ", " + block.getY() + ", " + block.getZ());
                     return true;

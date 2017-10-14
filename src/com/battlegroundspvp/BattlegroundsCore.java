@@ -5,13 +5,13 @@ import com.battlegroundspvp.administration.commands.*;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.sql.*;
 import com.battlegroundspvp.commands.*;
+import com.battlegroundspvp.listeners.BlockListeners;
 import com.battlegroundspvp.listeners.InventoryClickListener;
 import com.battlegroundspvp.listeners.ServerListPingListener;
 import com.battlegroundspvp.listeners.WeatherChangeListener;
 import com.battlegroundspvp.playerevents.*;
 import com.battlegroundspvp.punishments.commands.*;
 import com.battlegroundspvp.runnables.*;
-import com.battlegroundspvp.utils.ChatFilter;
 import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.DiscordBot;
 import com.battlegroundspvp.utils.enums.Advancements;
@@ -42,6 +42,7 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.hibernate.Session;
@@ -61,21 +62,15 @@ import java.util.*;
 public class BattlegroundsCore extends JavaPlugin {
 
     @Getter
-    public static Map<Player, Player> pendingFriends = new HashMap<>();
-
-    @Getter
     private static BattlegroundsCore instance = null;
+    @Getter
+    private static BattlegroundsKitPvP kitPvP = null;
+
     @Getter
     private static SessionFactory sessionFactory = null;
     @Getter
     private static ProtocolManager protocolManager;
 
-    @Getter
-    private static HashSet<UUID> afk = new HashSet<>();
-    @Getter
-    private static HashSet<UUID> cmdspies = new HashSet<>();
-    @Getter
-    private static HashSet<Player> fallDmg = new HashSet<>();
     @Getter
     private static List<GameProfile> gameProfiles = new ArrayList<>();
 
@@ -83,15 +78,21 @@ public class BattlegroundsCore extends JavaPlugin {
     private GlobalStatsEntity globalStats = null;
 
     @Getter
+    public static Map<Player, Player> pendingFriends = new HashMap<>();
+    @Getter
     private Map<UUID, UUID> messagers = new HashMap<>();
-
+    @Getter
+    private static HashSet<UUID> afk = new HashSet<>();
+    @Getter
+    private static HashSet<UUID> cmdspies = new HashSet<>();
+    @Getter
+    private static HashSet<Player> fallDmg = new HashSet<>();
     @Getter
     private List<String> filteredWords = new ArrayList<>();
     @Getter
     private List<String> safeWords = new ArrayList<>();
     @Getter
     private List<String> autoMessages = new ArrayList<>();
-
     @Getter
     private List<Location> uLaunchers = new ArrayList<>();
     @Getter
@@ -100,9 +101,11 @@ public class BattlegroundsCore extends JavaPlugin {
     private List<Location> fLaunchersParticle = new ArrayList<>();
     @Getter
     private List<Location> uLaunchersParticle = new ArrayList<>();
-
+    @Getter
+    private List<Location> crateLocations = new ArrayList<>();
     @Getter
     private static JDA aresDiscordBot = null;
+
 
     public void onEnable() {
         instance = this;
@@ -131,13 +134,14 @@ public class BattlegroundsCore extends JavaPlugin {
             }
         }
 
-        // Initialize Launcher Lists
+        // Initialize Location Lists
         uLaunchers = (List<Location>) getConfig().getList("launchersUp");
         if (!uLaunchers.isEmpty())
             uLaunchers.remove(0);
         fLaunchers = (List<Location>) getConfig().getList("launchersForward");
         if (!fLaunchers.isEmpty())
             fLaunchers.remove(0);
+        crateLocations = (List<Location>) getConfig().getList("crateLocations");
 
         for (Location location : uLaunchers)
             uLaunchersParticle.add(location.clone().add(0, 1, 0));
@@ -208,6 +212,14 @@ public class BattlegroundsCore extends JavaPlugin {
         this.globalStats = session.createQuery("from GlobalStatsEntity where id = 1", GlobalStatsEntity.class).getSingleResult();
         session.getTransaction().commit();
         session.close();
+
+        getServer().getScheduler().runTaskLater(this, () -> {
+            for (Plugin plugin : getServer().getPluginManager().getPlugins()) {
+                if (plugin.getName().equalsIgnoreCase("BattlegroundsKitPvP")) {
+                    kitPvP = BattlegroundsKitPvP.getInstance();
+                }
+            }
+        }, 10L);
     }
 
     public void onDisable() {
@@ -215,6 +227,7 @@ public class BattlegroundsCore extends JavaPlugin {
         fLaunchers.add(0, new Location(getServer().getWorlds().get(0), 3.1415, 3.1415, 3.1415));
         getConfig().set("launchersUp", uLaunchers);
         getConfig().set("launchersForward", fLaunchers);
+        getConfig().set("crateLocations", crateLocations);
         saveConfig();
         sessionFactory.close();
     }
@@ -288,7 +301,8 @@ public class BattlegroundsCore extends JavaPlugin {
         getCommand("message").setExecutor(new MessageCommand(this));
         getCommand("reply").setExecutor(new ReplyCommand(this));
         getCommand("rules").setExecutor(new RulesCommand(this));
-
+        getCommand("crate").setExecutor(new CrateCommand());
+        getCommand("setspawn").setExecutor(new SetSpawnCommand(this));
     }
 
     private void registerListeners() {
@@ -302,10 +316,10 @@ public class BattlegroundsCore extends JavaPlugin {
         pluginManager.registerEvents(new PlayerDamage(), this);
         pluginManager.registerEvents(new PlayerInteract(), this);
 
-        pluginManager.registerEvents(new ChatFilter(this), this);
         pluginManager.registerEvents(new ServerListPingListener(this), this);
         pluginManager.registerEvents(new InventoryClickListener(), this);
         pluginManager.registerEvents(new WeatherChangeListener(), this);
+        pluginManager.registerEvents(new BlockListeners(this), this);
     }
 
     public GameProfile getGameProfile(UUID uuid) {
@@ -410,13 +424,16 @@ public class BattlegroundsCore extends JavaPlugin {
         SettingsEntity settingsEntity = new SettingsEntity();
         KitPvpDataEntity kitPvpDataEntity = new KitPvpDataEntity();
         EssencesEntity essencesEntity = new EssencesEntity();
+        CratesEntity cratesEntity = new CratesEntity();
 
         gameProfilesEntity.setSettings(settingsEntity);
         gameProfilesEntity.setKitPvpData(kitPvpDataEntity);
         gameProfilesEntity.setEssences(essencesEntity);
+        gameProfilesEntity.setCrates(cratesEntity);
         settingsEntity.setGameProfile(gameProfilesEntity);
         kitPvpDataEntity.setGameProfile(gameProfilesEntity);
         essencesEntity.setGameProfile(gameProfilesEntity);
+        cratesEntity.setGameProfile(gameProfilesEntity);
 
         session.beginTransaction();
         session.saveOrUpdate(gameProfilesEntity);
@@ -540,6 +557,20 @@ public class BattlegroundsCore extends JavaPlugin {
 
     public static String getLore(ItemStack itemStack, int line) {
         return itemStack.getItemMeta().getLore().get(line - 1);
+    }
+
+    public static void clearTitle(Player player) {
+        TTA_Methods.sendTitle(player, null, 0, 0, 0, null, 0, 0, 0);
+    }
+
+    public static boolean checkKitPvP() {
+        for (Plugin plugin : instance.getServer().getPluginManager().getPlugins()) {
+            if (plugin.getName().equalsIgnoreCase("BattlegroundsKitPvP")) {
+                kitPvP = BattlegroundsKitPvP.getInstance();
+                return true;
+            }
+        }
+        return false;
     }
 
 }

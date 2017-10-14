@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="BattlegroundsKitPvP">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../Compiled Plugins/BattlegroundsKitPvP.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

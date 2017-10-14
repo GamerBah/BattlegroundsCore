@@ -9,6 +9,7 @@ import com.battlegroundspvp.utils.enums.EventSound;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -17,12 +18,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 
 public class UpdateRunnable implements Runnable {
 
     public static boolean updating = false;
     private BattlegroundsCore plugin;
     private File updateFile, currentFile;
+    public static ArrayList<Plugin> queuedUpdates = new ArrayList<>();
 
     public UpdateRunnable(BattlegroundsCore plugin) {
         this.plugin = plugin;
@@ -40,10 +43,23 @@ public class UpdateRunnable implements Runnable {
         if (updateFile == null || !updateFile.exists()) {
             return;
         }
-        plugin.getServer().broadcastMessage(new ColorBuilder(ChatColor.RED).bold().create() + "SERVER: " + ChatColor.GRAY + "Reloading in 5 seconds for an update. Hang in there!");
-        plugin.getServer().broadcastMessage(ChatColor.GRAY + "(You'll get sent back to the spawn once the update is complete)");
+        if (!queuedUpdates.isEmpty()) {
+            if (!queuedUpdates.contains(BattlegroundsCore.getInstance())) {
+                queuedUpdates.add(BattlegroundsCore.getInstance());
+            } else {
+                if (queuedUpdates.get(0).equals(BattlegroundsCore.getInstance())) {
+                    update();
+                }
+            }
+        } else {
+            plugin.getServer().broadcastMessage(new ColorBuilder(ChatColor.RED).bold().create() + "SERVER: " + ChatColor.GRAY + "Reloading in 5 seconds for an update. Hang in there!");
+            plugin.getServer().broadcastMessage(ChatColor.GRAY + "(You'll get sent back to the spawn once the update is complete)");
+            update();
+        }
+    }
+
+    private void update() {
         updating = true;
-        // TODO: TRIGGER SUB-PLUGIN UPDATE CORRUPTION PREVENTION
         for (Player player : plugin.getServer().getOnlinePlayers()) {
             EventSound.playSound(player, EventSound.CLICK);
             player.setGameMode(GameMode.ADVENTURE);
@@ -92,7 +108,8 @@ public class UpdateRunnable implements Runnable {
                         + "Update was a " + new ColorBuilder(ChatColor.GREEN).bold().create() + "success" + ChatColor.GRAY + "! Now go have fun!");
             } catch (Throwable throwable) {
                 plugin.getLogger().severe("Error during pre-update, sticking with the current version");
-                DiscordBot.errorLoggingChannel.sendMessage("@Staff There was an error beginning the update for BattlegroundsCore! (Code: BC-UpdRun:TrCa.64)").queue();
+                DiscordBot.errorLoggingChannel.sendMessageFormat("%s There was an error beginning the update for BattlegroundsCore! (Code: BC-UpdRun:TrCa.64)",
+                        BattlegroundsCore.getAresDiscordBot().getRolesByName("staff", true).get(0)).queue();
                 plugin.getLogger().severe(throwable.getMessage());
                 throwable.printStackTrace();
                 plugin.getServer().broadcastMessage(new ColorBuilder(ChatColor.RED).bold().create() + "SERVER: " + ChatColor.GRAY

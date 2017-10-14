@@ -4,6 +4,7 @@ package com.battlegroundspvp.listeners;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.runnables.UpdateRunnable;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerListPingEvent;
 
@@ -15,7 +16,7 @@ public class ServerListPingListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onServerPing(ServerListPingEvent event) {
         if (UpdateRunnable.updating) {
             event.setMotd("           §7\u00AB  §f\u00AB  §7\u00AB   §6§lBATTLEGROUNDS   §7\u00BB  §f\u00BB  §7\u00BB\n" +

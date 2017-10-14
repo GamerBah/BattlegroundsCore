@@ -20,7 +20,7 @@ public class MessageRunnable implements Runnable {
 
     @Override
     public void run() {
-        File file = new File(plugin.getDataFolder(), "resources/messages.yml");
+        File file = new File(plugin.getDataFolder(), "messages.yml");
         YamlConfiguration messageConfig = YamlConfiguration.loadConfiguration(file);
         if (messageConfig.getStringList("Messages") != null) {
             if (amount >= messageConfig.getStringList("Messages").size()) {

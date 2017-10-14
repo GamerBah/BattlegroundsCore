@@ -48,4 +48,6 @@ public class GameProfilesEntity {
     private KitPvpDataEntity kitPvpData = new KitPvpDataEntity();
     @OneToOne(fetch = FetchType.EAGER, mappedBy = "gameProfile", cascade = CascadeType.ALL)
     private EssencesEntity essences;
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "gameProfile", cascade = CascadeType.ALL)
+    private CratesEntity crates;
 }
