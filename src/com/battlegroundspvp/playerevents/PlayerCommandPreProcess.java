@@ -91,6 +91,26 @@ public class PlayerCommandPreProcess implements Listener {
             player.performCommand("battlegroundscore:setspawn");
             return;
         }
+        if (StringUtils.equalsIgnoreCase(command, "/npc")) {
+            event.setCancelled(true);
+            player.performCommand("battlegroundskitpvp:npc");
+            return;
+        }
+        if (StringUtils.equalsIgnoreCase(command, "/npc add")) {
+            event.setCancelled(true);
+            player.performCommand("battlegroundskitpvp:npc add");
+            return;
+        }
+        if (StringUtils.equalsIgnoreCase(command, "/npc remove")) {
+            event.setCancelled(true);
+            player.performCommand("battlegroundskitpvp:npc remove");
+            return;
+        }
+        if (StringUtils.equalsIgnoreCase(command, "/npc cancel")) {
+            event.setCancelled(true);
+            player.performCommand("battlegroundskitpvp:npc cancel");
+            return;
+        }
 
         if (BattlegroundsCore.getAfk().contains(player.getUniqueId()) && !StringUtils.startsWithIgnoreCase(command, "/afk") && !StringUtils.startsWithIgnoreCase(command, "/spawn")) {
             BattlegroundsCore.getAfk().remove(player.getUniqueId());

@@ -8,13 +8,14 @@ import net.md_5.bungee.api.ChatColor;
 @Getter
 public enum Rarity {
 
-    COMMON("Common", ChatColor.GRAY, 1),
-    RARE("Rare", ChatColor.BLUE, 5),
-    EPIC("Epic", ChatColor.GOLD, 15),
-    LEGENDARY("Legendary", ChatColor.LIGHT_PURPLE, 45);
+    COMMON("Common", ChatColor.GRAY, 100, 46),
+    RARE("Rare", ChatColor.BLUE, 45, 25),
+    EPIC("Epic", ChatColor.GOLD, 25, 13),
+    LEGENDARY("Legendary", ChatColor.LIGHT_PURPLE, 12, 1);
 
     private String name;
     private ChatColor color;
-    private int chance;
+    private int maxChance;
+    private int minChance;
 
 }
