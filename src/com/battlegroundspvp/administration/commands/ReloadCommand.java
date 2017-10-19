@@ -7,7 +7,6 @@ import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.runnables.UpdateRunnable;
 import com.battlegroundspvp.utils.ColorBuilder;
-import com.battlegroundspvp.utils.DiscordBot;
 import com.battlegroundspvp.utils.PluginUtil;
 import com.battlegroundspvp.utils.enums.EventSound;
 import de.Herbystar.TTA.TTA_Methods;
@@ -75,15 +74,11 @@ public class ReloadCommand implements CommandExecutor {
                             PluginUtil.load("BattlegroundsCore");
                         } catch (Throwable throwable) {
                             plugin.getLogger().severe("Unable to preform plugin reload!");
-                            DiscordBot.errorLoggingChannel.sendMessageFormat("%s There was an error while reloading BattlegroundsCore! (Code: BC-RelCom:TrCa.116)",
-                                    BattlegroundsCore.getAresDiscordBot().getRolesByName("staff", true).get(0)).queue();
                             plugin.getLogger().severe(throwable.getCause().toString());
                             return;
                         }
                     } catch (Throwable throwable) {
                         plugin.getLogger().severe("Error during reload!");
-                        DiscordBot.errorLoggingChannel.sendMessageFormat("%s There was an error beginning the update for BattlegroundsCore! (Code: BC-UpdRun:TrCa.64)",
-                                BattlegroundsCore.getAresDiscordBot().getRolesByName("staff", true).get(0)).queue();
                         plugin.getLogger().severe(throwable.getMessage());
                         throwable.printStackTrace();
                         plugin.getServer().broadcastMessage(new ColorBuilder(ChatColor.RED).bold().create() + "SERVER: " + ChatColor.GRAY

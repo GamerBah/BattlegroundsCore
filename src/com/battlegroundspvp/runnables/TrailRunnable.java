@@ -1,11 +1,17 @@
 package com.battlegroundspvp.runnables;
 /* Created by GamerBah on 8/20/2016 */
 
-
 import com.battlegroundspvp.BattlegroundsCore;
+import com.battlegroundspvp.administration.data.GameProfile;
+import com.battlegroundspvp.utils.enums.Cosmetic;
+import com.battlegroundspvp.utils.enums.EventSound;
+import com.battlegroundspvp.utils.packets.particles.ParticleEffect;
 import lombok.Getter;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +32,7 @@ public class TrailRunnable implements Runnable {
 
     @Override
     public void run() {
-        /*for (Player player : plugin.getServer().getOnlinePlayers()) {
+        for (Player player : plugin.getServer().getOnlinePlayers()) {
             GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
             playerLocations.putIfAbsent(player, player.getLocation());
 
@@ -45,7 +51,7 @@ public class TrailRunnable implements Runnable {
                     if (BattlegroundsCore.getAfk().contains(player.getUniqueId())) {
                         if (AFKRunnable.getAfkTimer().containsKey(player)) {
                             AFKRunnable.getAfkTimer().remove(player);
-                            TTA_Methods.sendTitle(player, null, 0, 0, 0, null, 0, 0, 0);
+                            BattlegroundsCore.clearTitle(player);
                             player.sendMessage(ChatColor.GRAY + "You are no longer AFK");
                             EventSound.playSound(player, EventSound.CLICK);
                             BattlegroundsCore.getAfk().remove(player.getUniqueId());
@@ -101,7 +107,7 @@ public class TrailRunnable implements Runnable {
                     }
                 }
             }
-        }*/
+        }
     }
 
     public void toggle(Player player) {

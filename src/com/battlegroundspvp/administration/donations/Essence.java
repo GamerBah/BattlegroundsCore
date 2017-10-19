@@ -29,7 +29,16 @@ public class Essence {
         plugin.getConfig().set("essenceTimeRemaining", type.getDuration() * 60 * 60);
         plugin.saveConfig();
         plugin.getGameProfile(player.getUniqueId()).getEssenceData().removeEssence(type);
-        //plugin.getGlobalStats().addUsedEssence();
+        plugin.getGlobalStats().setTotalUsedEssences(plugin.getGlobalStats().getTotalUsedEssences() + 1);
+        /*int timeRemaining = plugin.getConfig().getInt("essenceTimeRemaining");
+        long milliseconds = timeRemaining * 1000;
+        double completion = ((double) milliseconds / (plugin.getConfig().getInt("essenceTime") * 60 * 60 * 1000));
+        for (Player players : plugin.getServer().getOnlinePlayers()) {
+            TTA_Methods.createBossBar(players, ChatColor.RED + Time.toString(milliseconds, true) + ChatColor.GRAY + " remaining in "
+                            + ChatColor.RED + plugin.getConfig().getString("essenceOwner") + ChatColor.GRAY + "'s Battle Essence "
+                            + type.getChatColor() + "(+" + type.getPercent() + "%)",
+                    completion, BarStyle.SOLID, type.getBarColor(), BarFlag.CREATE_FOG, true);
+        }*/
     }
 
     public void removeActiveEssence() {

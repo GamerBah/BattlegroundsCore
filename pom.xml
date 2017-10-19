@@ -39,12 +39,6 @@
             <url>https://repository.jboss.org/nexus/content/repositories/releases/</url>
         </repository>
 
-        <repository>
-            <id>jcenter</id>
-            <name>jcenter-bintray</name>
-            <url>http://jcenter.bintray.com</url>
-        </repository>
-
     </repositories>
 
     <dependencies>
@@ -136,12 +130,6 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-hikaricp</artifactId>
             <version>5.2.10.Final</version>
-        </dependency>
-
-        <dependency>
-            <groupId>net.dv8tion</groupId>
-            <artifactId>JDA</artifactId>
-            <version>RELEASE</version>
         </dependency>
 
     </dependencies>

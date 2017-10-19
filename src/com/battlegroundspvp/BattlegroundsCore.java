@@ -13,7 +13,6 @@ import com.battlegroundspvp.playerevents.*;
 import com.battlegroundspvp.punishments.commands.*;
 import com.battlegroundspvp.runnables.*;
 import com.battlegroundspvp.utils.ColorBuilder;
-import com.battlegroundspvp.utils.DiscordBot;
 import com.battlegroundspvp.utils.enums.Advancements;
 import com.battlegroundspvp.utils.enums.EventSound;
 import com.battlegroundspvp.utils.inventories.InventoryBuilder;
@@ -25,11 +24,6 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import de.Herbystar.TTA.TTA_Methods;
 import lombok.Getter;
-import net.dv8tion.jda.core.AccountType;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.JDABuilder;
-import net.dv8tion.jda.core.entities.Game;
-import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -39,11 +33,15 @@ import org.bukkit.block.Sign;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandMap;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -51,9 +49,10 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
-import javax.security.auth.login.LoginException;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
@@ -64,7 +63,7 @@ public class BattlegroundsCore extends JavaPlugin {
     @Getter
     private static BattlegroundsCore instance = null;
     @Getter
-    private static BattlegroundsKitPvP kitPvP = null;
+    private static BattleModuleLoader moduleLoader = null;
 
     @Getter
     private static SessionFactory sessionFactory = null;
@@ -103,14 +102,9 @@ public class BattlegroundsCore extends JavaPlugin {
     private List<Location> uLaunchersParticle = new ArrayList<>();
     @Getter
     private List<Location> crateLocations = new ArrayList<>();
-    @Getter
-    private static JDA aresDiscordBot = null;
-
 
     public void onEnable() {
         instance = this;
-        registerCommands();
-        registerListeners();
 
         // Set up Hibernate SessionFactory for SQL
         try {
@@ -150,7 +144,7 @@ public class BattlegroundsCore extends JavaPlugin {
 
         // Initialize Various Repeating Tasks
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new UpdateRunnable(this), 120, 120);
-        //getServer().getScheduler().scheduleSyncRepeatingTask(this, new DonationUpdater(this), 0, 20);
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, new DonationUpdater(this), 0, 20);
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new TrailRunnable(this), 0, 2);
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new HelixRunnable(this), 0, 5);
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new AFKRunnable(this), 0, 20);
@@ -182,29 +176,6 @@ public class BattlegroundsCore extends JavaPlugin {
             getLogger().severe("Could not get safe words!");
         }
 
-        // Initialize Ares Discord Bot
-        try {
-            aresDiscordBot = new JDABuilder(AccountType.BOT)
-                    .setToken("MzY3ODM0MjAzOTMwMzYxODU5.DMBPLQ.W4NuixG--wvSHHH86S3WGIXU88w")
-                    .setGame(Game.of("Battlegrounds"))
-                    .buildBlocking();
-        } catch (LoginException | RateLimitedException | InterruptedException exception) {
-            getLogger().severe("Couldn't initialize the Ares Discord bot!");
-            exception.printStackTrace();
-        }
-
-        // Initialize Discord Channels
-        if (aresDiscordBot != null) {
-            //aresDiscordBot.addEventListener(new DiscordBot(this));
-            DiscordBot.staffChannel = aresDiscordBot.getTextChannelById("367463158102753280");
-            DiscordBot.punishmentsChannel = aresDiscordBot.getTextChannelById("367871072361512961");
-            DiscordBot.announcementsChannel = aresDiscordBot.getTextChannelById("271113764923899914");
-            DiscordBot.casualChannel = aresDiscordBot.getTextChannelById("263534021110267915");
-            DiscordBot.vipCasualChannel = aresDiscordBot.getTextChannelById("364917174810443786");
-            DiscordBot.supportChannel = aresDiscordBot.getTextChannelById("367466544004988929");
-            DiscordBot.errorLoggingChannel = aresDiscordBot.getTextChannelById("367898066910445578");
-        }
-
 
         setUpPacketHandlers();
         Session session = sessionFactory.openSession();
@@ -213,13 +184,29 @@ public class BattlegroundsCore extends JavaPlugin {
         session.getTransaction().commit();
         session.close();
 
-        getServer().getScheduler().runTaskLater(this, () -> {
-            for (Plugin plugin : getServer().getPluginManager().getPlugins()) {
-                if (plugin.getName().equalsIgnoreCase("BattlegroundsKitPvP")) {
-                    kitPvP = BattlegroundsKitPvP.getInstance();
+        moduleLoader = new BattleModuleLoader();
+        moduleLoader.enableModules();
+
+        registerCommands();
+        registerListeners();
+
+        /*if (getConfig().getBoolean("essenceActive")) {
+            int timeRemaining = getConfig().getInt("essenceTimeRemaining");
+            long milliseconds = timeRemaining * 1000;
+            double completion = ((double) milliseconds / (getConfig().getInt("essenceTime") * 60 * 60 * 1000));
+            Essence.Type type = Essence.Type.ONE_HOUR_50_PERCENT;
+            for (Essence.Type essenceType : Essence.Type.values()) {
+                if (getConfig().getInt("essenceTime") == essenceType.getDuration() && getConfig().getInt("essenceIncrease") == essenceType.getPercent()) {
+                    type = essenceType;
                 }
             }
-        }, 10L);
+            for (Player players : getServer().getOnlinePlayers()) {
+                TTA_Methods.createBossBar(players, ChatColor.RED + Time.toString(milliseconds, true) + ChatColor.GRAY + " remaining in "
+                                + ChatColor.RED + getConfig().getString("essenceOwner") + ChatColor.GRAY + "'s Battle Essence "
+                                + type.getChatColor() + "(+" + type.getPercent() + "%)",
+                        completion, BarStyle.SOLID, type.getBarColor(), BarFlag.CREATE_FOG, true);
+            }
+        }*/
     }
 
     public void onDisable() {
@@ -303,6 +290,14 @@ public class BattlegroundsCore extends JavaPlugin {
         getCommand("rules").setExecutor(new RulesCommand(this));
         getCommand("crate").setExecutor(new CrateCommand());
         getCommand("setspawn").setExecutor(new SetSpawnCommand(this));
+
+        for (BattleModule module : BattleModuleLoader.modules.keySet()) {
+            HashMap<String, CommandExecutor> commands = module.getCommands();
+            for (String name : commands.keySet()) {
+                getCommandMap().register(getConfig().getName(), getReflectCommand(name.replaceAll("\\s+", ""), this));
+                this.getCommand(name.replaceAll("\\s+", "")).setExecutor(commands.get(name));
+            }
+        }
     }
 
     private void registerListeners() {
@@ -465,69 +460,6 @@ public class BattlegroundsCore extends JavaPlugin {
         return player.getAdvancementProgress(advancement).getRemainingCriteria().size() <= 0;
     }
 
-    /*public void warnPlayer(Player player, GameProfile targetProfile, Punishment.Reason reason) {
-        if (!WarnCommand.getWarned().containsKey(targetProfile.getUuid())) {
-            WarnCommand.getWarned().put(targetProfile.getUuid(), 1);
-        } else {
-            WarnCommand.getWarned().put(targetProfile.getUuid(), WarnCommand.getWarned().get(targetProfile.getUuid()) + 1);
-        }
-        int warns = WarnCommand.getWarned().get(targetProfile.getUuid());
-        if (WarnCommand.getWarned().get(targetProfile.getUuid()) == 5) {
-            getServer().getOnlinePlayers().stream().filter(players ->
-                    getGameProfile(players.getUniqueId()).hasRank(Rank.HELPER))
-                    .forEach(players -> players.sendMessage(
-                            new ColorBuilder(ChatColor.DARK_RED).bold().create() + " [ARES] " + ChatColor.GOLD + targetProfile.getName() + new ColorBuilder(ChatColor.DARK_RED).bold().create() + " (5)"
-                                    + ChatColor.RED + "was " + (reason.getType().equals(Punishment.Type.MUTE) || reason.getType().equals(Punishment.Type.ALL) ? "muted" : "kicked")
-                                    + " for " + ChatColor.GRAY + reason.getName() + (reason.getType().equals(Punishment.Type.MUTE)
-                                    || reason.getType().equals(Punishment.Type.ALL) ? " for " + ChatColor.GRAY + Time.toString(reason.getLength() * 1000, true) : "")));
-            getServer().getOnlinePlayers().stream().filter(players ->
-                    getGameProfile(players.getUniqueId()).hasRank(Rank.HELPER))
-                    .forEach(players -> players.playSound(players.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 1));
-            if (player != null) {
-                player.closeInventory();
-            }
-
-            if (reason.getType().equals(Punishment.Type.MUTE) || reason.getType().equals(Punishment.Type.ALL)) {
-                HashMap<Punishment.Reason, Integer> punishment = new HashMap<>();
-                punishment.put(reason, reason.getLength());
-                targetProfile.mute(reason, player, punishment);
-            } else {
-                HashMap<Punishment.Reason, Integer> punishment = new HashMap<>();
-                punishment.put(reason, -1);
-                KickCommand.kickPlayer(targetProfile.getUuid(), player, punishment);
-            }
-            return;
-        }
-        if (WarnCommand.getWarned().get(targetProfile.getUuid()) >= 3) {
-            getServer().getOnlinePlayers().stream().filter(players ->
-                    getGameProfile(players.getUniqueId()).hasRank(Rank.HELPER))
-                    .forEach(players -> players.sendMessage(player != null ?
-                            new ColorBuilder(ChatColor.DARK_RED).bold().create() + " !!! " + ChatColor.GRAY + player.getName() + ChatColor.RED + " warned "
-                                    + ChatColor.GOLD + targetProfile.getName() + " (" + warns + ")" + ChatColor.RED + " for " + ChatColor.GRAY + reason.getName()
-                            : new ColorBuilder(ChatColor.DARK_RED).bold().create() + " !!! " + new ColorBuilder(ChatColor.AQUA).bold().create() + "Ares" + ChatColor.GRAY + ": " + ChatColor.RED + "ItemBuilder automatically warned "
-                            + ChatColor.GOLD + targetProfile.getName() + " (" + warns + ")" + ChatColor.RED + " for you " + ChatColor.GRAY + "(" + reason.getName() + ")"));
-            getServer().getOnlinePlayers().stream().filter(players ->
-                    getGameProfile(players.getUniqueId()).hasRank(Rank.HELPER))
-                    .forEach(players -> players.playSound(players.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 1));
-            if (player != null) {
-                player.closeInventory();
-            }
-            return;
-        }
-        if (player != null) {
-            player.closeInventory();
-        }
-        getServer().getOnlinePlayers().stream().filter(players ->
-                getGameProfile(players.getUniqueId()).hasRank(Rank.HELPER))
-                .forEach(players -> players.sendMessage(player != null ?
-                        ChatColor.GRAY + player.getName() + ChatColor.RED + " warned "
-                                + ChatColor.GOLD + targetProfile.getName() + " (" + warns + ")" + ChatColor.RED + " for " + ChatColor.GRAY + reason.getName()
-                        : new ColorBuilder(ChatColor.AQUA).bold().create() + "Ares" + ChatColor.GRAY + ": " + ChatColor.RED + "ItemBuilder automatically warned "
-                        + ChatColor.GOLD + targetProfile.getName() + " (" + warns + ")" + ChatColor.RED + " for you " + ChatColor.GRAY + "(" + reason.getName() + ")"));
-        getServer().getOnlinePlayers().stream().filter(players ->
-                getGameProfile(players.getUniqueId()).hasRank(Rank.HELPER))
-                .forEach(players -> players.playSound(players.getLocation(), Sound.BLOCK_LEVER_CLICK, 1, 1));
-    }*/
 
     // Respawn at location
     public void respawn(Player player, Location location) {
@@ -563,14 +495,36 @@ public class BattlegroundsCore extends JavaPlugin {
         TTA_Methods.sendTitle(player, null, 0, 0, 0, null, 0, 0, 0);
     }
 
-    public static boolean checkKitPvP() {
-        for (Plugin plugin : instance.getServer().getPluginManager().getPlugins()) {
-            if (plugin.getName().equalsIgnoreCase("BattlegroundsKitPvP")) {
-                kitPvP = BattlegroundsKitPvP.getInstance();
-                return true;
-            }
+    public static PluginCommand getReflectCommand(String name, Plugin plugin) {
+        PluginCommand command = null;
+
+        try {
+            Constructor<PluginCommand> c = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
+            c.setAccessible(true);
+
+            command = c.newInstance(name, plugin);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return false;
+
+        return command;
+    }
+
+    public static CommandMap getCommandMap() {
+        CommandMap commandMap = null;
+
+        try {
+            if (Bukkit.getPluginManager() instanceof SimplePluginManager) {
+                Field f = SimplePluginManager.class.getDeclaredField("commandMap");
+                f.setAccessible(true);
+
+                commandMap = (CommandMap) f.get(Bukkit.getPluginManager());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return commandMap;
     }
 
 }

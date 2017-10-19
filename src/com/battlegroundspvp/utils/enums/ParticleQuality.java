@@ -31,8 +31,8 @@ public enum ParticleQuality {
             .lore(ChatColor.GRAY + "in some effects").lore(" ")
             .lore(ChatColor.YELLOW + "Click to change!"));
 
-    private String name;
-    private ItemBuilder item;
+    public String name;
+    public ItemBuilder item;
 
     public static ParticleQuality fromString(String name) {
         ParticleQuality q = null;

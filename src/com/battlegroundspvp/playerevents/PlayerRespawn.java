@@ -1,14 +1,14 @@
 package com.battlegroundspvp.playerevents;
 /* Created by GamerBah on 8/9/2016 */
 
+import com.battlegroundspvp.BattleModule;
+import com.battlegroundspvp.BattleModuleLoader;
 import com.battlegroundspvp.BattlegroundsCore;
-import com.battlegroundspvp.BattlegroundsKitPvP;
 import com.battlegroundspvp.administration.commands.FreezeCommand;
 import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.inventories.ItemBuilder;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -40,19 +40,17 @@ public class PlayerRespawn implements Listener {
         player.setHealth(20F);
         player.setFoodLevel(20);
         player.setSaturation(20);
-        player.setExp(0);
-        player.setLevel(0);
         player.setFlying(false);
         player.setAllowFlight(false);
-        player.setGameMode(GameMode.ADVENTURE);
+
         if (!BattlegroundsCore.getFallDmg().contains(player))
             BattlegroundsCore.getFallDmg().add(player);
 
         for (PotionEffect effect : player.getActivePotionEffects())
             player.removePotionEffect(effect.getType());
 
-        if (BattlegroundsCore.checkKitPvP())
-            BattlegroundsKitPvP.runRespawn(event);
+        for (BattleModule module : BattleModuleLoader.modules.keySet())
+            module.onPlayerRespawn(event);
 
         for (Player players : Bukkit.getServer().getOnlinePlayers())
             players.showPlayer(player);

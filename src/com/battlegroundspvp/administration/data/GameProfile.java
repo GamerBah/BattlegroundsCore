@@ -7,7 +7,6 @@ import com.battlegroundspvp.administration.data.sql.GameProfilesEntity;
 import com.battlegroundspvp.punishments.Punishment;
 import com.battlegroundspvp.punishments.commands.BanCommand;
 import com.battlegroundspvp.punishments.commands.MuteCommand;
-import com.battlegroundspvp.utils.DiscordBot;
 import com.battlegroundspvp.utils.enums.Cosmetic;
 import com.battlegroundspvp.utils.enums.EventSound;
 import com.battlegroundspvp.utils.enums.Time;
@@ -236,10 +235,6 @@ public class GameProfile {
             return;
         }
 
-        DiscordBot.punishmentsChannel.sendMessageFormat("%s\n\n***" + enforcerProfile.getName() + "*** *temporarily banned* ***"
-                        + this.name + "*** *for* ***" + Time.toString(duration * 1000, true) + "*** *for* ***" + reason.getName() + "***",
-                BattlegroundsCore.getAresDiscordBot().getRolesByName("staff", true).get(0)).queue();
-
         if (!WarnCommand.getWarned().containsKey(this.uuid))
             WarnCommand.getWarned().remove(this.uuid);
 
@@ -272,10 +267,6 @@ public class GameProfile {
             return;
         }
 
-        DiscordBot.punishmentsChannel.sendMessageFormat("%s\n\n***" + enforcerProfile.getName()
-                        + "*** *permanently banned* ***" + this.name + "*** *for* ***" + reason.getName() + "***",
-                BattlegroundsCore.getAresDiscordBot().getRolesByName("staff", true).get(0)).queue();
-
         if (!WarnCommand.getWarned().containsKey(this.uuid))
             WarnCommand.getWarned().remove(this.uuid);
 
@@ -307,9 +298,6 @@ public class GameProfile {
             gameProfile.playSound(EventSound.ACTION_FAIL);
             return;
         }
-
-        DiscordBot.punishmentsChannel.sendMessageFormat("%s\n\n***" + gameProfile.getName() + "*** *unbanned* ***" + this.name + "***\n**Reason for Ban:** *"
-                + punishment.getReason().getName() + "*", BattlegroundsCore.getAresDiscordBot().getRolesByName("staff", true).get(0)).queue();
 
         BattlegroundsCore.getInstance().getServer().getOnlinePlayers().stream().filter(staff ->
                 BattlegroundsCore.getInstance().getGameProfile(staff.getUniqueId()).hasRank(Rank.HELPER)).forEach(staff ->

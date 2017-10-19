@@ -4,7 +4,6 @@ package com.battlegroundspvp.commands;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
-import com.battlegroundspvp.utils.DiscordBot;
 import com.battlegroundspvp.utils.enums.EventSound;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.StringUtils;
@@ -55,9 +54,6 @@ public class StaffReqCommand implements CommandExecutor {
         }
 
         String message = StringUtils.join(args, ' ', 0, args.length);
-
-        DiscordBot.staffChannel.sendMessageFormat("%s **" + player.getName() + ":** *" + message + "*",
-                BattlegroundsCore.getAresDiscordBot().getRolesByName("staff", true).get(0)).queue();
 
         player.sendMessage(ChatColor.GREEN + "Your message has been sent! A staff member has been notified of your request and should be able to help you shortly!");
         EventSound.playSound(player, EventSound.ACTION_SUCCESS);

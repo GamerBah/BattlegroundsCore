@@ -12,10 +12,10 @@ package com.battlegroundspvp.utils;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,6 +27,7 @@ package com.battlegroundspvp.utils;
  */
 
 import com.battlegroundspvp.BattlegroundsCore;
+import com.google.common.base.Joiner;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -39,10 +40,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URLClassLoader;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -58,17 +56,10 @@ public class PluginUtil {
      *
      * @param plugin the plugin to enable
      */
-    private static void enable(Plugin plugin) {
-        if (plugin != null && !plugin.isEnabled())
+    public static void enable(Plugin plugin) {
+        if (plugin != null && !plugin.isEnabled()) {
             Bukkit.getPluginManager().enablePlugin(plugin);
-    }
-
-    /**
-     * Enable all plugins.
-     */
-    private static void enableAll() {
-        for (Plugin plugin : Bukkit.getPluginManager().getPlugins())
-            enable(plugin);
+        }
     }
 
     /**
@@ -76,18 +67,20 @@ public class PluginUtil {
      *
      * @param plugin the plugin to disable
      */
-    private static void disable(Plugin plugin) {
-        if (plugin != null && plugin.isEnabled())
+    public static void disable(Plugin plugin) {
+        if (plugin != null && plugin.isEnabled()) {
             Bukkit.getPluginManager().disablePlugin(plugin);
+        }
     }
 
     /**
-     * Disable all plugins.
+     * Returns the formatted name of the plugin.
+     *
+     * @param plugin the plugin to format
+     * @return the formatted name
      */
-    private static void disableAll() {
-        for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
-            disable(plugin);
-        }
+    public static String getFormattedName(Plugin plugin) {
+        return getFormattedName(plugin, false);
     }
 
     /**
@@ -97,24 +90,15 @@ public class PluginUtil {
      * @param includeVersions whether to include the version
      * @return the formatted name
      */
-    private static String getFormattedName(Plugin plugin, boolean includeVersions) {
+    public static String getFormattedName(Plugin plugin, boolean includeVersions) {
         ChatColor color = plugin.isEnabled() ? ChatColor.GREEN : ChatColor.RED;
         String pluginName = color + plugin.getName();
-        if (includeVersions)
+        if (includeVersions) {
             pluginName += " (" + plugin.getDescription().getVersion() + ")";
+        }
         return pluginName;
     }
 
-    /**
-     * Returns a plugin from an array of Strings.
-     *
-     * @param args  the array
-     * @param start the index to start at
-     * @return the plugin
-     */
-    static Plugin getPluginByName(String[] args, int start) {
-        return getPluginByName(consolidateStrings(args, start));
-    }
 
     /**
      * Returns a plugin from a String.
@@ -122,37 +106,175 @@ public class PluginUtil {
      * @param name the name of the plugin
      * @return the plugin
      */
-    static Plugin getPluginByName(String name) {
+    public static Plugin getPluginByName(String name) {
         for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
-            if (name.equalsIgnoreCase(plugin.getName()))
+            if (name.equalsIgnoreCase(plugin.getName())) {
                 return plugin;
+            }
         }
         return null;
     }
 
     /**
+     * Returns a List of plugin names.
+     *
+     * @return list of plugin names
+     */
+    public static List<String> getPluginNames(boolean fullName) {
+        List<String> plugins = new ArrayList<>();
+        for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+            plugins.add(fullName ? plugin.getDescription().getFullName() : plugin.getName());
+        }
+        return plugins;
+    }
+
+    /**
+     * Get the version of another plugin.
+     *
+     * @param name the name of the other plugin.
+     * @return the version.
+     */
+    public static String getPluginVersion(String name) {
+        Plugin plugin = getPluginByName(name);
+        if (plugin != null && plugin.getDescription() != null) {
+            return plugin.getDescription().getVersion();
+        }
+        return null;
+    }
+
+    /**
+     * Returns the commands a plugin has registered.
+     *
+     * @param plugin the plugin to deal with
+     * @return the commands registered
+     */
+    public static String getUsages(Plugin plugin) {
+
+        List<String> parsedCommands = new ArrayList<>();
+
+        Map commands = plugin.getDescription().getCommands();
+
+        if (commands != null) {
+            Iterator commandsIt = commands.entrySet().iterator();
+            while (commandsIt.hasNext()) {
+                Map.Entry thisEntry = (Map.Entry) commandsIt.next();
+                if (thisEntry != null) {
+                    parsedCommands.add((String) thisEntry.getKey());
+                }
+            }
+        }
+
+        if (parsedCommands.isEmpty())
+            return "No commands registered.";
+
+        return Joiner.on(", ").join(parsedCommands);
+
+    }
+
+    /**
+     * Find which plugin has a given command registered.
+     *
+     * @param command the command.
+     * @return the plugin.
+     */
+    public static List<String> findByCommand(String command) {
+
+        List<String> plugins = new ArrayList<>();
+
+        for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+
+            // Map of commands and their attributes.
+            Map<String, Map<String, Object>> commands = plugin.getDescription().getCommands();
+
+            if (commands != null) {
+
+                // Iterator for all the plugin's commands.
+                Iterator<Map.Entry<String, Map<String, Object>>> commandIterator = commands.entrySet().iterator();
+
+                while (commandIterator.hasNext()) {
+
+                    // Current value.
+                    Map.Entry<String, Map<String, Object>> commandNext = commandIterator.next();
+
+                    // Plugin name matches - return.
+                    if (commandNext.getKey().equalsIgnoreCase(command)) {
+                        plugins.add(plugin.getName());
+                        continue;
+                    }
+
+                    // No match - let's iterate over the attributes and see if
+                    // it has aliases.
+                    Iterator<Map.Entry<String, Object>> attributeIterator = commandNext.getValue().entrySet().iterator();
+
+                    while (attributeIterator.hasNext()) {
+
+                        // Current value.
+                        Map.Entry<String, Object> attributeNext = attributeIterator.next();
+
+                        // Has an alias attribute.
+                        if (attributeNext.getKey().equals("aliases")) {
+
+                            Object aliases = attributeNext.getValue();
+
+                            if (aliases instanceof String) {
+                                if (((String) aliases).equalsIgnoreCase(command)) {
+                                    plugins.add(plugin.getName());
+                                    continue;
+                                }
+                            } else {
+
+                                // Cast to a List of Strings.
+                                List<String> array = (List<String>) aliases;
+
+                                // Check for matches here.
+                                for (String str : array) {
+                                    if (str.equalsIgnoreCase(command)) {
+                                        plugins.add(plugin.getName());
+                                        continue;
+                                    }
+                                }
+
+                            }
+
+                        }
+
+                    }
+                }
+
+            }
+
+        }
+
+        // No matches.
+        return plugins;
+
+    }
+
+
+    /**
      * Loads and enables a plugin.
      *
      * @param plugin plugin to load
+     * @return status message
      */
-    private static void load(Plugin plugin) throws InvalidPluginException, InvalidDescriptionException {
-        load(plugin.getName());
+    private static String load(Plugin plugin) {
+        return load(plugin.getName());
     }
 
     /**
      * Loads and enables a plugin.
      *
      * @param name plugin's name
+     * @return status message
      */
-    public static void load(String name) throws InvalidPluginException, InvalidDescriptionException {
+    public static String load(String name) {
 
-        Plugin target;
+        Plugin target = null;
 
         File pluginDir = new File("plugins");
 
         if (!pluginDir.isDirectory()) {
-            BattlegroundsCore.getInstance().getLogger().severe("Plugins directory does not exist!");
-            return;
+            return "Plugins directory does not exist!";
         }
 
         File pluginFile = new File(pluginDir, name + ".jar");
@@ -160,22 +282,34 @@ public class PluginUtil {
         if (!pluginFile.isFile()) {
             for (File f : pluginDir.listFiles()) {
                 if (f.getName().endsWith(".jar")) {
-                    PluginDescriptionFile desc = BattlegroundsCore.getInstance().getPluginLoader().getPluginDescription(f);
-                    if (desc.getName().equalsIgnoreCase(name)) {
-                        pluginFile = f;
-                        break;
+                    try {
+                        PluginDescriptionFile desc = BattlegroundsCore.getInstance().getPluginLoader().getPluginDescription(f);
+                        if (desc.getName().equalsIgnoreCase(name)) {
+                            pluginFile = f;
+                            break;
+                        }
+                    } catch (InvalidDescriptionException e) {
+                        return "Cannot find file!";
                     }
                 }
             }
         }
 
-        target = Bukkit.getPluginManager().loadPlugin(pluginFile);
-
+        try {
+            target = Bukkit.getPluginManager().loadPlugin(pluginFile);
+        } catch (InvalidDescriptionException e) {
+            e.printStackTrace();
+            return "Invalid plugin.yml!";
+        } catch (InvalidPluginException e) {
+            e.printStackTrace();
+            return "Invalid plugin!";
+        }
 
         target.onLoad();
         Bukkit.getPluginManager().enablePlugin(target);
 
-        BattlegroundsCore.getInstance().getLogger().info("Successfully loaded plugin " + name + "!");
+        return "BattlegroundsCore successfully loaded!";
+
     }
 
     /**
@@ -183,25 +317,10 @@ public class PluginUtil {
      *
      * @param plugin the plugin to reload
      */
-    static void reload(Plugin plugin) {
+    public static void reload(Plugin plugin) {
         if (plugin != null) {
             unload(plugin);
-            try {
-                load(plugin);
-            } catch (InvalidDescriptionException e) {
-                plugin.getLogger().severe("Invalid Plugin Description!");
-            } catch (InvalidPluginException e) {
-                plugin.getLogger().severe("Invalid Plugin!");
-            }
-        }
-    }
-
-    /**
-     * Reload all plugins.
-     */
-    static void reloadAll() {
-        for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
-            reload(plugin);
+            load(plugin);
         }
     }
 
@@ -209,8 +328,9 @@ public class PluginUtil {
      * Unload a plugin.
      *
      * @param plugin the plugin to unload
+     * @return the message to send to the user.
      */
-    public static void unload(Plugin plugin) {
+    public static String unload(Plugin plugin) {
 
         String name = plugin.getName();
 
@@ -224,7 +344,11 @@ public class PluginUtil {
         Map<String, Command> commands = null;
         Map<Event, SortedSet<RegisteredListener>> listeners = null;
 
+        boolean reloadlisteners = true;
+
         if (pluginManager != null) {
+
+            pluginManager.disablePlugin(plugin);
 
             try {
 
@@ -240,7 +364,8 @@ public class PluginUtil {
                     Field listenersField = Bukkit.getPluginManager().getClass().getDeclaredField("listeners");
                     listenersField.setAccessible(true);
                     listeners = (Map<Event, SortedSet<RegisteredListener>>) listenersField.get(pluginManager);
-                } catch (Exception ignored) {
+                } catch (Exception e) {
+                    reloadlisteners = false;
                 }
 
                 Field commandMapField = Bukkit.getPluginManager().getClass().getDeclaredField("commandMap");
@@ -253,12 +378,12 @@ public class PluginUtil {
 
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 e.printStackTrace();
-                BattlegroundsCore.getInstance().getLogger().severe("Failed to unload plugin " + name + "!");
-                return;
+                return "Failed to unload BattlegroundsCore!";
             }
 
-            pluginManager.disablePlugin(plugin);
         }
+
+        pluginManager.disablePlugin(plugin);
 
         if (plugins != null && plugins.contains(plugin))
             plugins.remove(plugin);
@@ -266,7 +391,7 @@ public class PluginUtil {
         if (names != null && names.containsKey(name))
             names.remove(name);
 
-        if (listeners != null) {
+        if (listeners != null && reloadlisteners) {
             for (SortedSet<RegisteredListener> set : listeners.values()) {
                 for (Iterator<RegisteredListener> it = set.iterator(); it.hasNext(); ) {
                     RegisteredListener value = it.next();
@@ -290,39 +415,40 @@ public class PluginUtil {
             }
         }
 
-        // Attempt to close the classloader to unlock any handles on the plugin's
-        // jar file.
+        // Attempt to close the classloader to unlock any handles on the plugin's jar file.
         ClassLoader cl = plugin.getClass().getClassLoader();
 
         if (cl instanceof URLClassLoader) {
+
             try {
+
+                Field pluginField = cl.getClass().getDeclaredField("plugin");
+                pluginField.setAccessible(true);
+                pluginField.set(cl, null);
+
+                Field pluginInitField = cl.getClass().getDeclaredField("pluginInit");
+                pluginInitField.setAccessible(true);
+                pluginInitField.set(cl, null);
+
+            } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+                Logger.getLogger(PluginUtil.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            try {
+
                 ((URLClassLoader) cl).close();
             } catch (IOException ex) {
                 Logger.getLogger(PluginUtil.class.getName()).log(Level.SEVERE, null, ex);
             }
+
         }
 
-        // Will not work on processes started with the -XX:+DisableExplicitGC flag,
-        // but lets try it anyway. This tries to get around the issue where Windows
-        // refuses to unlock jar files that were previously loaded into the JVM.
+        // Will not work on processes started with the -XX:+DisableExplicitGC flag, but lets try it anyway.
+        // This tries to get around the issue where Windows refuses to unlock jar files that were previously loaded into the JVM.
         System.gc();
 
-        BattlegroundsCore.getInstance().getLogger().info("Unloaded plugin " + name + "!");
+        return "BattlegroundsCore succefully unloaded!";
+
     }
 
-    /**
-     * Returns an array of Strings as a single String.
-     *
-     * @param args  the array
-     * @param start the index to start at
-     * @return the array as a String
-     */
-    private static String consolidateStrings(String[] args, int start) {
-        String ret = args[start];
-        if (args.length > (start + 1)) {
-            for (int i = (start + 1); i < args.length; i++)
-                ret = ret + " " + args[i];
-        }
-        return ret;
-    }
 }

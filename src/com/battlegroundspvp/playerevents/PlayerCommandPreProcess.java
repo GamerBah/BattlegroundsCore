@@ -93,17 +93,17 @@ public class PlayerCommandPreProcess implements Listener {
         }
         if (StringUtils.equalsIgnoreCase(command, "/npc")) {
             event.setCancelled(true);
-            player.performCommand("battlegroundskitpvp:npc");
+            player.performCommand("battlegroundscore:npc");
             return;
         }
         if (StringUtils.equalsIgnoreCase(command, "/npc add")) {
             event.setCancelled(true);
-            player.performCommand("battlegroundskitpvp:npc add");
+            player.performCommand("battlegroundscore:npc add");
             return;
         }
         if (StringUtils.equalsIgnoreCase(command, "/npc remove")) {
             event.setCancelled(true);
-            player.performCommand("battlegroundskitpvp:npc remove");
+            player.performCommand("battlegroundscore:npc remove");
             return;
         }
         if (StringUtils.equalsIgnoreCase(command, "/npc cancel")) {

@@ -86,3 +86,11 @@ commands:
     description: Adds locations for Battle Crates
   setspawn:
     description: Sets the world spawn with correct yaw value
+  npc:
+    description:
+  spectate:
+    description:
+  team:
+    description:
+  spawn:
+    description:

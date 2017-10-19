@@ -1,6 +1,8 @@
 package com.battlegroundspvp.playerevents;
 /* Created by GamerBah on 8/13/2016 */
 
+import com.battlegroundspvp.BattleModule;
+import com.battlegroundspvp.BattleModuleLoader;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.commands.FreezeCommand;
 import com.battlegroundspvp.menus.Crates.CrateMenu;
@@ -33,11 +35,6 @@ public class PlayerInteract implements Listener {
         }
 
         if (event.getClickedBlock() != null) {
-            if (event.getClickedBlock().getType() == Material.CHEST
-                    || event.getClickedBlock().getType() == Material.TRAPPED_CHEST) {
-                event.setCancelled(true);
-            }
-
             if (event.getClickedBlock().getType() == Material.ENDER_CHEST) {
                 if (BattlegroundsCore.getInstance().getCrateLocations().contains(event.getClickedBlock().getLocation())) {
                     event.setCancelled(true);
@@ -51,12 +48,11 @@ public class PlayerInteract implements Listener {
             return;
         }
 
+        for (BattleModule module : BattleModuleLoader.modules.keySet())
+            module.onPlayerInteractItem(event);
+
         if (item != null) {
             if (UpdateRunnable.updating) {
-                event.setCancelled(true);
-                return;
-            }
-            if (item.getType().equals(Material.POISONOUS_POTATO) || item.getType().equals(Material.POTATO_ITEM)) {
                 event.setCancelled(true);
             }
         }
