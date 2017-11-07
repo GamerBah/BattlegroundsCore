@@ -22,23 +22,18 @@ public class GameProfilesEntity {
     @Column(columnDefinition = "VARCHAR(36)")
     private UUID uuid;
     private int coins;
-    private String cosmetics;
     private boolean dailyReward;
+    @Generated(value = GenerationTime.INSERT)
     private LocalDateTime dailyRewardLast;
+    @Generated(value = GenerationTime.INSERT)
     private String friends;
     @Generated(value = GenerationTime.INSERT)
-    private String gore;
     private LocalDateTime lastOnline;
     private String name;
     private int playersRecruited;
     @Generated(value = GenerationTime.INSERT)
     private String rank;
-    @Generated(value = GenerationTime.INSERT)
     private int recruitedBy;
-    @Generated(value = GenerationTime.INSERT)
-    private String trail;
-    @Generated(value = GenerationTime.INSERT)
-    private String warcry;
 
     @OneToOne(fetch = FetchType.EAGER, mappedBy = "gameProfile", cascade = CascadeType.ALL)
     private SettingsEntity settings;
@@ -50,4 +45,6 @@ public class GameProfilesEntity {
     private EssencesEntity essences;
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "gameProfile", cascade = CascadeType.ALL)
     private CratesEntity crates;
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "gameProfile", cascade = CascadeType.ALL)
+    private CosmeticsEntity cosmetics;
 }

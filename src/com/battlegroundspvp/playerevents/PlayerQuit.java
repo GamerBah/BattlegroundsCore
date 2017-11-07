@@ -4,6 +4,7 @@ package com.battlegroundspvp.playerevents;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.commands.ReportCommand;
+import com.battlegroundspvp.runnables.DonationUpdater;
 import com.battlegroundspvp.utils.ColorBuilder;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
@@ -56,5 +57,9 @@ public class PlayerQuit implements Listener {
         //}
 
         gameProfile.setLastOnline(LocalDateTime.now());
+
+        if (DonationUpdater.essenceBar != null)
+            if (DonationUpdater.essenceBar.getPlayers().contains(player))
+                DonationUpdater.essenceBar.removePlayer(player);
     }
 }

@@ -4,6 +4,7 @@ import com.battlegroundspvp.BattleModule;
 import com.battlegroundspvp.BattleModuleLoader;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.commands.FreezeCommand;
+import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.PluginUtil;
 import com.battlegroundspvp.utils.enums.EventSound;
@@ -145,6 +146,14 @@ public class UpdateRunnable implements Runnable {
         updating = true;
         FreezeCommand.reloadFreeze = true;
         for (Player player : plugin.getServer().getOnlinePlayers()) {
+
+            for (Player players : BattlegroundsCore.getCrateOpening().keySet()) {
+                GameProfile gameProfile = BattlegroundsCore.getInstance().getGameProfile(players.getUniqueId());
+                gameProfile.getCratesData().addCrate(BattlegroundsCore.getCrateOpening().get(player), 1);
+                player.sendMessage(" ");
+                player.sendMessage(ChatColor.GRAY + "The " + BattlegroundsCore.getCrateOpening().get(player).getName()
+                        + ChatColor.GRAY + " you were opening has been given back to you");
+            }
 
             // Run Core pre-update
             EventSound.playSound(player, EventSound.CLICK);

@@ -2,6 +2,8 @@ package com.battlegroundspvp.administration.commands;
 /* Created by GamerBah on 8/7/2016 */
 
 
+import com.battlegroundspvp.BattleModule;
+import com.battlegroundspvp.BattleModuleLoader;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
@@ -66,7 +68,8 @@ public class RankCommand implements CommandExecutor, TabCompleter {
                         }
                         gameProfile.setRank(rank);
                         if (target.isOnline()) {
-                            //scoreboardListener.updateScoreboardRank((Player) target, rank);
+                            for (BattleModule module : BattleModuleLoader.modules.keySet())
+                                module.updateScoreboardRank((Player) target, rank);
                             ((Player) target).setPlayerListName((gameProfile.hasRank(Rank.WARRIOR) ? gameProfile.getRank().getColor().create() + gameProfile.getRank().getName().toUpperCase() + " " : "")
                                     + (gameProfile.hasRank(Rank.WARRIOR) ? ChatColor.WHITE : ChatColor.GRAY) + target.getName());
                             ((Player) target).sendMessage(ChatColor.GRAY + "Your rank was changed to " + rank.getColor().create() + WordUtils.capitalizeFully(rank.toString())

@@ -1,13 +1,23 @@
 package com.battlegroundspvp.utils.inventories;
 /* Created by GamerBah on 8/2/2017 */
 
+import com.battlegroundspvp.BattleModule;
+import com.battlegroundspvp.BattleModuleLoader;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
+import com.battlegroundspvp.administration.donations.CrateItem;
+import com.battlegroundspvp.menus.Crates.ForgeMenu;
 import com.battlegroundspvp.punishments.Punishment;
+import com.battlegroundspvp.runnables.CrateRollRunnable;
 import com.battlegroundspvp.utils.ColorBuilder;
+import com.battlegroundspvp.utils.enums.EventSound;
+import com.battlegroundspvp.utils.enums.Rarity;
 import com.battlegroundspvp.utils.enums.Time;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.libs.jline.internal.Nullable;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.time.format.DateTimeFormatter;
@@ -68,5 +78,60 @@ public class InventoryItems {
         item.lore("").lore(ChatColor.YELLOW + "Click for options!");
 
         return item;
+    }
+
+    public static ItemBuilder crateItem(Player player, Rarity rarity, boolean buying, @Nullable Location location) {
+        GameProfile gameProfile = BattlegroundsCore.getInstance().getGameProfile(player.getUniqueId());
+        ItemBuilder crate = new ItemBuilder(Material.ENDER_CHEST).name(rarity.getCrateName()).lore(" ");
+        if (rarity == Rarity.COMMON)
+            crate.lore(ChatColor.GRAY + "Has a small chance of rewarding")
+                    .lore(Rarity.EPIC.getColor() + "EPIC" + ChatColor.GRAY + " or " + Rarity.LEGENDARY.getColor() + "LEGENDARY" + ChatColor.GRAY + " cosmetics");
+        if (rarity == Rarity.RARE)
+            crate.lore(ChatColor.GRAY + "Has an improved chance of rewarding")
+                    .lore(Rarity.EPIC.getColor() + "EPIC" + ChatColor.GRAY + " or " + Rarity.LEGENDARY.getColor() + "LEGENDARY" + ChatColor.GRAY + " cosmetics");
+        if (rarity == Rarity.EPIC)
+            crate.lore(ChatColor.GRAY + "Has a very good chance of rewarding")
+                    .lore(Rarity.EPIC.getColor() + "EPIC" + ChatColor.GRAY + " or " + Rarity.LEGENDARY.getColor() + "LEGENDARY" + ChatColor.GRAY + " cosmetics");
+        if (rarity == Rarity.LEGENDARY || rarity == Rarity.GIFT)
+            crate.lore(ChatColor.GRAY + "Has an insane chance of rewarding")
+                    .lore(Rarity.EPIC.getColor() + "EPIC" + ChatColor.GRAY + " or " + Rarity.LEGENDARY.getColor() + "LEGENDARY" + ChatColor.GRAY + " cosmetics");
+        if (rarity == Rarity.SEASONAL)
+            crate.lore(ChatColor.GRAY + "Rewards " + Rarity.SEASONAL.getColor() + "SEASONAL" + ChatColor.GRAY + " cosmetics only!");
+        if (buying) {
+            crate.lore(" ").lore(ChatColor.GRAY + "Cost: " + (gameProfile.getCoins() >= rarity.getCrateCost() ? ChatColor.LIGHT_PURPLE + "" + rarity.getCrateCost() + " Battle Coins"
+                    : ChatColor.RED + "" + rarity.getCrateCost() + " Battle Coins")).lore(" ");
+            if (gameProfile.getCoins() >= rarity.getCrateCost()) {
+                crate.lore(ChatColor.GRAY + "You'll have " + ChatColor.LIGHT_PURPLE + (gameProfile.getCoins() - rarity.getCrateCost())
+                        + " Battle Coin" + (gameProfile.getCoins() - rarity.getCrateCost() != 1 ? "s" : "") + ChatColor.GRAY + " remaining")
+                        .lore(" ").lore(new ColorBuilder(ChatColor.YELLOW).bold().create() + "CLICK TO BUY!")
+                        .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
+                            EventSound.playSound(player, EventSound.ACTION_SUCCESS);
+                            new InventoryBuilder(player, new ForgeMenu(player, location)).open();
+                            player.sendMessage(ChatColor.GRAY + "You bought a " + rarity.getCrateName() + ChatColor.GRAY + "!");
+                            gameProfile.getCratesData().addCrate(rarity, 1);
+                            for (BattleModule module : BattleModuleLoader.modules.keySet())
+                                module.updateScoreboardCoins(player, -rarity.getCrateCost());
+                            gameProfile.addCoins(-rarity.getCrateCost());
+                        }));
+            } else {
+                crate.lore(ChatColor.RED + "You need " + ChatColor.LIGHT_PURPLE + (rarity.getCrateCost() - gameProfile.getCoins()) + " Battle Coins" + ChatColor.RED + " to buy this!")
+                        .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> EventSound.playSound(player, EventSound.ACTION_FAIL)));
+            }
+        } else {
+            crate.lore(" ").lore(new ColorBuilder(ChatColor.YELLOW).bold().create() + "CLICK TO OPEN!")
+                    .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
+                        player.closeInventory();
+                        if (CrateItem.isInUse(location)) {
+                            EventSound.playSound(player, EventSound.ACTION_FAIL);
+                            player.sendMessage(new ColorBuilder(ChatColor.RED).bold().create() + "Sorry! "
+                                    + ChatColor.GRAY + "Someone is already opening a Battle Crate!");
+                            return;
+                        }
+                        EventSound.playSound(player, EventSound.ACTION_SUCCESS);
+                        BattlegroundsCore.getInstance().getServer().getScheduler().runTaskLater(BattlegroundsCore.getInstance(),
+                                () -> new CrateRollRunnable(BattlegroundsCore.getInstance(), player, rarity, location).start(), 20L);
+                    }));
+        }
+        return crate;
     }
 }

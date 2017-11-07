@@ -5,10 +5,11 @@ import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.punishments.Punishment;
 import com.battlegroundspvp.utils.ColorBuilder;
-import com.battlegroundspvp.utils.SignGUI;
 import com.battlegroundspvp.utils.enums.EventSound;
 import com.battlegroundspvp.utils.enums.Time;
 import com.battlegroundspvp.utils.inventories.*;
+import com.comphenix.packetwrapper.WrapperPlayServerOpenSignEditor;
+import com.comphenix.protocol.wrappers.BlockPosition;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -364,8 +365,10 @@ public class PunishmentMenus {
         }
     }
 
-    private void openSearch(Player player) {
-        SignGUI.open(player);
+    private static void openSearch(Player player) {
+        WrapperPlayServerOpenSignEditor openSignEditor = new WrapperPlayServerOpenSignEditor();
+        openSignEditor.setLocation(new BlockPosition(0, 0, 0));
+        openSignEditor.sendPacket(player);
     }
 
        /*inv.setItem(47, new ItemBuilder(Material.APPLE).name(ChatColor.AQUA + "Sort by Name: " + ChatColor.GRAY + (sortType.equals(SortType.NAME_AZ) ? "Z-A" : "A-Z")));

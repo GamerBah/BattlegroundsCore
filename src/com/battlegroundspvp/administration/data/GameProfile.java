@@ -7,7 +7,6 @@ import com.battlegroundspvp.administration.data.sql.GameProfilesEntity;
 import com.battlegroundspvp.punishments.Punishment;
 import com.battlegroundspvp.punishments.commands.BanCommand;
 import com.battlegroundspvp.punishments.commands.MuteCommand;
-import com.battlegroundspvp.utils.enums.Cosmetic;
 import com.battlegroundspvp.utils.enums.EventSound;
 import com.battlegroundspvp.utils.enums.Time;
 import lombok.Getter;
@@ -48,13 +47,10 @@ public class GameProfile {
     private boolean dailyReward = false;
     @Getter
     @Setter
-    private Cosmetic.Item trail, warcry, gore;
-    @Getter
-    @Setter
     private LocalDateTime dailyRewardLast, lastOnline;
     @Getter
     @Setter
-    private String friends, ownedCosmetics;
+    private String friends;
     @Getter
     private final KitPvpData kitPvpData;
     @Getter
@@ -63,6 +59,8 @@ public class GameProfile {
     private final EssenceData essenceData;
     @Getter
     private final CratesData cratesData;
+    @Getter
+    private final CosmeticsData cosmeticsData;
     @Getter
     private final PunishmentData punishmentData;
 
@@ -76,17 +74,14 @@ public class GameProfile {
         this.playersRecruited = entity.getPlayersRecruited();
         this.recruitedBy = entity.getRecruitedBy();
         this.dailyReward = entity.isDailyReward();
-        this.trail = Cosmetic.Item.fromString(entity.getTrail());
-        this.warcry = Cosmetic.Item.fromString(entity.getWarcry());
-        this.gore = Cosmetic.Item.fromString(entity.getGore());
         this.dailyRewardLast = entity.getDailyRewardLast();
         this.lastOnline = entity.getLastOnline();
         this.friends = entity.getFriends();
-        this.ownedCosmetics = entity.getCosmetics();
         this.kitPvpData = new KitPvpData(entity.getKitPvpData());
         this.playerSettings = new PlayerSettings(entity.getSettings());
         this.essenceData = new EssenceData(entity.getEssences());
         this.cratesData = new CratesData(entity.getCrates());
+        this.cosmeticsData = new CosmeticsData(entity.getCosmetics());
         this.punishmentData = new PunishmentData(entity.getPunishments(), entity);
     }
 
@@ -336,22 +331,20 @@ public class GameProfile {
         entity.setPlayersRecruited(this.playersRecruited);
         entity.setRecruitedBy(this.recruitedBy);
         entity.setDailyReward(this.dailyReward);
-        entity.setTrail(this.trail.toString());
-        entity.setWarcry(this.warcry.toString());
-        entity.setGore(this.gore.toString());
         entity.setDailyRewardLast(this.dailyRewardLast);
         entity.setLastOnline(this.lastOnline);
         entity.setFriends(this.friends);
-        entity.setCosmetics(this.ownedCosmetics);
         this.kitPvpData.sync();
         this.essenceData.sync();
         this.playerSettings.sync();
         this.cratesData.sync();
+        this.cosmeticsData.sync();
         this.punishmentData.sync();
         entity.setKitPvpData(this.kitPvpData.getEntity());
         entity.setSettings(this.playerSettings.getEntity());
         entity.setEssences(this.essenceData.getEntity());
         entity.setCrates(this.cratesData.getEntity());
+        entity.setCosmetics(this.cosmeticsData.getEntity());
         entity.setPunishments(this.punishmentData.getEntities());
         session.saveOrUpdate(entity);
         session.getTransaction().commit();

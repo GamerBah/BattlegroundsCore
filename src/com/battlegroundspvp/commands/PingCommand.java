@@ -4,6 +4,7 @@ package com.battlegroundspvp.commands;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
+import de.Herbystar.TTA.TTA_Methods;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -42,15 +43,7 @@ public class PingCommand implements CommandExecutor {
             return true;
         }
 
-        int ping = -1;
-
-        try {
-            Object nmsPlayer = Class.forName("org.bukkit.craftbukkit." + nmsVersion + ".entity.CraftPlayer").cast(player).getClass().getMethod("getHandle").invoke(target);
-            ping = nmsPlayer.getClass().getField("ping").getInt(nmsPlayer);
-        } catch (Exception e) {
-            plugin.getLogger().severe("Uh oh! Unable to retrieve the player's ping!");
-            e.printStackTrace();
-        }
+        int ping = TTA_Methods.getPing(player);
 
         String status = "";
         if (ping <= 20) {
@@ -81,7 +74,7 @@ public class PingCommand implements CommandExecutor {
         if (player == target) {
             player.sendMessage(ChatColor.GRAY + "Your connection to Battlegrounds is " + status + ChatColor.GRAY + "(" + ping + "ms)");
         } else {
-            player.sendMessage(ChatColor.RED + target.getName() + ChatColor.GRAY + "'s connection to BattlegroundsCore is " + status + ChatColor.GRAY + "(" + ping + "ms)");
+            player.sendMessage(ChatColor.RED + target.getName() + ChatColor.GRAY + "'s connection to Battlegrounds is " + status + ChatColor.GRAY + "(" + ping + "ms)");
         }
 
         return true;

@@ -87,7 +87,7 @@ public class DonationCommand implements CommandExecutor {
                 }
             }
             if (eType == null) {
-                plugin.getLogger().severe("Fatal Error Processing Donation Request! Essence Type invalid!");
+                plugin.getLogger().severe("Fatal Error Processing Donation Request! Essence EffectType invalid!");
                 return true;
             }
 

@@ -5,9 +5,13 @@ import com.battlegroundspvp.BattleModule;
 import com.battlegroundspvp.BattleModuleLoader;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.commands.FreezeCommand;
+import com.battlegroundspvp.administration.donations.CrateItem;
 import com.battlegroundspvp.menus.Crates.CrateMenu;
 import com.battlegroundspvp.runnables.UpdateRunnable;
+import com.battlegroundspvp.utils.Crate;
+import com.battlegroundspvp.utils.enums.EventSound;
 import com.battlegroundspvp.utils.inventories.InventoryBuilder;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -36,9 +40,22 @@ public class PlayerInteract implements Listener {
 
         if (event.getClickedBlock() != null) {
             if (event.getClickedBlock().getType() == Material.ENDER_CHEST) {
-                if (BattlegroundsCore.getInstance().getCrateLocations().contains(event.getClickedBlock().getLocation())) {
-                    event.setCancelled(true);
-                    new InventoryBuilder(player, new CrateMenu(player, event.getClickedBlock().getLocation())).open();
+                if (player.getGameMode() != GameMode.CREATIVE) {
+                    for (Crate crate : BattlegroundsCore.getCrates()) {
+                        if (crate.getLocation().hashCode() == event.getClickedBlock().getLocation().hashCode()) {
+                            event.setCancelled(true);
+                            if (UpdateRunnable.updating) {
+                                return;
+                            }
+                            if (!CrateItem.isOpening(player)) {
+                                new InventoryBuilder(player, new CrateMenu(player, event.getClickedBlock().getLocation())).open();
+                            } else {
+                                EventSound.playSound(player, EventSound.ACTION_FAIL);
+                                player.sendMessage(ChatColor.RED + "Wait for this crate to finish opening!");
+                                return;
+                            }
+                        }
+                    }
                 }
             }
         }

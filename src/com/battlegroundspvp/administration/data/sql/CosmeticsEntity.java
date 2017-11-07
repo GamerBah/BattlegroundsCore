@@ -1,5 +1,5 @@
 package com.battlegroundspvp.administration.data.sql;
-/* Created by GamerBah on 9/28/2017 */
+/* Created by GamerBah on 10/24/2017 */
 
 import lombok.Data;
 import org.hibernate.annotations.Generated;
@@ -10,35 +10,22 @@ import javax.persistence.*;
 
 @Data
 @Entity
-@Table(name = "KitPvpData", schema = "mc2162")
-public class KitPvpDataEntity {
+@Table(name = "Cosmetics", schema = "mc2162")
+public class CosmeticsEntity {
 
     @OneToOne(fetch = FetchType.EAGER)
     @PrimaryKeyJoinColumn
     private GameProfilesEntity gameProfile;
 
     @Id
+    @Column
     @GenericGenerator(name = "generator", strategy = "foreign",
             parameters = @org.hibernate.annotations.Parameter(name = "property", value = "gameProfile"))
     @GeneratedValue(generator = "generator")
     private int id;
-    private int combatLevel;
-    private int deaths;
-    private int highestKillstreak;
-    private int kills;
-    private int killstreaksEnded;
-    private int lastKilledBy;
-    private int combatLogLevel;
-    private int combatLogs;
-    private int activeTrail;
-    private int activeWarcry;
-    private int activeGore;
     @Generated(value = GenerationTime.INSERT)
-    private String ownedKits;
+    private String lobby;
     @Generated(value = GenerationTime.INSERT)
-    private String playersRated;
-    private int revengeKills;
-    private int souls;
-    @Generated(value = GenerationTime.INSERT)
-    private String title;
+    private String kitPvp;
+
 }

@@ -4,6 +4,7 @@ package com.battlegroundspvp;
 import com.battlegroundspvp.administration.commands.*;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.sql.*;
+import com.battlegroundspvp.administration.donations.Essence;
 import com.battlegroundspvp.commands.*;
 import com.battlegroundspvp.listeners.BlockListeners;
 import com.battlegroundspvp.listeners.InventoryClickListener;
@@ -13,8 +14,13 @@ import com.battlegroundspvp.playerevents.*;
 import com.battlegroundspvp.punishments.commands.*;
 import com.battlegroundspvp.runnables.*;
 import com.battlegroundspvp.utils.ColorBuilder;
+import com.battlegroundspvp.utils.Crate;
+import com.battlegroundspvp.utils.Launcher;
+import com.battlegroundspvp.utils.cosmetics.CosmeticManager;
 import com.battlegroundspvp.utils.enums.Advancements;
 import com.battlegroundspvp.utils.enums.EventSound;
+import com.battlegroundspvp.utils.enums.Rarity;
+import com.battlegroundspvp.utils.enums.Time;
 import com.battlegroundspvp.utils.inventories.InventoryBuilder;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -23,6 +29,7 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import de.Herbystar.TTA.TTA_Methods;
+import de.slikey.effectlib.EffectManager;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -30,12 +37,12 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.block.Sign;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
@@ -69,9 +76,17 @@ public class BattlegroundsCore extends JavaPlugin {
     private static SessionFactory sessionFactory = null;
     @Getter
     private static ProtocolManager protocolManager;
+    @Getter
+    private static EffectManager effectManager = null;
 
     @Getter
     private static List<GameProfile> gameProfiles = new ArrayList<>();
+    @Getter
+    private static List<Thread> activeThreads = new ArrayList<>();
+    @Getter
+    private static List<Crate> crates = new ArrayList<>();
+    @Getter
+    private static List<Launcher> launchers = new ArrayList<>();
 
     @Getter
     private GlobalStatsEntity globalStats = null;
@@ -93,20 +108,17 @@ public class BattlegroundsCore extends JavaPlugin {
     @Getter
     private List<String> autoMessages = new ArrayList<>();
     @Getter
-    private List<Location> uLaunchers = new ArrayList<>();
+    private static HashMap<Location, Player> usingCrates = new HashMap<>();
     @Getter
-    private List<Location> fLaunchers = new ArrayList<>();
+    private static HashMap<Player, Rarity> crateOpening = new HashMap<>();
     @Getter
-    private List<Location> fLaunchersParticle = new ArrayList<>();
-    @Getter
-    private List<Location> uLaunchersParticle = new ArrayList<>();
-    @Getter
-    private List<Location> crateLocations = new ArrayList<>();
+    private static ArrayList<Entity> entities = new ArrayList<>();
 
     public void onEnable() {
         instance = this;
+        protocolManager = ProtocolLibrary.getProtocolManager();
+        effectManager = new EffectManager(this);
 
-        // Set up Hibernate SessionFactory for SQL
         try {
             setUp();
         } catch (Exception e) {
@@ -114,70 +126,13 @@ public class BattlegroundsCore extends JavaPlugin {
             this.getServer().shutdown();
         }
 
-        protocolManager = ProtocolLibrary.getProtocolManager();
-        saveDefaultConfig();
-
-        // Reload player data on reload
         reloadGameProfiles();
-        for (Player player : getServer().getOnlinePlayers()) {
-            if (player != null) {
-                TTA_Methods.createBossBar(player, "", 0.0, BarStyle.SOLID, BarColor.WHITE, BarFlag.CREATE_FOG, false);
-                TTA_Methods.removeBossBar(player);
-                respawn(player);
-                TTA_Methods.sendTitle(player, null, 0, 0, 0, null, 0, 0, 0);
-            }
-        }
-
-        // Initialize Location Lists
-        uLaunchers = (List<Location>) getConfig().getList("launchersUp");
-        if (!uLaunchers.isEmpty())
-            uLaunchers.remove(0);
-        fLaunchers = (List<Location>) getConfig().getList("launchersForward");
-        if (!fLaunchers.isEmpty())
-            fLaunchers.remove(0);
-        crateLocations = (List<Location>) getConfig().getList("crateLocations");
-
-        for (Location location : uLaunchers)
-            uLaunchersParticle.add(location.clone().add(0, 1, 0));
-        for (Location location : fLaunchers)
-            fLaunchersParticle.add(location.clone().add(0, 1, 0));
-
-        // Initialize Various Repeating Tasks
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, new UpdateRunnable(this), 120, 120);
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, new DonationUpdater(this), 0, 20);
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, new TrailRunnable(this), 0, 2);
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, new HelixRunnable(this), 0, 5);
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, new AFKRunnable(this), 0, 20);
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, new PunishmentRunnable(this), 0, 20L);
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, new WorldParticlesRunnable(this), 0, 2L);
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, new MessageRunnable(this), 0, 6000L);
-
-        // Save Filter File
-        File filterFile = new File(getDataFolder(), "filter.txt");
-        if (!filterFile.exists()) {
-            saveResource("filter.txt", false);
-        }
-        try {
-            Files.lines(FileSystems.getDefault().getPath(filterFile.getPath())).forEach(filterLine ->
-                    filteredWords.add(ChatColor.translateAlternateColorCodes('&', filterLine)));
-        } catch (IOException e) {
-            getLogger().severe("Could not get filtered words!");
-        }
-
-        // Save SafeWords File
-        File safeWordsFile = new File(getDataFolder(), "safewords.txt");
-        if (!filterFile.exists()) {
-            saveResource("safewords.txt", false);
-        }
-        try {
-            Files.lines(FileSystems.getDefault().getPath(safeWordsFile.getPath())).forEach(wordLine ->
-                    safeWords.add(ChatColor.translateAlternateColorCodes('&', wordLine)));
-        } catch (IOException e) {
-            getLogger().severe("Could not get safe words!");
-        }
+        getServer().getOnlinePlayers().forEach(p -> {
+            respawn(p);
+            TTA_Methods.sendTitle(p, null, 0, 0, 0, null, 0, 0, 0);
+        });
 
 
-        setUpPacketHandlers();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
         this.globalStats = session.createQuery("from GlobalStatsEntity where id = 1", GlobalStatsEntity.class).getSingleResult();
@@ -187,38 +142,53 @@ public class BattlegroundsCore extends JavaPlugin {
         moduleLoader = new BattleModuleLoader();
         moduleLoader.enableModules();
 
+        setUpPacketHandlers();
         registerCommands();
         registerListeners();
+        loadConfigs();
+        startTaskTimers();
 
-        /*if (getConfig().getBoolean("essenceActive")) {
-            int timeRemaining = getConfig().getInt("essenceTimeRemaining");
-            long milliseconds = timeRemaining * 1000;
-            double completion = ((double) milliseconds / (getConfig().getInt("essenceTime") * 60 * 60 * 1000));
-            Essence.Type type = Essence.Type.ONE_HOUR_50_PERCENT;
-            for (Essence.Type essenceType : Essence.Type.values()) {
-                if (getConfig().getInt("essenceTime") == essenceType.getDuration() && getConfig().getInt("essenceIncrease") == essenceType.getPercent()) {
-                    type = essenceType;
-                }
-            }
-            for (Player players : getServer().getOnlinePlayers()) {
-                TTA_Methods.createBossBar(players, ChatColor.RED + Time.toString(milliseconds, true) + ChatColor.GRAY + " remaining in "
-                                + ChatColor.RED + getConfig().getString("essenceOwner") + ChatColor.GRAY + "'s Battle Essence "
-                                + type.getChatColor() + "(+" + type.getPercent() + "%)",
-                        completion, BarStyle.SOLID, type.getBarColor(), BarFlag.CREATE_FOG, true);
-            }
-        }*/
+        if (getConfig().getBoolean("essence.active")) {
+            Essence.Type type = Essence.fromId(getConfig().getInt("essence.id"));
+            long milliseconds = getConfig().getInt("essence.timeRemaining") * 1000;
+            DonationUpdater.essenceBar = Bukkit.createBossBar(type.getChatColor() + Time.toString(milliseconds, true)
+                    + ChatColor.GRAY + " remaining in " + type.getChatColor() + getConfig().getString("essenceOwner") + ChatColor.GRAY + "'s Battle Essence "
+                    + type.getChatColor() + "(+" + type.getPercent() + "%)", type.getBarColor(), BarStyle.SOLID);
+            getServer().getOnlinePlayers().forEach(p -> DonationUpdater.essenceBar.addPlayer(p));
+        }
     }
 
     public void onDisable() {
-        uLaunchers.add(0, new Location(getServer().getWorlds().get(0), 3.1415, 3.1415, 3.1415));
-        fLaunchers.add(0, new Location(getServer().getWorlds().get(0), 3.1415, 3.1415, 3.1415));
-        getConfig().set("launchersUp", uLaunchers);
-        getConfig().set("launchersForward", fLaunchers);
-        getConfig().set("crateLocations", crateLocations);
+        effectManager.dispose();
+
+        activeThreads.forEach(Thread::interrupt);
+        entities.forEach(Entity::remove);
+
+        if (DonationUpdater.essenceBar != null) {
+            DonationUpdater.essenceBar.removeAll();
+            DonationUpdater.essenceBar.setVisible(false);
+        }
+
+        launchers.forEach(launcher -> {
+            getConfig().set("launchers." + launcher.getId() + ".type", launcher.getType().toString());
+            getConfig().set("launchers." + launcher.getId() + ".strength", launcher.getStrength());
+            getConfig().set("launchers." + launcher.getId() + ".location.world", launcher.getLocation().getWorld().getName());
+            getConfig().set("launchers." + launcher.getId() + ".location.x", launcher.getLocation().getBlockX());
+            getConfig().set("launchers." + launcher.getId() + ".location.y", launcher.getLocation().getBlockY());
+            getConfig().set("launchers." + launcher.getId() + ".location.z", launcher.getLocation().getBlockZ());
+            getConfig().set("launchers." + launcher.getId() + ".location.pitch", launcher.getLocation().getPitch());
+            getConfig().set("launchers." + launcher.getId() + ".location.yaw", launcher.getLocation().getYaw());
+        });
+        crates.forEach(crate -> {
+            crate.getHologram().getStands().forEach(ArmorStand::remove);
+            getConfig().set("crates." + crate.getId() + ".world", crate.getLocation().getWorld().getName());
+            getConfig().set("crates." + crate.getId() + ".x", crate.getLocation().getBlockX());
+            getConfig().set("crates." + crate.getId() + ".y", crate.getLocation().getBlockY());
+            getConfig().set("crates." + crate.getId() + ".z", crate.getLocation().getBlockZ());
+        });
         saveConfig();
         sessionFactory.close();
     }
-
 
     private void setUp() throws Exception {
         // sessionFactory SessionFactory is set up once for an application!
@@ -235,7 +205,7 @@ public class BattlegroundsCore extends JavaPlugin {
         }
     }
 
-    public void setUpPacketHandlers() {
+    private void setUpPacketHandlers() {
         if (getProtocolManager() != null)
             getProtocolManager().getAsynchronousManager().registerAsyncHandler(
                     new PacketAdapter(this, PacketType.Play.Client.UPDATE_SIGN) {
@@ -310,11 +280,74 @@ public class BattlegroundsCore extends JavaPlugin {
         pluginManager.registerEvents(new PlayerCloseInventory(), this);
         pluginManager.registerEvents(new PlayerDamage(), this);
         pluginManager.registerEvents(new PlayerInteract(), this);
+        pluginManager.registerEvents(new PlayerInteractEntity(), this);
 
         pluginManager.registerEvents(new ServerListPingListener(this), this);
         pluginManager.registerEvents(new InventoryClickListener(), this);
         pluginManager.registerEvents(new WeatherChangeListener(), this);
         pluginManager.registerEvents(new BlockListeners(this), this);
+        pluginManager.registerEvents(new CosmeticManager(this), this);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void loadConfigs() {
+        getConfig().options().copyDefaults(true);
+        getConfig().options().copyHeader(true);
+        saveDefaultConfig();
+
+        if (getConfig().getConfigurationSection("launchers") != null)
+            getConfig().getConfigurationSection("launchers").getKeys(false).forEach(id -> {
+                Location location = new Location(getServer().getWorld(getConfig().getString("launchers." + id + ".location.world")),
+                        getConfig().getInt("launchers." + id + ".location.x"),
+                        getConfig().getInt("launchers." + id + ".location.y"),
+                        getConfig().getInt("launchers." + id + ".location.z"));
+                location.setPitch(getConfig().getInt("launchers." + id + ".location.pitch"));
+                location.setYaw(getConfig().getInt("launchers." + id + ".location.yaw"));
+                launchers.add(new Launcher(Integer.parseInt(id), location, Launcher.Type.valueOf(getConfig().getString("launchers." + id + ".type")),
+                        getConfig().getInt("launchers." + id + ".strength")));
+            });
+
+        if (getConfig().getConfigurationSection("crates") != null)
+            getConfig().getConfigurationSection("crates").getKeys(false).forEach(id ->
+                    crates.add(new Crate(Integer.parseInt(id),
+                            new Location(getServer().getWorld(getConfig().getString("crates." + id + ".world")),
+                                    getConfig().getInt("crates." + id + ".x"),
+                                    getConfig().getInt("crates." + id + ".y"),
+                                    getConfig().getInt("crates." + id + ".z")))));
+
+        File filterFile = new File(getDataFolder(), "filter.txt");
+        if (!filterFile.exists()) {
+            saveResource("filter.txt", false);
+        }
+        try {
+            Files.lines(FileSystems.getDefault().getPath(filterFile.getPath())).forEach(filterLine ->
+                    filteredWords.add(ChatColor.translateAlternateColorCodes('&', filterLine)));
+        } catch (IOException e) {
+            getLogger().severe("Could not get filtered words!");
+        }
+
+        // Save SafeWords File
+        File safeWordsFile = new File(getDataFolder(), "safewords.txt");
+        if (!filterFile.exists()) {
+            saveResource("safewords.txt", false);
+        }
+        try {
+            Files.lines(FileSystems.getDefault().getPath(safeWordsFile.getPath())).forEach(wordLine ->
+                    safeWords.add(ChatColor.translateAlternateColorCodes('&', wordLine)));
+        } catch (IOException e) {
+            getLogger().severe("Could not get safe words!");
+        }
+    }
+
+    private void startTaskTimers() {
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, new UpdateRunnable(this), 120, 120);
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, new DonationUpdater(this), 0, 20);
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, new TrailRunnable(this), 0, 2);
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, new HelixRunnable(this), 0, 5);
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, new AFKRunnable(this), 0, 20);
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, new PunishmentRunnable(this), 0, 20L);
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, new WorldParticlesRunnable(this), 0, 2L);
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, new MessageRunnable(this), 0, 6000L);
     }
 
     public GameProfile getGameProfile(UUID uuid) {
@@ -420,15 +453,20 @@ public class BattlegroundsCore extends JavaPlugin {
         KitPvpDataEntity kitPvpDataEntity = new KitPvpDataEntity();
         EssencesEntity essencesEntity = new EssencesEntity();
         CratesEntity cratesEntity = new CratesEntity();
+        CosmeticsEntity cosmeticsEntity = new CosmeticsEntity();
+        cosmeticsEntity.setLobby("[]");
+        cosmeticsEntity.setKitPvp("[]");
 
         gameProfilesEntity.setSettings(settingsEntity);
         gameProfilesEntity.setKitPvpData(kitPvpDataEntity);
         gameProfilesEntity.setEssences(essencesEntity);
         gameProfilesEntity.setCrates(cratesEntity);
+        gameProfilesEntity.setCosmetics(cosmeticsEntity);
         settingsEntity.setGameProfile(gameProfilesEntity);
         kitPvpDataEntity.setGameProfile(gameProfilesEntity);
         essencesEntity.setGameProfile(gameProfilesEntity);
         cratesEntity.setGameProfile(gameProfilesEntity);
+        cosmeticsEntity.setGameProfile(gameProfilesEntity);
 
         session.beginTransaction();
         session.saveOrUpdate(gameProfilesEntity);
@@ -450,7 +488,7 @@ public class BattlegroundsCore extends JavaPlugin {
     }
 
     public void sendNoResults(Player player, String msg) {
-        player.sendMessage(new ColorBuilder(ChatColor.RED).bold().create() + "Sorry! " + ChatColor.GRAY + "I wasn't able to ");
+        player.sendMessage(new ColorBuilder(ChatColor.RED).bold().create() + "Sorry! " + ChatColor.GRAY + "I couldn't " + msg);
         EventSound.playSound(player, EventSound.ACTION_FAIL);
     }
 
@@ -460,15 +498,12 @@ public class BattlegroundsCore extends JavaPlugin {
         return player.getAdvancementProgress(advancement).getRemainingCriteria().size() <= 0;
     }
 
-
-    // Respawn at location
     public void respawn(Player player, Location location) {
         player.spigot().respawn();
         player.teleport(location);
         getServer().getPluginManager().callEvent(new PlayerRespawnEvent(player, location, false));
     }
 
-    // Respawn at world spawn
     public void respawn(Player player) {
         respawn(player, player.getWorld().getSpawnLocation().add(0.5, 0, 0.5));
     }

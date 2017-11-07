@@ -2,9 +2,9 @@ package com.battlegroundspvp.utils.messages;
 // AUTHOR: gamer_000 (12/28/2015)
 
 import com.battlegroundspvp.BattlegroundsCore;
+import com.battlegroundspvp.utils.Launcher;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 public class TextComponentMessages {
@@ -15,14 +15,16 @@ public class TextComponentMessages {
         this.plugin = plugin;
     }
 
-    public static BaseComponent launcherLocation(Player player, Location location) {
-        int x = location.getBlockX();
-        int y = location.getBlockY();
-        int z = location.getBlockZ();
+    public static BaseComponent launcherLocation(Player player, Launcher launcher) {
+        int x = launcher.getLocation().getBlockX();
+        int y = launcher.getLocation().getBlockY();
+        int z = launcher.getLocation().getBlockZ();
 
         TextComponent textComponent = new TextComponent(ChatColor.GRAY + "- " + ChatColor.RED + x + ", " + y + ", " + z);
-        textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GREEN + "Click to teleport!").create()));
-        textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/teleport " + player.getName() + " " + x + " " + (y + 1) + " " + z));
+        textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GRAY + "ID: "
+                + ChatColor.AQUA + launcher.getId() + "\n" + ChatColor.GRAY + "Strength: " + ChatColor.RED + launcher.getStrength()
+                + "\n" + ChatColor.GREEN + "Click to teleport!").create()));
+        textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/teleport " + player.getName() + " " + x + " " + y + " " + z));
 
         BaseComponent baseComponent = new TextComponent("   ");
         baseComponent.addExtra(textComponent);

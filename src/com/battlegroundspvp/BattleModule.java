@@ -1,7 +1,13 @@
 package com.battlegroundspvp;
 /* Created by GamerBah on 10/15/2017 */
 
+import com.battlegroundspvp.administration.data.Rank;
+import com.battlegroundspvp.utils.cosmetics.Cosmetic;
+import com.battlegroundspvp.utils.cosmetics.Gore;
+import com.battlegroundspvp.utils.cosmetics.ParticlePack;
+import com.battlegroundspvp.utils.cosmetics.Warcry;
 import org.bukkit.command.CommandExecutor;
+import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -10,7 +16,10 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.weather.WeatherChangeEvent;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 /*
  * This interface must be implemented by every main class of every plugin module
@@ -26,6 +35,32 @@ public class BattleModule {
 
     public String getName() {
         return "";
+    }
+
+    public List<UUID> getInCombat() {
+        return new ArrayList<>();
+    }
+
+    public ParticlePack getActiveTrail(Player player) {
+        return null;
+    }
+
+    public Warcry getActiveWarcry(Player player) {
+        return null;
+    }
+
+    public Gore getActiveGore(Player player) {
+        return null;
+    }
+
+    public ArrayList<Cosmetic> getCosmetics() {
+        return new ArrayList<>();
+    }
+
+    public void updateScoreboardRank(Player player, Rank rank) {
+    }
+
+    public void updateScoreboardCoins(Player player, int amount) {
     }
 
     // STANDARD EVENTS

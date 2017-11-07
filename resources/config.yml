@@ -1,13 +1,13 @@
-essenceActive: false
-essenceIncrease:
-essenceTime:
-essenceTimeRemaining:
-essenceOwner:
-essenceThanks:
-
+### Config for Battlegrounds Core ###
+# Do not edit these values directly #
+#####################################
+essence:
+  active: false
+  id: 0
+  owner: ""
+  timeRemaining: 0
+  thanks: []
 developmentMode: false
-
-launchersUp: []
-launchersForward: []
-
-crateLocations: []
+spawn:
+crates:
+launchers:

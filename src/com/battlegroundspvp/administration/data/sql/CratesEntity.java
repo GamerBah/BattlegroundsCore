@@ -29,8 +29,8 @@ public class CratesEntity {
     private int epic;
     @Column(name = "legendary", insertable = false)
     private int legendary;
-    @Column(name = "limited", insertable = false)
-    private int limited;
+    @Column(name = "seasonal", insertable = false)
+    private int seasonal;
     @Column(name = "gift", insertable = false)
     private int gift;
 

@@ -108,7 +108,7 @@ public class PlayerCommandPreProcess implements Listener {
         }
         if (StringUtils.equalsIgnoreCase(command, "/npc cancel")) {
             event.setCancelled(true);
-            player.performCommand("battlegroundskitpvp:npc cancel");
+            player.performCommand("battlegroundscore:npc cancel");
             return;
         }
 

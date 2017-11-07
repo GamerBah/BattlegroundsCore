@@ -5,9 +5,11 @@ import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.utils.ColorBuilder;
+import com.battlegroundspvp.utils.Launcher;
 import com.battlegroundspvp.utils.enums.EventSound;
 import com.battlegroundspvp.utils.messages.TextComponentMessages;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -39,117 +41,187 @@ public class LauncherCommand implements CommandExecutor {
         }
 
         if (args.length == 0) {
-            plugin.sendIncorrectUsage(player, "/launcher <add/remove/list>");
+            plugin.sendIncorrectUsage(player, "/launcher <add/remove/list/strength>");
             return true;
         }
 
         Block block = player.getLocation().getBlock();
 
-        if (args.length == 1) {
-            if (args[0].equalsIgnoreCase("add")) {
-                plugin.sendIncorrectUsage(player, "/launcher add <-u/-f>");
+        if (args[0].equalsIgnoreCase("add")) {
+            if (args.length != 3) {
+                plugin.sendIncorrectUsage(player, "/launcher add <-u/-f> <strength>");
                 return true;
-            } else if (args[0].equalsIgnoreCase("remove")) {
-                for (int x = 0; x < plugin.getULaunchers().size(); x++) {
-                    if (block.getRelative(BlockFace.DOWN).getLocation().getBlockX() == plugin.getULaunchers().get(x).getBlockX()
-                            && block.getRelative(BlockFace.DOWN).getLocation().getBlockY() == plugin.getULaunchers().get(x).getBlockY()
-                            && block.getRelative(BlockFace.DOWN).getLocation().getBlockZ() == plugin.getULaunchers().get(x).getBlockZ()) {
-                        player.sendMessage(ChatColor.GREEN + "Successfully removed " + ChatColor.AQUA + "upwards launcher" + ChatColor.GREEN
-                                + " at " + ChatColor.RED + plugin.getULaunchers().get(x).getX() + ", " + plugin.getULaunchers().get(x).getY() + ", " + plugin.getULaunchers().get(x).getZ());
-                        plugin.getULaunchers().remove(x);
-                        plugin.getULaunchersParticle().remove(x);
-                        return true;
-                    }
-                }
-                for (int x = 0; x < plugin.getFLaunchers().size(); x++) {
-                    if (block.getRelative(BlockFace.DOWN).getLocation().getBlockX() == plugin.getFLaunchers().get(x).getBlockX()
-                            && block.getRelative(BlockFace.DOWN).getLocation().getBlockY() == plugin.getFLaunchers().get(x).getBlockY()
-                            && block.getRelative(BlockFace.DOWN).getLocation().getBlockZ() == plugin.getFLaunchers().get(x).getBlockZ()) {
-                        player.sendMessage(ChatColor.GREEN + "Successfully removed " + ChatColor.AQUA + "forwards launcher" + ChatColor.GREEN
-                                + " at " + ChatColor.RED + plugin.getFLaunchers().get(x).getX() + ", " + plugin.getFLaunchers().get(x).getY() + ", " + plugin.getFLaunchers().get(x).getZ());
-                        plugin.getFLaunchers().remove(x);
-                        plugin.getFLaunchersParticle().remove(x);
-                        return true;
-                    }
-                }
-                player.sendMessage(ChatColor.RED + "No launcher was found at this location!");
+            }
+
+            if (block.getRelative(BlockFace.DOWN).getType().equals(Material.WATER)
+                    || block.getRelative(BlockFace.DOWN).getType().equals(Material.STATIONARY_WATER)
+                    || block.getRelative(BlockFace.DOWN).getType().equals(Material.LAVA)
+                    || block.getRelative(BlockFace.DOWN).getType().equals(Material.STATIONARY_LAVA)
+                    || block.getRelative(BlockFace.DOWN).getType().equals(Material.AIR)
+                    || !block.getType().isSolid()) {
+                player.sendMessage(ChatColor.RED + "Launchers can only be placed in safe places!");
                 EventSound.playSound(player, EventSound.ACTION_FAIL);
                 return true;
-            } else if (args[0].equalsIgnoreCase("list")) {
-                player.sendMessage(new ColorBuilder(ChatColor.AQUA).bold().create() + "Upwards Launchers:");
-                for (int x = 0; x < plugin.getULaunchers().size(); x++)
-                    player.spigot().sendMessage(TextComponentMessages.launcherLocation(player, plugin.getULaunchers().get(x)));
+            }
+
+            for (Launcher launcher : BattlegroundsCore.getLaunchers()) {
+                if (launcher.getLocation().hashCode() == block.getLocation().hashCode()) {
+                    player.sendMessage(ChatColor.RED + "A launcher already exists here!");
+                    EventSound.playSound(player, EventSound.ACTION_FAIL);
+                    return true;
+                }
+            }
+
+            if (!args[2].matches("[0-9]+")) {
+                player.sendMessage(ChatColor.RED + "The strength can only be a number!");
+                EventSound.playSound(player, EventSound.ACTION_FAIL);
+                return true;
+            }
+
+            if (args[1].equalsIgnoreCase("-u")) {
+                Location location = block.getLocation();
+                location.setPitch(player.getLocation().getPitch());
+                location.setYaw(player.getLocation().getYaw());
+                Launcher launcher = new Launcher(location, Launcher.Type.UPWARD, Integer.parseInt(args[2]));
+                BattlegroundsCore.getLaunchers().add(launcher);
+                player.sendMessage(ChatColor.GREEN + "Added an upwards launcher" + ChatColor.GRAY
+                        + " at " + ChatColor.AQUA + block.getX() + ", " + block.getY() + ", " + block.getZ() + ChatColor.GRAY + " with an ID of " + ChatColor.AQUA + launcher.getId());
+                return true;
+            } else if (args[1].equalsIgnoreCase("-f")) {
+                Location location = block.getLocation();
+                location.setPitch(player.getLocation().getPitch());
+                location.setYaw(player.getLocation().getYaw());
+                Launcher launcher = new Launcher(location, Launcher.Type.FORWARD, Integer.parseInt(args[2]));
+                BattlegroundsCore.getLaunchers().add(launcher);
+                player.sendMessage(ChatColor.GREEN + "Added a forwards launcher" + ChatColor.GRAY
+                        + " at " + ChatColor.AQUA + block.getX() + ", " + block.getY() + ", " + block.getZ() + ChatColor.GRAY + " with an ID of " + ChatColor.AQUA + launcher.getId());
+                return true;
+            } else {
+                plugin.sendIncorrectUsage(player, "/launcher add <-u/-f> <strength>");
+                return true;
+            }
+        }
+
+        if (args[0].equalsIgnoreCase("remove")) {
+            if (args.length > 2) {
+                plugin.sendIncorrectUsage(player, "/launcher remove [id]");
+                return true;
+            }
+
+            if (args.length == 1) {
+                Launcher removal = null;
+                for (Launcher launcher : BattlegroundsCore.getLaunchers())
+                    if (launcher.getLocation().hashCode() == block.getLocation().hashCode())
+                        removal = launcher;
+
+                if (removal == null) {
+                    plugin.sendNoResults(player, "find a launcher at this location!");
+                    return true;
+                }
+                BattlegroundsCore.getLaunchers().remove(removal);
+                player.sendMessage(ChatColor.GREEN + "Successfully removed that launcher " + ChatColor.GRAY + "(ID: " + ChatColor.AQUA + removal.getId() + ChatColor.GRAY + ")");
+                return true;
+            }
+
+            if (!args[1].matches("[0-9]+")) {
+                player.sendMessage(ChatColor.RED + "The ID can only be a number!");
+                EventSound.playSound(player, EventSound.ACTION_FAIL);
+                return true;
+            }
+
+            Launcher removal = null;
+            for (Launcher launcher : BattlegroundsCore.getLaunchers())
+                if (launcher.getId() == Integer.parseInt(args[1]))
+                    removal = launcher;
+
+            if (removal == null) {
+                plugin.sendNoResults(player, "find a launcher with that ID!");
+                player.sendMessage(ChatColor.GRAY + "(Hint: Use " + ChatColor.RED + "/launcher list" + ChatColor.GRAY + " to easily find launcher ID's)");
+                return true;
+            }
+
+            BattlegroundsCore.getLaunchers().remove(removal);
+            player.sendMessage(ChatColor.GREEN + "Successfully removed that launcher " + ChatColor.GRAY + "(ID: " + ChatColor.AQUA + removal.getId() + ChatColor.GRAY + ")");
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("list")) {
+            if (args.length != 2) {
+                plugin.sendIncorrectUsage(player, "/launcher list [-u/-f]");
+                return true;
+            }
+            if (args[1].equalsIgnoreCase("-f")) {
                 player.sendMessage(new ColorBuilder(ChatColor.AQUA).bold().create() + "Forwards Launchers:");
-                for (int x = 0; x < plugin.getFLaunchers().size(); x++)
-                    player.spigot().sendMessage(TextComponentMessages.launcherLocation(player, plugin.getFLaunchers().get(x)));
+                if (BattlegroundsCore.getLaunchers().size() == 0)
+                    player.sendMessage(ChatColor.GRAY + "   None");
+                BattlegroundsCore.getLaunchers().stream().filter(launcher -> launcher.getType() == Launcher.Type.FORWARD).forEach(launcher ->
+                        player.spigot().sendMessage(TextComponentMessages.launcherLocation(player, launcher)));
+            } else if (args[1].equalsIgnoreCase("-u")) {
+                player.sendMessage(new ColorBuilder(ChatColor.AQUA).bold().create() + "Upwards Launchers:");
+                if (BattlegroundsCore.getLaunchers().size() == 0)
+                    player.sendMessage(ChatColor.GRAY + "   None");
+                BattlegroundsCore.getLaunchers().stream().filter(launcher -> launcher.getType() == Launcher.Type.UPWARD).forEach(launcher ->
+                        player.spigot().sendMessage(TextComponentMessages.launcherLocation(player, launcher)));
                 return true;
             } else {
-                plugin.sendIncorrectUsage(player, "/launcher <add/remove/list>");
+                plugin.sendIncorrectUsage(player, "/launcher list [-u/-f]");
                 return true;
             }
         }
 
-        if (args.length == 2) {
-            if (args[0].equalsIgnoreCase("add")) {
-                if (block.getRelative(BlockFace.DOWN).getType().equals(Material.WATER)
-                        || block.getRelative(BlockFace.DOWN).getType().equals(Material.STATIONARY_WATER)
-                        || block.getRelative(BlockFace.DOWN).getType().equals(Material.LAVA)
-                        || block.getRelative(BlockFace.DOWN).getType().equals(Material.STATIONARY_LAVA)
-                        || block.getRelative(BlockFace.DOWN).getType().equals(Material.AIR)
-                        || !block.getType().equals(Material.AIR)) {
-                    player.sendMessage(ChatColor.RED + "Launchers can only be placed in safe places!");
-                    EventSound.playSound(player, EventSound.ACTION_FAIL);
-                    return true;
-                }
-                if (plugin.getConfig().getList("launchersUp").contains(block.getRelative(BlockFace.DOWN).getLocation())) {
-                    player.sendMessage(ChatColor.RED + "An upwards launcher already exists here!");
-                    EventSound.playSound(player, EventSound.ACTION_FAIL);
-                    return true;
-                }
-                if (plugin.getConfig().getList("launchersForward").contains(block.getRelative(BlockFace.DOWN).getLocation())) {
-                    player.sendMessage(ChatColor.RED + "A forwards launcher already exists here!");
-                    EventSound.playSound(player, EventSound.ACTION_FAIL);
-                    return true;
-                }
-                if (args[1].equalsIgnoreCase("-u")) {
-                    plugin.getULaunchers().add(block.getRelative(BlockFace.DOWN).getLocation());
-                    plugin.getULaunchersParticle().add(plugin.getULaunchers().get(plugin.getULaunchers().size() - 1).clone().add(0, 1.1, 0));
-                    player.sendMessage(ChatColor.GREEN + "Successfully added " + ChatColor.AQUA + "upwards launcher" + ChatColor.GREEN
-                            + " at " + ChatColor.RED + block.getX() + ", " + block.getY() + ", " + block.getZ());
-                    return true;
-                } else if (args[1].equalsIgnoreCase("-f")) {
-                    plugin.getFLaunchers().add(block.getRelative(BlockFace.DOWN).getLocation());
-                    plugin.getFLaunchersParticle().add(plugin.getFLaunchers().get(plugin.getFLaunchers().size() - 1).clone().add(0, 1.1, 0));
-                    player.sendMessage(ChatColor.GREEN + "Successfully added " + ChatColor.AQUA + "forwards launcher" + ChatColor.GREEN
-                            + " at " + ChatColor.RED + block.getX() + ", " + block.getY() + ", " + block.getZ());
-                    return true;
-                } else {
-                    plugin.sendIncorrectUsage(player, "/launcher add <-u/-f>");
-                    return true;
-                }
-            } else if (args[0].equalsIgnoreCase("remove")) {
-                plugin.sendIncorrectUsage(player, "/launcher remove");
-                return true;
-            } else if (args[0].equalsIgnoreCase("list")) {
-                plugin.sendIncorrectUsage(player, "/launcher list");
-                return true;
-            } else {
-                plugin.sendIncorrectUsage(player, "/launcher <add/remove/list>");
+        if (args[0].equalsIgnoreCase("strength")) {
+            if (args.length > 3 || args.length == 1) {
+                plugin.sendIncorrectUsage(player, "/launcher strength <id> [number]");
                 return true;
             }
-        }
 
-        if (args.length >= 3) {
-            if (args[0].equalsIgnoreCase("add")) {
-                plugin.sendIncorrectUsage(player, "/launcher add <-u/-f>");
-            } else if (args[0].equalsIgnoreCase("remove")) {
-                plugin.sendIncorrectUsage(player, "/launcher remove");
+            if (args.length == 2) {
+                if (!args[1].matches("[0-9]+")) {
+                    player.sendMessage(ChatColor.RED + "The ID can only be a number!");
+                    EventSound.playSound(player, EventSound.ACTION_FAIL);
+                    return true;
+                }
+                Launcher find = null;
+                for (Launcher launcher : BattlegroundsCore.getLaunchers())
+                    if (launcher.getId() == Integer.parseInt(args[1]))
+                        find = launcher;
+
+                if (find == null) {
+                    plugin.sendNoResults(player, "find a launcher with that ID!");
+                    player.sendMessage(ChatColor.GRAY + "(Hint: Use " + ChatColor.RED + "/launcher list" + ChatColor.GRAY + " to easily find launcher ID's)");
+                    return true;
+                }
+                player.sendMessage(ChatColor.GRAY + "The " + find.getType().toString().toLowerCase() + " strength of launcher " + ChatColor.AQUA + find.getId()
+                        + ChatColor.GRAY + " is " + ChatColor.AQUA + find.getStrength());
                 return true;
-            } else if (args[0].equalsIgnoreCase("list")) {
-                plugin.sendIncorrectUsage(player, "/launcher list");
-                return true;
-            } else {
-                plugin.sendIncorrectUsage(player, "/launcher <add/remove/list>");
+            }
+
+            if (args.length == 3) {
+                if (!args[1].matches("[0-9]+")) {
+                    player.sendMessage(ChatColor.RED + "The ID can only be a number!");
+                    EventSound.playSound(player, EventSound.ACTION_FAIL);
+                    return true;
+                }
+                Launcher edit = null;
+                for (Launcher launcher : BattlegroundsCore.getLaunchers())
+                    if (launcher.getId() == Integer.parseInt(args[1]))
+                        edit = launcher;
+
+                if (edit == null) {
+                    plugin.sendNoResults(player, "find a launcher with that ID!");
+                    player.sendMessage(ChatColor.GRAY + "(Hint: Use " + ChatColor.RED + "/launcher list" + ChatColor.GRAY + " to easily find launcher ID's)");
+                    return true;
+                }
+
+                if (!args[2].matches("[0-9]+")) {
+                    player.sendMessage(ChatColor.RED + "The strength can only be a number!");
+                    EventSound.playSound(player, EventSound.ACTION_FAIL);
+                    return true;
+                }
+
+                edit.setStrength(Integer.parseInt(args[2]));
+                player.sendMessage(ChatColor.GREEN + "Changed the " + edit.getType().toString().toLowerCase() + " strength of launcher " + ChatColor.AQUA + edit.getId()
+                        + ChatColor.GRAY + " to " + ChatColor.AQUA + edit.getStrength());
                 return true;
             }
         }

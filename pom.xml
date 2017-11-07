@@ -39,6 +39,11 @@
             <url>https://repository.jboss.org/nexus/content/repositories/releases/</url>
         </repository>
 
+        <repository>
+            <id>confuser-repo</id>
+            <url>http://ci.frostcast.net/plugin/repository/everything</url>
+        </repository>
+
     </repositories>
 
     <dependencies>
@@ -130,6 +135,12 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-hikaricp</artifactId>
             <version>5.2.10.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>me.confuser</groupId>
+            <artifactId>BarAPI</artifactId>
+            <version>3.5</version>
         </dependency>
 
     </dependencies>

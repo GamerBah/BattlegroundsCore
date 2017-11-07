@@ -4,7 +4,7 @@ package com.battlegroundspvp.administration.data;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.sql.CratesEntity;
 import com.battlegroundspvp.administration.data.sql.GameProfilesEntity;
-import com.battlegroundspvp.administration.donations.Crate;
+import com.battlegroundspvp.utils.enums.Rarity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.hibernate.Session;
@@ -19,7 +19,7 @@ public class CratesData {
     @Getter
     private final int id;
     @Getter
-    private int common, rare, epic, legendary, limited, gift;
+    private int common, rare, epic, legendary, seasonal, gift;
 
     CratesData(CratesEntity entity) {
         this.entity = entity;
@@ -29,42 +29,42 @@ public class CratesData {
         this.rare = entity.getRare();
         this.epic = entity.getEpic();
         this.legendary = entity.getLegendary();
-        this.limited = entity.getLimited();
+        this.seasonal = entity.getSeasonal();
         this.gift = entity.getGift();
     }
 
-    public void addCrate(Crate.Type type, int amount) {
-        if (type.equals(Crate.Type.COMMON))
+    public void addCrate(Rarity rarity, int amount) {
+        if (rarity.equals(Rarity.COMMON))
             this.common += amount;
-        if (type.equals(Crate.Type.RARE))
+        if (rarity.equals(Rarity.RARE))
             this.rare += amount;
-        if (type.equals(Crate.Type.EPIC))
+        if (rarity.equals(Rarity.EPIC))
             this.epic += amount;
-        if (type.equals(Crate.Type.LEGENDARY))
+        if (rarity.equals(Rarity.LEGENDARY))
             this.legendary += amount;
-        if (type.equals(Crate.Type.LIMITED))
-            this.limited += amount;
-        if (type.equals(Crate.Type.GIFT))
+        if (rarity.equals(Rarity.SEASONAL))
+            this.seasonal += amount;
+        if (rarity.equals(Rarity.GIFT))
             this.gift += amount;
     }
 
-    public void removeEssence(Crate.Type type) {
-        if (type.equals(Crate.Type.COMMON))
+    public void removeCrate(Rarity rarity) {
+        if (rarity.equals(Rarity.COMMON))
             this.common--;
-        if (type.equals(Crate.Type.RARE))
+        if (rarity.equals(Rarity.RARE))
             this.rare--;
-        if (type.equals(Crate.Type.EPIC))
+        if (rarity.equals(Rarity.EPIC))
             this.epic--;
-        if (type.equals(Crate.Type.LEGENDARY))
+        if (rarity.equals(Rarity.LEGENDARY))
             this.legendary--;
-        if (type.equals(Crate.Type.LIMITED))
-            this.limited--;
-        if (type.equals(Crate.Type.GIFT))
+        if (rarity.equals(Rarity.SEASONAL))
+            this.seasonal--;
+        if (rarity.equals(Rarity.GIFT))
             this.gift--;
     }
 
     public int getTotal() {
-        return common + rare + epic + legendary + limited + gift;
+        return common + rare + epic + legendary + seasonal + gift;
     }
 
     void sync() {
@@ -74,7 +74,7 @@ public class CratesData {
         entity.setRare(this.rare);
         entity.setEpic(this.epic);
         entity.setLegendary(this.legendary);
-        entity.setLimited(this.limited);
+        entity.setSeasonal(this.seasonal);
         entity.setGift(this.gift);
         session.getTransaction().commit();
         session.close();

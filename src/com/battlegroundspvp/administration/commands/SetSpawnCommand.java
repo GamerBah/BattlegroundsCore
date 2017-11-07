@@ -45,6 +45,7 @@ public class SetSpawnCommand implements CommandExecutor {
         location.setYaw(player.getLocation().getYaw());
         location.setPitch(0);
         BattlegroundsCore.getInstance().getConfig().set("spawn", location);
+        BattlegroundsCore.getInstance().saveConfig();
         player.sendMessage(ChatColor.GREEN + "Spawn location set!");
         EventSound.playSound(player, EventSound.ACTION_SUCCESS);
 

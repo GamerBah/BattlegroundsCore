@@ -2,6 +2,9 @@ package com.battlegroundspvp.menus.Punishment;
 /* Created by GamerBah on 8/25/2016 */
 
 import com.battlegroundspvp.BattlegroundsCore;
+import com.comphenix.packetwrapper.WrapperPlayServerOpenSignEditor;
+import com.comphenix.protocol.wrappers.BlockPosition;
+import org.bukkit.entity.Player;
 
 public class WarnMenu {
     private BattlegroundsCore plugin;
@@ -10,11 +13,13 @@ public class WarnMenu {
         this.plugin = plugin;
     }
 
-    /*public void openSearch(Player player) {
-        SignGUI.open(player);
+    private static void openSearch(Player player) {
+        WrapperPlayServerOpenSignEditor openSignEditor = new WrapperPlayServerOpenSignEditor();
+        openSignEditor.setLocation(new BlockPosition(0, 0, 0));
+        openSignEditor.sendPacket(player);
     }
 
-    public void openPlayersMenu(Player player, PunishmentMenus.SortType sortType, String searchTerm, int page) {
+    /*public void openPlayersMenu(Player player, PunishmentMenus.SortType sortType, String searchTerm, int page) {
         GameProfile pData = plugin.getGameProfile(player.getUniqueId());
         Inventory inv = plugin.getServer().createInventory(null, 54, "Warn Menu");
 
@@ -91,7 +96,7 @@ public class WarnMenu {
 
         int i = 10;
         for (Punishment.Reason reasons : Punishment.Reason.values()) {
-            if (!reasons.getType().equals(Punishment.Type.BAN) && !reasons.getType().equals(Punishment.Type.AUTO)) {
+            if (!reasons.getEffectType().equals(Punishment.EffectType.BAN) && !reasons.getEffectType().equals(Punishment.EffectType.AUTO)) {
                 String[] split = reasons.getDescription().split(",");
                 inv.setItem(i++, new ItemBuilder((reason != null && reason.equals(reasons) ? Material.ENCHANTED_BOOK : Material.BOOK))
                         .name(ChatColor.RED + reasons.getName() + (reason != null && reason.equals(reasons) ? new ColorBuilder(ChatColor.GREEN).bold().create() + " SELECTED" : ""))

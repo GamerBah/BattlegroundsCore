@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="PacketWrapper">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../Libraries/PacketWrapper.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

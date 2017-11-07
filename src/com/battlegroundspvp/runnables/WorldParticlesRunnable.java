@@ -2,7 +2,8 @@ package com.battlegroundspvp.runnables;
 /* Created by GamerBah on 8/30/2016 */
 
 import com.battlegroundspvp.BattlegroundsCore;
-import com.battlegroundspvp.utils.packets.particles.ParticleEffect;
+import com.battlegroundspvp.utils.Launcher;
+import de.slikey.effectlib.util.ParticleEffect;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
@@ -28,39 +29,24 @@ public class WorldParticlesRunnable implements Runnable {
 
     @Override
     public void run() {
-        for (Location location : plugin.getFLaunchersParticle()) {
+        for (Launcher launcher : BattlegroundsCore.getLaunchers()) {
+            Location location = launcher.getParticleLocation();
             if (Bukkit.getServer().getOnlinePlayers() != null) {
                 if (i <= 10) {
                     location = location.add(0, 0, round(i / 5.5 / 10, 1));
-                    ParticleEffect.FIREWORKS_SPARK.display(0, 0, 0, 0, 1, location, 25);
+                    ParticleEffect.FIREWORKS_SPARK.display(0, 0, 0, 0, 1, location, 30);
                 } else if (i <= 20 && i > 10) {
                     location = location.add(round((i - 10) / 5.5 / 10, 1), 0, 0);
-                    ParticleEffect.FIREWORKS_SPARK.display(0, 0, 0, 0, 1, location, 25);
+                    ParticleEffect.FIREWORKS_SPARK.display(0, 0, 0, 0, 1, location, 30);
                 } else if (i <= 30 && i > 20) {
                     location = location.add(0, 0, round(-(i - 20) / 5.5 / 10, 1));
-                    ParticleEffect.FIREWORKS_SPARK.display(0, 0, 0, 0, 1, location, 25);
+                    ParticleEffect.FIREWORKS_SPARK.display(0, 0, 0, 0, 1, location, 30);
                 } else if (i <= 40 && i > 30) {
                     location = location.add(round(-(i - 30) / 5.5 / 10, 1), 0, 0);
-                    ParticleEffect.FIREWORKS_SPARK.display(0, 0, 0, 0, 1, location, 25);
+                    ParticleEffect.FIREWORKS_SPARK.display(0, 0, 0, 0, 1, location, 30);
                 } else if (i > 40) {
                     i -= 40;
                 }
-            }
-        }
-        for (Location location : plugin.getULaunchersParticle()) {
-            if (Bukkit.getServer().getOnlinePlayers() != null) {
-                if (i <= 10) {
-                    location = location.add(0, 0, round(i / 5.5 / 10, 1));
-                } else if (i <= 20 && i > 10) {
-                    location = location.add(round((i - 10) / 5.5 / 10, 1), 0, 0);
-                } else if (i <= 30 && i > 20) {
-                    location = location.add(0, 0, round(-(i - 20) / 5.5 / 10, 1));
-                } else if (i <= 40 && i > 30) {
-                    location = location.add(round(-(i - 30) / 5.5 / 10, 1), 0, 0);
-                } else if (i > 40) {
-                    i -= 40;
-                }
-                ParticleEffect.FIREWORKS_SPARK.display(0, 0, 0, 0, 1, location, 25);
             }
         }
         i++;

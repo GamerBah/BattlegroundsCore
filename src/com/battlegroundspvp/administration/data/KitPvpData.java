@@ -16,7 +16,8 @@ public class KitPvpData {
     private final int id;
     @Getter
     @Setter
-    private int kills, deaths, souls, combatLevel, killstreaksEnded, revengeKills, highestKillstreak, lastKilledBy, combatLogLevel, combatLogs;
+    private int kills, deaths, souls, combatLevel, killstreaksEnded, revengeKills,
+            highestKillstreak, lastKilledBy, combatLogLevel, combatLogs, activeTrail, activeWarcry, activeGore;
     @Getter
     @Setter
     private String playersRated, ownedKits, title;
@@ -35,6 +36,9 @@ public class KitPvpData {
         this.combatLogs = entity.getCombatLogs();
         this.combatLogLevel = entity.getCombatLogLevel();
         this.playersRated = entity.getPlayersRated();
+        this.activeTrail = entity.getActiveTrail();
+        this.activeWarcry = entity.getActiveWarcry();
+        this.activeGore = entity.getActiveGore();
         this.ownedKits = entity.getOwnedKits();
         this.title = entity.getTitle();
     }
@@ -87,6 +91,9 @@ public class KitPvpData {
         entity.setHighestKillstreak(this.highestKillstreak);
         entity.setLastKilledBy(this.lastKilledBy);
         entity.setPlayersRated(this.playersRated);
+        entity.setActiveTrail(this.activeTrail);
+        entity.setActiveWarcry(this.activeWarcry);
+        entity.setActiveGore(this.activeGore);
         entity.setOwnedKits(this.ownedKits);
         entity.setTitle(this.title);
         session.getTransaction().commit();

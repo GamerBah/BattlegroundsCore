@@ -6,6 +6,7 @@ import com.battlegroundspvp.administration.commands.FreezeCommand;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.punishments.Punishment;
+import com.battlegroundspvp.runnables.DonationUpdater;
 import com.battlegroundspvp.runnables.UpdateRunnable;
 import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.enums.Advancements;
@@ -121,6 +122,10 @@ public class PlayerJoin implements Listener {
             player.setWalkSpeed(0.2F);
         }
 
+        if (DonationUpdater.essenceBar != null)
+            if (!DonationUpdater.essenceBar.getPlayers().contains(player))
+                DonationUpdater.essenceBar.addPlayer(player);
+
         player.setPlayerListName((gameProfile.hasRank(Rank.WARRIOR) ? gameProfile.getRank().getColor().create() + "" + ChatColor.BOLD + gameProfile.getRank().getName().toUpperCase() + " " : "")
                 + (gameProfile.hasRank(Rank.WARRIOR) ? ChatColor.WHITE : ChatColor.GRAY) + player.getName());
 
@@ -128,5 +133,6 @@ public class PlayerJoin implements Listener {
                 ChatColor.YELLOW + "Visit our store! store.battlegroundspvp.com");
 
         plugin.respawn(player);
+
     }
 }
