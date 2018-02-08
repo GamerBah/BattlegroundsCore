@@ -1,5 +1,5 @@
 package com.battlegroundspvp.administration.commands;
-/* Created by GamerBah on 10/13/2017 */
+/* Created by GamerBah on 11/12/2017 */
 
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
@@ -12,11 +12,11 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class SetSpawnCommand implements CommandExecutor {
+public class SetLocationCommand implements CommandExecutor {
 
     private BattlegroundsCore plugin;
 
-    public SetSpawnCommand(BattlegroundsCore plugin) {
+    public SetLocationCommand(BattlegroundsCore plugin) {
         this.plugin = plugin;
     }
 
@@ -34,8 +34,8 @@ public class SetSpawnCommand implements CommandExecutor {
             return true;
         }
 
-        if (args.length > 0) {
-            plugin.sendIncorrectUsage(player, "/setspawn");
+        if (args.length != 1) {
+            plugin.sendIncorrectUsage(player, "/setlocation <afk|spawn>");
             EventSound.playSound(player, EventSound.ACTION_FAIL);
             return true;
         }
@@ -44,12 +44,23 @@ public class SetSpawnCommand implements CommandExecutor {
                 player.getLocation().getBlockZ()).add(0.5, 0, 0.5);
         location.setYaw(player.getLocation().getYaw());
         location.setPitch(0);
-        BattlegroundsCore.getInstance().getConfig().set("spawn", location);
-        BattlegroundsCore.getInstance().saveConfig();
-        player.sendMessage(ChatColor.GREEN + "Spawn location set!");
-        EventSound.playSound(player, EventSound.ACTION_SUCCESS);
 
-        return false;
+        if (args[0].equalsIgnoreCase("spawn")) {
+            plugin.getConfig().set("locations.spawn", location);
+            plugin.saveConfig();
+            player.sendMessage(ChatColor.GREEN + "Spawn location set!");
+            EventSound.playSound(player, EventSound.ACTION_SUCCESS);
+            return true;
+        } else if (args[0].equalsIgnoreCase("afk")) {
+            plugin.getConfig().set("locations.afk", location);
+            plugin.saveConfig();
+            player.sendMessage(ChatColor.GREEN + "AFK location set!");
+            EventSound.playSound(player, EventSound.ACTION_SUCCESS);
+            return true;
+        } else {
+            plugin.sendIncorrectUsage(player, "/setlocation <afk|spawn>");
+            EventSound.playSound(player, EventSound.ACTION_FAIL);
+            return true;
+        }
     }
-
 }

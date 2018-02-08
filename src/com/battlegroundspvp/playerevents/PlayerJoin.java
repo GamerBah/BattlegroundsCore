@@ -8,9 +8,10 @@ import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.punishments.Punishment;
 import com.battlegroundspvp.runnables.DonationUpdater;
 import com.battlegroundspvp.runnables.UpdateRunnable;
-import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.enums.Advancements;
+import com.battlegroundspvp.utils.enums.Rarity;
 import com.battlegroundspvp.utils.enums.Time;
+import com.battlegroundspvp.utils.messages.ColorBuilder;
 import de.Herbystar.TTA.TTA_Methods;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -35,6 +36,13 @@ public class PlayerJoin implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onLogin(AsyncPlayerPreLoginEvent event) {
+        if (event.getLoginResult() == AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST) {
+            event.setKickMessage(new ColorBuilder(ChatColor.RED).bold().create() + "You're not on the whitelist!\n\n"
+                    + ChatColor.GRAY + "Access to the Development Server is only given§7to donators with the " + Rank.WARLORD.getColor().create() + Rank.WARLORD.toString() + "§7 rank.\n\n"
+                    + ChatColor.GRAY + "You can purchase the rank at our store!\n§e§lstore.battlegroundspvp.com");
+            return;
+        }
+
         if (plugin.getGameProfile(event.getUniqueId()) == null) {
             BattlegroundsCore.createNewGameProfile(event.getName(), event.getUniqueId());
             plugin.getGlobalStats().setTotalUniqueJoins(plugin.getGlobalStats().getTotalUniqueJoins() + 1);
@@ -113,6 +121,16 @@ public class PlayerJoin implements Listener {
             }
         }
 
+        if (Math.random() <= 0.05) {
+            double chance = Math.random();
+            Rarity reward = Rarity.COMMON;
+            for (Rarity rarity : Rarity.values())
+                if (chance <= Math.pow(rarity.getChance(), 2) && chance >= Math.pow(rarity.getMinChance(Rarity.COMMON), 2))
+                    reward = rarity;
+            gameProfile.getCratesData().addCrate(reward, 1);
+            player.sendMessage(reward.getColor() + "\u00BB " + ChatColor.GRAY + "You found a " + reward.getCrateName() + ChatColor.GRAY + "!");
+        }
+
         if ((FreezeCommand.frozen && !gameProfile.hasRank(Rank.MODERATOR)) || FreezeCommand.frozenPlayers.contains(player) || FreezeCommand.reloadFreeze) {
             player.setWalkSpeed(0F);
             player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, -50, true, false));
@@ -129,10 +147,9 @@ public class PlayerJoin implements Listener {
         player.setPlayerListName((gameProfile.hasRank(Rank.WARRIOR) ? gameProfile.getRank().getColor().create() + "" + ChatColor.BOLD + gameProfile.getRank().getName().toUpperCase() + " " : "")
                 + (gameProfile.hasRank(Rank.WARRIOR) ? ChatColor.WHITE : ChatColor.GRAY) + player.getName());
 
-        TTA_Methods.sendTablist(player, ChatColor.AQUA + "You're playing on " + new ColorBuilder(ChatColor.GOLD).bold().create() + "BATTLEGROUNDS",
+        TTA_Methods.sendTablist(player, ChatColor.AQUA + "   You're playing on " + new ColorBuilder(ChatColor.GOLD).bold().create() + "BATTLEGROUNDS   ",
                 ChatColor.YELLOW + "Visit our store! store.battlegroundspvp.com");
 
         plugin.respawn(player);
-
     }
 }

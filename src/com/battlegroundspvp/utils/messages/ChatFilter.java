@@ -1,4 +1,4 @@
-package com.battlegroundspvp.utils;
+package com.battlegroundspvp.utils.messages;
 /* Created by GamerBah on 8/15/2016 */
 
 import com.battlegroundspvp.BattlegroundsCore;
@@ -33,14 +33,14 @@ public class ChatFilter implements Listener {
         if (joined != null) {
             joined = joined.replace("1", "i").replace("7", "t").replace("4", "a")
                     .replace("!", "i").replace("0", "o").replace("(", "c").replace("|", "i")
-                    .replace("3", "e").replace("8", "b");
+                    .replace("3", "e").replace("8", "b").replaceAll("[^a-zA-Z0-9]+", "");
             for (String bad : BattlegroundsCore.getInstance().getFilteredWords()) {
                 if (joined.equals(bad)) {
-                    //plugin.getServer().broadcastMessage("1. Joined-Equals");
+                    BattlegroundsCore.getInstance().getServer().broadcastMessage("1. Joined-Equals");
                     return false;
                 }
                 if (joined.contains(bad)) {
-                    //plugin.getServer().broadcastMessage("2. Joined-Contains, not safe");
+                    BattlegroundsCore.getInstance().getServer().broadcastMessage("2. Joined-Contains, not safe");
                     return false;
                 }
             }
@@ -51,7 +51,7 @@ public class ChatFilter implements Listener {
                             .replace("!", "i").replace("0", "o").replace("(", "c").replace("|", "i")
                             .replace("3", "e").replace("8", "b");
                     if (word.equals(bad)) {
-                        //plugin.getServer().broadcastMessage("3. Standard-Equals");
+                        BattlegroundsCore.getInstance().getServer().broadcastMessage("3. Standard-Equals");
                         return false;
                     }
                     if (word.contains(bad)) {
@@ -60,7 +60,7 @@ public class ChatFilter implements Listener {
                                 return true;
                             }
                         }
-                        //plugin.getServer().broadcastMessage("2. Standard-Contains, not safe");
+                        BattlegroundsCore.getInstance().getServer().broadcastMessage("2. Standard-Contains, not safe");
                         return false;
                     }
                 }

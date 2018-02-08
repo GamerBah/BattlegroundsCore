@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.Session;
 
+import java.util.ArrayList;
+
 public class KitPvpData {
 
     @Getter
@@ -20,7 +22,10 @@ public class KitPvpData {
             highestKillstreak, lastKilledBy, combatLogLevel, combatLogs, activeTrail, activeWarcry, activeGore;
     @Getter
     @Setter
-    private String playersRated, ownedKits, title;
+    private String title;
+    @Getter
+    @Setter
+    private ArrayList<Integer> ownedKits, duplicateKits, quickSelectKits;
 
     KitPvpData(KitPvpDataEntity entity) {
         this.entity = entity;
@@ -35,12 +40,34 @@ public class KitPvpData {
         this.lastKilledBy = entity.getLastKilledBy();
         this.combatLogs = entity.getCombatLogs();
         this.combatLogLevel = entity.getCombatLogLevel();
-        this.playersRated = entity.getPlayersRated();
         this.activeTrail = entity.getActiveTrail();
         this.activeWarcry = entity.getActiveWarcry();
         this.activeGore = entity.getActiveGore();
-        this.ownedKits = entity.getOwnedKits();
         this.title = entity.getTitle();
+        ArrayList<Integer> ownedKits = new ArrayList<>();
+        if (entity.getOwnedKits() != null) {
+            String owned = entity.getOwnedKits().replace("[", "").replace("]", "").replace(" ", "");
+            if (!owned.equals(""))
+                for (String id : owned.split(","))
+                    ownedKits.add(Integer.parseInt(id));
+        }
+        this.ownedKits = ownedKits;
+        ArrayList<Integer> duplicateKits = new ArrayList<>();
+        if (entity.getDuplicateKits() != null) {
+            String duplicate = entity.getDuplicateKits().replace("[", "").replace("]", "").replace(" ", "");
+            if (!duplicate.equals(""))
+                for (String id : duplicate.split(","))
+                    duplicateKits.add(Integer.parseInt(id));
+        }
+        this.duplicateKits = duplicateKits;
+        ArrayList<Integer> quickSelectKits = new ArrayList<>();
+        if (entity.getQuickSelectKits() != null) {
+            String quickSelect = entity.getQuickSelectKits().replace("[", "").replace("]", "").replace(" ", "");
+            if (!quickSelect.equals(""))
+                for (String id : quickSelect.split(","))
+                    quickSelectKits.add(Integer.parseInt(id));
+        }
+        this.quickSelectKits = quickSelectKits;
     }
 
     public void addKill(int amount) {
@@ -59,12 +86,12 @@ public class KitPvpData {
         setCombatLogs(getCombatLogs() + 1);
     }
 
-    public void addPlayerRated(int id) {
-        setPlayersRated(this.playersRated + id + ",");
+    public void addOwnedKit(int kitId) {
+        ownedKits.add(kitId);
     }
 
-    public void addOwnedKit(int kitId) {
-        setOwnedKits(getOwnedKits() + kitId + ",");
+    public void addDuplicateKit(int kitId) {
+        duplicateKits.add(kitId);
     }
 
     public void addKillstreakEnded() {
@@ -90,12 +117,13 @@ public class KitPvpData {
         entity.setRevengeKills(this.revengeKills);
         entity.setHighestKillstreak(this.highestKillstreak);
         entity.setLastKilledBy(this.lastKilledBy);
-        entity.setPlayersRated(this.playersRated);
         entity.setActiveTrail(this.activeTrail);
         entity.setActiveWarcry(this.activeWarcry);
         entity.setActiveGore(this.activeGore);
-        entity.setOwnedKits(this.ownedKits);
         entity.setTitle(this.title);
+        entity.setOwnedKits(this.ownedKits.toString());
+        entity.setDuplicateKits(this.duplicateKits.toString());
+        entity.setQuickSelectKits(this.quickSelectKits.toString());
         session.getTransaction().commit();
         session.close();
     }

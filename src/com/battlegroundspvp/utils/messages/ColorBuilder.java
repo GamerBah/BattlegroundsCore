@@ -1,4 +1,4 @@
-package com.battlegroundspvp.utils;
+package com.battlegroundspvp.utils.messages;
 /* Created by GamerBah on 7/12/2017 */
 
 import net.md_5.bungee.api.ChatColor;

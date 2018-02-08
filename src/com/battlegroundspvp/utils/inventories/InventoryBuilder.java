@@ -1,160 +1,121 @@
 package com.battlegroundspvp.utils.inventories;
 /* Created by GamerBah on 7/17/2017 */
 
-import com.battlegroundspvp.BattlegroundsCore;
-import com.battlegroundspvp.administration.data.Rank;
-import com.battlegroundspvp.punishments.Punishment;
-import com.battlegroundspvp.utils.enums.EventSound;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 
 public class InventoryBuilder {
 
-    private BattlegroundsCore plugin = BattlegroundsCore.getInstance();
-
     @Getter
-    private static HashMap<Player, InventoryBuilder> inventoryUsers = new HashMap<>();
+    private static final HashMap<Player, InventoryBuilder> inventoryUsers = new HashMap<>();
 
     @Getter
     private Player player;
     @Getter
     private GameInventory gameInventory;
     @Getter
-    private Inventory inventory;
-    @Getter
-    private int page = 0;
-    @Getter
-    private int maxPage = 0;
-    @Getter
-    private SortType sortType = SortType.ALPHABETICALLY;
+    private int page = 0, maxPage = 0, pageRow = 6;
     @Getter
     private String search = "";
     @Getter
     private boolean onlineOnly = false;
     @Getter
     private ArrayList<ItemBuilder> items = new ArrayList<>();
+    @Getter
+    @Setter
+    private ItemBuilder nextPageItem = InventoryItems.nextPage, previousPageItem = InventoryItems.previousPage, goBackItem = InventoryItems.back;
     private int itemsPerPage;
 
+    /**
+     * Creates a new chainable builder for the specified {@link Player} and {@link GameInventory}
+     *
+     * @param player        the {@link Player} this {@link GameInventory} will be displayed to upon calling {@code open()}
+     * @param gameInventory the {@link GameInventory} to build from
+     * @see GameInventory
+     */
     public InventoryBuilder(Player player, GameInventory gameInventory) {
         this.player = player;
         this.gameInventory = gameInventory;
-        this.inventory = gameInventory.getInventory();
-        this.items = gameInventory.getSortables();
-        this.itemsPerPage = (gameInventory.isBiDirectionalOffset() ? 35 - (2 * gameInventory.getSlotOffset()) : 35 - gameInventory.getSlotOffset());
+        this.items = gameInventory.getItems();
+        this.itemsPerPage = (gameInventory.getSearchRows() * 9) - gameInventory.getTopOffset() - gameInventory.getBottomOffset();
         this.maxPage = (items.size() <= itemsPerPage ? 0 : (int) Math.floor(items.size() / itemsPerPage));
-        if (!gameInventory.getType().equals(GameInventory.Type.STANDARD))
-            for (int i = 36; i < 45; i++)
-                inventory.setItem(i, InventoryItems.border);
-
         inventoryUsers.put(player, this);
     }
 
-    public InventoryBuilder(Player player, GameInventory gameInventory, SortType defaultSort) {
-        this.player = player;
-        this.gameInventory = gameInventory;
-        this.inventory = gameInventory.getInventory();
-        this.items = gameInventory.getSortables();
-        sort(defaultSort);
-        this.itemsPerPage = (gameInventory.isBiDirectionalOffset() ? 35 - (2 * gameInventory.getSlotOffset()) : 35 - gameInventory.getSlotOffset());
-        this.maxPage = (items.size() <= itemsPerPage ? 0 : (int) Math.floor(items.size() / itemsPerPage));
-        if (!gameInventory.getType().equals(GameInventory.Type.STANDARD))
-            for (int i = 36; i < 45; i++)
-                inventory.setItem(i, InventoryItems.border);
 
-        inventoryUsers.put(player, this);
-    }
-
-    public InventoryBuilder sort(SortType type) {
-        if (gameInventory.getType() != GameInventory.Type.PUNISH_SEARCH) {
-            switch (type) {
-                case ALPHABETICALLY:
-                    items.sort((ItemBuilder is1, ItemBuilder is2) -> ChatColor.stripColor(is1.getItemMeta().getDisplayName()).compareTo(ChatColor.stripColor(is2.getItemMeta().getDisplayName())));
-                    sortType = SortType.ALPHABETICALLY;
-
-                case REVERSE_ALPHABETICALLY:
-                    items.sort((ItemBuilder is1, ItemBuilder is2) -> ChatColor.stripColor(is2.getItemMeta().getDisplayName()).compareTo(ChatColor.stripColor(is1.getItemMeta().getDisplayName())));
-                    sortType = SortType.REVERSE_ALPHABETICALLY;
-
-                case RANK_HIGH_LOW:
-                    items.sort((ItemBuilder is1, ItemBuilder is2) -> Rank.valueOf(ChatColor.stripColor(BattlegroundsCore.getLore(is1, 1)).replace("Rank: ", "").toUpperCase())
-                            .compareTo(Rank.valueOf(ChatColor.stripColor(BattlegroundsCore.getLore(is2, 1)).replace("Rank: ", "").toUpperCase())));
-                    sortType = SortType.RANK_HIGH_LOW;
-
-                case RANK_LOW_HIGH:
-                    items.sort((ItemBuilder is1, ItemBuilder is2) -> Rank.valueOf(ChatColor.stripColor(BattlegroundsCore.getLore(is2, 1)).replace("Rank: ", "").toUpperCase())
-                            .compareTo(Rank.valueOf(ChatColor.stripColor(BattlegroundsCore.getLore(is1, 1)).replace("Rank: ", "").toUpperCase())));
-                    sortType = SortType.RANK_LOW_HIGH;
-            }
-        } else {
-            switch (type) {
-                case OLDEST:
-                    Bukkit.broadcastMessage("oldest");
-                    this.items.sort((ItemBuilder is1, ItemBuilder is2) -> {
-                        Punishment punishment1 = (Punishment) is1.getStoredObjects().get(Punishment.class);
-                        Punishment punishment2 = (Punishment) is2.getStoredObjects().get(Punishment.class);
-                        return punishment1.getDate().compareTo(punishment2.getDate());
-                    });
-                    sortType = SortType.OLDEST;
-
-                case NEWEST:
-                    this.items.sort((ItemBuilder is1, ItemBuilder is2) -> {
-                        Punishment punishment1 = (Punishment) is1.getStoredObjects().get(Punishment.class);
-                        Punishment punishment2 = (Punishment) is2.getStoredObjects().get(Punishment.class);
-                        return punishment2.getDate().compareTo(punishment1.getDate());
-                    });
-                    sortType = SortType.NEWEST;
-            }
-        }
+    /**
+     * Sorts the items using the given {@link Comparator}
+     *
+     * @param comparator the {@link Comparator} to use for comparing items
+     * @return this class for chaining
+     */
+    public InventoryBuilder sortItems(final Comparator<ItemBuilder> comparator) {
+        items.sort(comparator);
         return this;
     }
 
-    public InventoryBuilder page(int number) {
-        if (gameInventory.getType() != GameInventory.Type.STANDARD) {
-            if (number > maxPage || number < 0)
-                throw new IllegalArgumentException("Number must be <= maxPage and >= 0");
-            this.page = number;
-            int index = number * itemsPerPage;
-            if (this.items.size() > 0) {
-                for (int i = gameInventory.getSlotOffset(); i <= itemsPerPage + gameInventory.getSlotOffset(); i++) {
-                    if (index < this.items.size()) {
-                        inventory.setItem(i, this.items.get(index++));
-                    } else {
-                        inventory.setItem(i, null);
-                    }
+    /**
+     * Sets this builder instance to the specified page without opening it to the {@link Player}
+     * <p>
+     * Next Page, Previous Page, and Back button items are automatically added accordingly, so
+     * there's no need to manually add them per-page
+     *
+     * @param number the page to go to
+     * @return this class for chaining
+     * @throws IllegalArgumentException when number is {@literal >} the max page and {@literal <} 0
+     */
+    public InventoryBuilder page(final int number) {
+        if (number > maxPage || number < 0)
+            throw new IllegalArgumentException("Number must be <= maxPage and >= 0");
+        this.page = number;
+        int index = number * itemsPerPage;
+        if (this.items.size() > 0) {
+            for (int i = (gameInventory.getSearchStart() * 9) + gameInventory.getTopOffset(); i < itemsPerPage - (gameInventory.getSearchEnd() * 9) - gameInventory.getBottomOffset(); i++) {
+                if (index < this.items.size()) {
+                    gameInventory.getInventory().setItem(i, this.items.get(index++));
+                } else {
+                    gameInventory.getInventory().setItem(i, null);
                 }
             }
-
-            if (page < maxPage)
-                gameInventory.addClickableItem(53, InventoryItems.nextPage.clone().clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
-                    this.nextPage().open();
-                    EventSound.playSound(player, EventSound.INVENTORY_OPEN_SUBMENU);
-                })));
-            if (page > 0)
-                gameInventory.addClickableItem(45, InventoryItems.previousPage.clone().clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
-                    this.previousPage().open();
-                    EventSound.playSound(player, EventSound.INVENTORY_OPEN_SUBMENU);
-                })));
-            if (page == 0)
-                gameInventory.addClickableItem(45, InventoryItems.back.clone().clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> this.gameInventory.openPreviousInventory(player))));
-            if (page == maxPage)
-                gameInventory.getInventory().clear(53);
-            online(onlineOnly);
         }
+
+        if (page < maxPage)
+            gameInventory.addButton((gameInventory.isInlineNavigation() ? (gameInventory.getSearchRows() * 9) - 1 : (9 * pageRow) - 1),
+                    getNextPageItem().clone().clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> this.nextPage().open())));
+        if (page > 0)
+            gameInventory.addButton((gameInventory.isInlineNavigation() ? (gameInventory.getSearchRows() * 9) - 1 : (9 * pageRow) - 1),
+                    getPreviousPageItem().clone().clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> this.previousPage().open())));
+        if (page == 0)
+            if (!gameInventory.isNoBackButton())
+                gameInventory.addButton(9 * (pageRow - 1),
+                        getGoBackItem().clone().clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> this.gameInventory.openPreviousInventory(player))));
+        if (page == maxPage)
+            gameInventory.getInventory().clear((9 * pageRow) - 1);
         return this;
     }
 
-    public InventoryBuilder search(String search) {
+    /**
+     * Searches the names of the items for the given keyword
+     * <p>
+     * Calling this will reset the page to 0. This is to prevent
+     * exceptions that would occur if the current page didn't
+     * exist after the search keyword changed.<br>
+     * Setting the value to "" will clear the current search keyword.
+     *
+     * @param search the keyword to search item names for
+     * @return this class for chaining
+     */
+    public InventoryBuilder search(final String search) {
         if (search.equals("")) {
             this.search = "";
-            items = gameInventory.getSortables();
+            items = gameInventory.getItems();
         }
         this.search = search;
         for (ItemBuilder item : items)
@@ -165,53 +126,35 @@ public class InventoryBuilder {
         return this;
     }
 
-    public InventoryBuilder online(boolean online) {
-        if (gameInventory.getType().equals(GameInventory.Type.PUNISH_SEARCH))
-            return this;
-        onlineOnly = online;
-        if (online) {
-            for (ItemBuilder item : items)
-                if (!plugin.getServer().getPlayer(ChatColor.stripColor(item.getItemMeta().getDisplayName())).isOnline())
-                    items.remove(item);
-            maxPage = (int) Math.floor(items.size() / itemsPerPage);
-            sort(sortType);
-        } else {
-            items = gameInventory.getSortables();
-            sort(sortType);
-        }
-        return this;
-    }
 
-    private InventoryBuilder nextPage() {
+    /**
+     * Makes a cleaner call to <code>page(int number + 1)</code>
+     *
+     * @return this class for chaining
+     */
+    public InventoryBuilder nextPage() {
         return this.page(this.page + 1);
     }
 
-    private InventoryBuilder previousPage() {
+    /**
+     * Makes a cleaner call to <code>page(int number - 1)</code>
+     *
+     * @return this class for chaining
+     */
+    public InventoryBuilder previousPage() {
         return this.page(this.page - 1);
     }
 
-    private InventoryBuilder previousInventory() {
-        return new InventoryBuilder(this.player, this.gameInventory.getPreviousInventory());
-    }
-
+    /**
+     * Opens this {@link GameInventory} for the current {@link Player}
+     * <p>
+     * Uses the current InventoryBuilder instance
+     * Opens to the page set by <code>page(int number)</code>, or the first page if unset
+     */
     public void open() {
         page(page);
-        player.openInventory(this.inventory);
+        player.openInventory(this.gameInventory.getInventory());
         inventoryUsers.put(player, this);
-    }
-
-    @AllArgsConstructor
-    @Getter
-    public enum SortType {
-        ALPHABETICALLY("Alphabetically"),
-        REVERSE_ALPHABETICALLY("Reverse Alphabetically"),
-        RANK_LOW_HIGH("Rank: Low to High"),
-        RANK_HIGH_LOW("Rank: High to Low"),
-        NEWEST("Newest First"),
-        OLDEST("Oldest First");
-
-
-        private String name;
     }
 
 }

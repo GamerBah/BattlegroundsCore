@@ -33,7 +33,7 @@
         <mapping class="com.battlegroundspvp.administration.data.sql.PunishmentsEntity"/>
         <mapping class="com.battlegroundspvp.administration.data.sql.SettingsEntity"/>
         <mapping class="com.battlegroundspvp.administration.data.sql.CratesEntity"/>
-        <mapping class="com.battlegroundspvp.administration.data.sql.CosmeticsEntity"/>
+        <mapping class="com.battlegroundspvp.administration.data.sql.BugReportsEntity"/>
 
         <!-- DB schema will be updated if needed -->
         <!-- <property name="hbm2ddl.auto">update</property> -->

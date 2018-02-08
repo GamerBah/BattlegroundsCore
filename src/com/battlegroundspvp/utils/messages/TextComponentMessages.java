@@ -1,19 +1,12 @@
 package com.battlegroundspvp.utils.messages;
 // AUTHOR: gamer_000 (12/28/2015)
 
-import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.utils.Launcher;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
 import org.bukkit.entity.Player;
 
 public class TextComponentMessages {
-
-    private BattlegroundsCore plugin;
-
-    public TextComponentMessages(BattlegroundsCore plugin) {
-        this.plugin = plugin;
-    }
 
     public static BaseComponent launcherLocation(Player player, Launcher launcher) {
         int x = launcher.getLocation().getBlockX();

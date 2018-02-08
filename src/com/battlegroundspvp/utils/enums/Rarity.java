@@ -1,6 +1,6 @@
 package com.battlegroundspvp.utils.enums;/* Created by GamerBah on 8/7/2016 */
 
-import com.battlegroundspvp.utils.ColorBuilder;
+import com.battlegroundspvp.utils.messages.ColorBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
@@ -9,10 +9,10 @@ import net.md_5.bungee.api.ChatColor;
 @Getter
 public enum Rarity {
 
-    COMMON("Common", new ColorBuilder(ChatColor.GRAY), 1, 1, 50),
-    RARE("Rare", new ColorBuilder(ChatColor.BLUE), 0.45, 1.5, 100),
-    EPIC("Epic", new ColorBuilder(ChatColor.GOLD).bold(), 0.24, 2.0, 150),
-    LEGENDARY("Legendary", new ColorBuilder(ChatColor.LIGHT_PURPLE).bold(), 0.12, 2.5, 200),
+    COMMON("Common", new ColorBuilder(ChatColor.GRAY), 1, 1, 1),
+    RARE("Rare", new ColorBuilder(ChatColor.BLUE), 0.45, 1.5, 1),
+    EPIC("Epic", new ColorBuilder(ChatColor.GOLD).bold(), 0.24, 2.0, 1),
+    LEGENDARY("Legendary", new ColorBuilder(ChatColor.LIGHT_PURPLE).bold(), 0.12, 2.5, 1),
     GIFT("Gifted", new ColorBuilder(ChatColor.AQUA).bold(), 0, 0, -1),
     SEASONAL("Seasonal", new ColorBuilder(ChatColor.GREEN).bold(), 0, 0, -1);
 
@@ -44,6 +44,10 @@ public enum Rarity {
 
     public String getCrateName() {
         return getName() + (this == EPIC || this == LEGENDARY ? " BATTLE CRATE" : " Battle Crate");
+    }
+
+    public boolean hasRarity(Rarity rarity) {
+        return this.chance <= rarity.getChance();
     }
 
 }

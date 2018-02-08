@@ -2,9 +2,9 @@ package com.battlegroundspvp.commands;
 
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
-import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
 import com.battlegroundspvp.utils.enums.Time;
+import com.battlegroundspvp.utils.messages.ColorBuilder;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -57,8 +57,8 @@ public class MessageCommand implements CommandExecutor {
             return true;
         }
 
-        plugin.getMessagers().put(player.getUniqueId(), target.getUniqueId());
-        plugin.getMessagers().put(target.getUniqueId(), player.getUniqueId());
+        BattlegroundsCore.getMessagers().put(player.getUniqueId(), target.getUniqueId());
+        BattlegroundsCore.getMessagers().put(target.getUniqueId(), player.getUniqueId());
 
         String message = StringUtils.join(args, ' ', 1, args.length);
 
@@ -77,10 +77,11 @@ public class MessageCommand implements CommandExecutor {
     }
 
     public static void sendErrorMessage(GameProfile gameProfile) {
+        GameProfile enforcerProfile = BattlegroundsCore.getInstance().getGameProfile(gameProfile.getCurrentMute().getEnforcerId());
         BaseComponent baseComponent = new TextComponent(ChatColor.RED + "You are muted! " + ChatColor.GRAY + "(Hover to view details)");
         baseComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GRAY + "Muted by: "
-                + ChatColor.WHITE + BattlegroundsCore.getInstance() + "\n" + ChatColor.GRAY + "Reason: "
-                + ChatColor.WHITE + gameProfile.getCurrentMute().getReason().getName() + "\n" + ChatColor.GRAY + "Time Remaining: " + ChatColor.WHITE +
+                + enforcerProfile.getRank().getColor().create() + enforcerProfile.getName() + "\n" + ChatColor.GRAY + "Reason: "
+                + ChatColor.YELLOW + gameProfile.getCurrentMute().getReason().getName() + "\n" + ChatColor.GRAY + "Time Remaining: " + ChatColor.GOLD +
                 Time.toString(Time.punishmentTimeRemaining(gameProfile.getCurrentMute().getExpiration()), true)).create()));
         gameProfile.getPlayer().spigot().sendMessage(baseComponent);
         EventSound.playSound(gameProfile.getPlayer(), EventSound.ACTION_FAIL);

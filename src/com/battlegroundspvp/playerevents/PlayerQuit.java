@@ -3,9 +3,10 @@ package com.battlegroundspvp.playerevents;
 
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
+import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.commands.ReportCommand;
 import com.battlegroundspvp.runnables.DonationUpdater;
-import com.battlegroundspvp.utils.ColorBuilder;
+import com.battlegroundspvp.utils.messages.ColorBuilder;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -45,21 +46,23 @@ public class PlayerQuit implements Listener {
             BattlegroundsCore.getAfk().remove(player.getUniqueId());
         }
 
-        /*if (gameProfile.getPlayerSettings().isStealthyJoin()) {
+        if (gameProfile.getPlayerSettings().isStealthyJoin()) {
             event.setQuitMessage(null);
             plugin.getServer().getOnlinePlayers().stream().filter(staff ->
                     plugin.getGameProfile(staff.getUniqueId()).hasRank(Rank.ADMIN)).forEach(staff ->
                     staff.sendMessage(new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "[" + new ColorBuilder(ChatColor.RED).bold().create() + "-"
                             + new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName()));
-        } else {*/
-        event.setQuitMessage(new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "[" + new ColorBuilder(ChatColor.RED).bold().create() + "-"
-                + new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName());
-        //}
+        } else {
+            event.setQuitMessage(new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "[" + new ColorBuilder(ChatColor.RED).bold().create() + "-"
+                    + new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName());
+        }
 
         gameProfile.setLastOnline(LocalDateTime.now());
 
         if (DonationUpdater.essenceBar != null)
             if (DonationUpdater.essenceBar.getPlayers().contains(player))
                 DonationUpdater.essenceBar.removePlayer(player);
+
+        gameProfile.sync();
     }
 }

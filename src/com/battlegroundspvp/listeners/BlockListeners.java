@@ -38,7 +38,7 @@ public class BlockListeners implements Listener {
                     if (crate.getLocation().hashCode() == block.getLocation().hashCode()) removal = crate;
                 if (removal == null) {
                     player.sendMessage(ChatColor.RED + "That wasn't a Crate Location!"
-                            + ChatColor.GRAY + "Use" + ChatColor.RED + " /crate remove " + ChatColor.GRAY + "and try again!");
+                            + ChatColor.GRAY + " Use" + ChatColor.RED + " /crate remove " + ChatColor.GRAY + "and try again!");
                     EventSound.playSound(player, EventSound.ACTION_FAIL);
                     CrateCommand.getRemoving().remove(player);
                     return;
@@ -80,7 +80,7 @@ public class BlockListeners implements Listener {
             if (block.getType().equals(Material.ENDER_CHEST)) {
                 if (!block.getRelative(BlockFace.DOWN).getType().equals(Material.ENDER_PORTAL_FRAME)) {
                     player.sendMessage(ChatColor.RED + "There must be an End Portal Frame below the Enderchest!"
-                            + ChatColor.GRAY + "Use" + ChatColor.RED + " /crate add " + ChatColor.GRAY + "to try again!");
+                            + ChatColor.GRAY + " Use" + ChatColor.RED + " /crate add " + ChatColor.GRAY + "to try again!");
                     EventSound.playSound(player, EventSound.ACTION_FAIL);
                     CrateCommand.getAdding().remove(player);
                     return;
@@ -89,7 +89,7 @@ public class BlockListeners implements Listener {
                 for (Crate crate : BattlegroundsCore.getCrates()) {
                     if (crate.getLocation().hashCode() == block.getLocation().hashCode()) {
                         player.sendMessage(ChatColor.RED + "That's already a Crate Location!"
-                                + ChatColor.GRAY + "Use" + ChatColor.RED + " /crate remove " + ChatColor.GRAY + "to remove this location!");
+                                + ChatColor.GRAY + " Use" + ChatColor.RED + " /crate remove " + ChatColor.GRAY + "to remove this location!");
                         EventSound.playSound(player, EventSound.ACTION_FAIL);
                         CrateCommand.getAdding().remove(player);
                         return;

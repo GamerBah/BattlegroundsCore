@@ -1,6 +1,4 @@
 package com.battlegroundspvp.utils;
-/* Created by GamerBah on 8/20/2016 */
-
 
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
@@ -17,7 +15,12 @@ public class FireworkUtils {
         final Firework firework = (Firework) loc.getWorld().spawnEntity(loc, EntityType.FIREWORK);
         final FireworkMeta fireworkMeta = firework.getFireworkMeta();
         final Random random = new Random();
-        final FireworkEffect effect = FireworkEffect.builder().flicker(random.nextBoolean()).withColor(getColor(random.nextInt(17) + 1)).withFade(getColor(random.nextInt(17) + 1)).with(FireworkEffect.Type.values()[random.nextInt(FireworkEffect.Type.values().length)]).trail(random.nextBoolean()).build();
+        final FireworkEffect effect = FireworkEffect.builder()
+                .flicker(random.nextBoolean())
+                .withColor(getColor(random.nextInt(17) + 1))
+                .withFade(getColor(random.nextInt(17) + 1))
+                .with(FireworkEffect.Type.values()[random.nextInt(FireworkEffect.Type.values().length)])
+                .trail(random.nextBoolean()).build();
         fireworkMeta.addEffect(effect);
         fireworkMeta.setPower(1);
         firework.setFireworkMeta(fireworkMeta);
@@ -60,6 +63,6 @@ public class FireworkUtils {
             case 17:
                 return Color.YELLOW;
         }
-        return null;
+        return Color.WHITE;
     }
 }

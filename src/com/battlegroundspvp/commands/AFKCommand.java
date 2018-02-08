@@ -3,10 +3,11 @@ package com.battlegroundspvp.commands;
 
 
 import com.battlegroundspvp.BattlegroundsCore;
-import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
+import com.battlegroundspvp.utils.messages.ColorBuilder;
 import de.Herbystar.TTA.TTA_Methods;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -32,18 +33,16 @@ public class AFKCommand implements CommandExecutor {
         if (BattlegroundsCore.getAfk().contains(player.getUniqueId())) {
             BattlegroundsCore.getAfk().remove(player.getUniqueId());
             plugin.respawn(player);
-            player.sendMessage(ChatColor.GRAY + "You are no longer AFK");
             EventSound.playSound(player, EventSound.CLICK);
-            TTA_Methods.sendTitle(player, null, 0, 0, 0, null, 0, 0, 0);
-            player.removePotionEffect(PotionEffectType.INVISIBILITY);
+            BattlegroundsCore.clearTitle(player);
         } else {
-            plugin.respawn(player, player.getWorld().getSpawnLocation().add(0.5, 8, 0.5));
-            player.getInventory().clear();
-            player.sendMessage(ChatColor.GRAY + "You are now AFK");
-            EventSound.playSound(player, EventSound.CLICK);
-            TTA_Methods.sendTitle(player, new ColorBuilder(ChatColor.AQUA).bold().create() + "You are AFK!", 10, Integer.MAX_VALUE, 20,
-                    ChatColor.YELLOW + "Move to start playing again!", 10, Integer.MAX_VALUE, 20);
+            plugin.respawn(player, (Location) plugin.getConfig().get("locations.afk"));
             player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true, false));
+            player.getInventory().clear();
+            player.getInventory().setHeldItemSlot(4);
+            EventSound.playSound(player, EventSound.CLICK);
+            TTA_Methods.sendTitle(player, new ColorBuilder(ChatColor.AQUA).bold().create() + "You are AFK!", 10, 9999999, 20,
+                    ChatColor.YELLOW + "Move to start playing again!", 10, 9999999, 20);
             plugin.getServer().getScheduler().runTaskLater(plugin, () -> BattlegroundsCore.getAfk().add(player.getUniqueId()), 5L);
         }
         return false;

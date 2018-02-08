@@ -52,24 +52,25 @@ public class Hologram {
     public void addConditionalLine(String line) {
         lines.add(line);
         conditional.add(line);
+        ArmorStand stand = (ArmorStand) this.location.getWorld().spawnEntity(this.location.clone().add(0, 0.25 * this.lines.indexOf(line), 0), EntityType.ARMOR_STAND);
+        stand.setVisible(false);
+        stand.setBasePlate(false);
+        stand.setSmall(true);
+        stand.setCustomName(line);
+        stand.setCustomNameVisible(true);
+        stand.setCollidable(false);
+        stand.setGravity(false);
+        stand.setAI(false);
+        stand.setSilent(true);
+        stand.setInvulnerable(true);
+        stand.setCanPickupItems(false);
 
-        WrapperPlayServerSpawnEntityLiving spawnEntityPacket = new WrapperPlayServerSpawnEntityLiving();
-        spawnEntityPacket.setEntityID(id);
-        spawnEntityPacket.setType(EntityType.ARMOR_STAND);
-        spawnEntityPacket.setX(location.getX());
-        spawnEntityPacket.setY(location.getY());
-        spawnEntityPacket.setZ(location.getZ());
-        spawnEntityPacket.setPitch(location.getPitch());
-        spawnEntityPacket.setYaw(location.getYaw());
-
+        WrapperPlayServerSpawnEntityLiving spawnEntityPacket = new WrapperPlayServerSpawnEntityLiving(stand);
         WrappedDataWatcher.Serializer stringSerializer = WrappedDataWatcher.Registry.get(String.class);
-        WrappedDataWatcher.Serializer byteSerializer = WrappedDataWatcher.Registry.get(Byte.class);
+        WrappedDataWatcher entityData = new WrappedDataWatcher(stand);
+        stand.remove();
 
-        WrappedDataWatcher entityData = new WrappedDataWatcher();
-        entityData.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(0, byteSerializer), (byte) (0x20));
-        entityData.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(2, stringSerializer), "Test");
-        entityData.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(3, byteSerializer), (byte) (0x01));
-        entityData.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(11, byteSerializer), (byte) (0x01 | 0x08));
+        entityData.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(2, stringSerializer), line);
         spawnEntityPacket.setMetadata(entityData);
 
         conditionalPackets.add(spawnEntityPacket);

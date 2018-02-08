@@ -3,8 +3,8 @@ package com.battlegroundspvp.runnables;
 
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.donations.Essence;
-import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.enums.Time;
+import com.battlegroundspvp.utils.messages.ColorBuilder;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.boss.BossBar;

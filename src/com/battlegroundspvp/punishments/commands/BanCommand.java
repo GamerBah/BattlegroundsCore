@@ -4,7 +4,7 @@ package com.battlegroundspvp.punishments.commands;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
-import com.battlegroundspvp.menus.Punishment.PunishmentMenus;
+import com.battlegroundspvp.menus.punishment.PunishmentMenus;
 import com.battlegroundspvp.punishments.Punishment;
 import com.battlegroundspvp.utils.enums.EventSound;
 import com.battlegroundspvp.utils.enums.Time;

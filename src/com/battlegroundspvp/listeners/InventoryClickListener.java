@@ -49,31 +49,30 @@ public class InventoryClickListener implements Listener {
                     if (InventoryBuilder.getInventoryUsers().containsKey(player)) {
                         ItemBuilder itemBuilder = null;
                         GameInventory gameInventory = InventoryBuilder.getInventoryUsers().get(player).getGameInventory();
-                        if (gameInventory.getClickables().keySet().contains(event.getSlot()))
-                            itemBuilder = gameInventory.getClickables().get(event.getSlot());
+                        if (gameInventory.getButtons().keySet().contains(event.getSlot()))
+                            itemBuilder = gameInventory.getButtons().get(event.getSlot());
 
                         if (itemBuilder == null) {
-                            for (ItemBuilder items : gameInventory.getSortables()) {
+                            for (ItemBuilder items : gameInventory.getItems()) {
                                 if (items.isSimilar(event.getCurrentItem())) {
                                     itemBuilder = items;
                                 }
                             }
                         }
-                        if (itemBuilder != null) {
-                            if (itemBuilder.getClickEvents() != null && !itemBuilder.getClickEvents().isEmpty()) {
+                        if (itemBuilder != null)
+                            if (itemBuilder.getClickEvents() != null && !itemBuilder.getClickEvents().isEmpty())
                                 for (ClickEvent clickEvent : itemBuilder.getClickEvents()) {
-                                    if (clickEvent.getType().getClickType().equals(event.getClick()) || clickEvent.getType().equals(ClickEvent.Type.ANY))
-                                        clickEvent.run();
+                                    boolean contains = false;
+                                    for (ClickEvent.Type clickType : clickEvent.getClickTypes())
+                                        if (event.getClick() == clickType.getClickType())
+                                            contains = true;
+                                    if (contains || clickEvent.getClickTypes().contains(ClickEvent.Type.ANY))
+                                        clickEvent.getAction().run();
                                 }
-                            }
-                        }
                     }
                 }
-            } else {
-                if (InventoryBuilder.getInventoryUsers().keySet().contains(player)) {
-                    event.setCancelled(true);
-                }
-            }
+            } else if (InventoryBuilder.getInventoryUsers().keySet().contains(player))
+                event.setCancelled(true);
         }
     }
 }

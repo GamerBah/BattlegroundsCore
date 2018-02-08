@@ -20,17 +20,13 @@ public class AFKRunnable implements Runnable {
 
     @Override
     public void run() {
-        for (Player player : plugin.getServer().getOnlinePlayers()) {
+        for (Player player : plugin.getServer().getOnlinePlayers())
             if (afkTimer.containsKey(player)) {
-                if (afkTimer.get(player) < 300) {
+                if (afkTimer.get(player) < 300)
                     afkTimer.put(player, afkTimer.get(player) + 1);
-                }
-                if (afkTimer.get(player) == 300) {
-                    if (!BattlegroundsCore.getAfk().contains(player.getUniqueId())) {
-                        player.chat("/afk");
-                    }
-                }
+                if (afkTimer.get(player) == 300)
+                    if (!BattlegroundsCore.getAfk().contains(player.getUniqueId()))
+                        player.performCommand("afk");
             }
-        }
     }
 }

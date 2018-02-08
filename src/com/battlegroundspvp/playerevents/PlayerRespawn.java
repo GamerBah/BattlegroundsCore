@@ -5,11 +5,10 @@ import com.battlegroundspvp.BattleModule;
 import com.battlegroundspvp.BattleModuleLoader;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.commands.FreezeCommand;
-import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.inventories.ItemBuilder;
+import com.battlegroundspvp.utils.messages.ColorBuilder;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -34,9 +33,9 @@ public class PlayerRespawn implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-        player.teleport((Location) BattlegroundsCore.getInstance().getConfig().get("spawn"));
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
+        player.teleport(event.getRespawnLocation());
         player.setHealth(20F);
         player.setFoodLevel(20);
         player.setSaturation(20);

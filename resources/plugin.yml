@@ -84,8 +84,9 @@ commands:
     description: Adds either upwards or forwards launchers
   crate:
     description: Adds locations for Battle Crates
-  setspawn:
-    description: Sets the world spawn with correct yaw value
+  setlocation:
+    description: Sets various locations
+    aliases: [setloc]
   npc:
     description:
   spectate:

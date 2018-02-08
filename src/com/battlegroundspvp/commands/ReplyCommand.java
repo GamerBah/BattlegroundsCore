@@ -2,8 +2,8 @@ package com.battlegroundspvp.commands;
 
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
-import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.enums.EventSound;
+import com.battlegroundspvp.utils.messages.ColorBuilder;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Sound;
@@ -33,12 +33,12 @@ public class ReplyCommand implements CommandExecutor {
             return true;
         }
 
-        if (!plugin.getMessagers().containsKey(player.getUniqueId())) {
+        if (!BattlegroundsCore.getMessagers().containsKey(player.getUniqueId())) {
             player.sendMessage(ChatColor.RED + "You have not messaged anyone!");
             return true;
         }
 
-        Player target = plugin.getServer().getPlayer(plugin.getMessagers().get(player.getUniqueId()));
+        Player target = plugin.getServer().getPlayer(BattlegroundsCore.getMessagers().get(player.getUniqueId()));
 
         if (target == null) {
             player.sendMessage(ChatColor.RED + "The player that you previously messaged is no longer online.");
@@ -51,8 +51,8 @@ public class ReplyCommand implements CommandExecutor {
             return true;
         }
 
-        plugin.getMessagers().put(player.getUniqueId(), target.getUniqueId());
-        plugin.getMessagers().put(target.getUniqueId(), player.getUniqueId());
+        BattlegroundsCore.getMessagers().put(player.getUniqueId(), target.getUniqueId());
+        BattlegroundsCore.getMessagers().put(target.getUniqueId(), player.getUniqueId());
 
         String message = StringUtils.join(args, ' ', 0, args.length);
 

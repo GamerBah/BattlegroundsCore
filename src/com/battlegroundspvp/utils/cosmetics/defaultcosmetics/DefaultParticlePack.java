@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 public class DefaultParticlePack extends ParticlePack {
 
     public DefaultParticlePack() {
-        super(1, ChatColor.GRAY + "None", new ItemBuilder(Material.BARRIER).name(ChatColor.GRAY + "None"), Rarity.COMMON, null);
+        super(0, ChatColor.GRAY + "None", new ItemBuilder(Material.BARRIER).name(ChatColor.GRAY + "None"), Rarity.COMMON, null);
     }
 
     @Override

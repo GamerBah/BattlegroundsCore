@@ -8,6 +8,6 @@ essence:
   timeRemaining: 0
   thanks: []
 developmentMode: false
-spawn:
+locations:
 crates:
 launchers:

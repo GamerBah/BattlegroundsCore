@@ -1,6 +1,8 @@
 package com.battlegroundspvp.playerevents;
 /* Created by GamerBah on 9/22/2017 */
 
+import com.battlegroundspvp.BattleModule;
+import com.battlegroundspvp.BattleModuleLoader;
 import com.battlegroundspvp.commands.ReportCommand;
 import com.battlegroundspvp.utils.inventories.InventoryBuilder;
 import org.bukkit.entity.Player;
@@ -16,6 +18,9 @@ public class PlayerCloseInventory implements Listener {
     public void onInventoryClose(InventoryCloseEvent event) {
         Player player = (Player) event.getPlayer();
         Inventory inventory = event.getInventory();
+
+        for (BattleModule module : BattleModuleLoader.modules.keySet())
+            module.onPlayerCloseInventory(event);
 
         if (InventoryBuilder.getInventoryUsers().keySet().contains(player))
             InventoryBuilder.getInventoryUsers().remove(player);

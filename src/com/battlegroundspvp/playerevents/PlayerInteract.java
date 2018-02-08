@@ -6,7 +6,7 @@ import com.battlegroundspvp.BattleModuleLoader;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.commands.FreezeCommand;
 import com.battlegroundspvp.administration.donations.CrateItem;
-import com.battlegroundspvp.menus.Crates.CrateMenu;
+import com.battlegroundspvp.menus.crates.CrateMenu;
 import com.battlegroundspvp.runnables.UpdateRunnable;
 import com.battlegroundspvp.utils.Crate;
 import com.battlegroundspvp.utils.enums.EventSound;

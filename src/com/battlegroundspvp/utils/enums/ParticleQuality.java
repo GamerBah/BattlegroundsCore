@@ -1,7 +1,7 @@
 package com.battlegroundspvp.utils.enums;/* Created by GamerBah on 12/23/2016 */
 
-import com.battlegroundspvp.utils.ColorBuilder;
 import com.battlegroundspvp.utils.inventories.ItemBuilder;
+import com.battlegroundspvp.utils.messages.ColorBuilder;
 import lombok.AllArgsConstructor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;

@@ -4,10 +4,9 @@ package com.battlegroundspvp.commands;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.utils.enums.EventSound;
-import com.battlegroundspvp.utils.friends.FriendMessages;
-import com.battlegroundspvp.utils.friends.FriendUtils;
+import com.battlegroundspvp.utils.enums.Time;
+import com.battlegroundspvp.utils.messages.ColorBuilder;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -30,97 +29,71 @@ public class FriendCommand implements CommandExecutor {
         Player player = (Player) sender;
         GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
 
-        if (args.length == 0) {
+        if (args.length == 0 || args.length > 2) {
             plugin.sendIncorrectUsage(player, "/friend <add/accept/remove/decline/list/seen> <username>");
             return true;
         }
 
         if (args.length == 1) {
-            if (!args[0].equalsIgnoreCase("list") && !args[0].equalsIgnoreCase("accept")
-                    && !args[0].equalsIgnoreCase("decline")) {
-                plugin.sendIncorrectUsage(player, "/friend <add/accept/remove/decline/list> <username>");
+            if (!args[0].equalsIgnoreCase("list")) {
+                plugin.sendIncorrectUsage(player, "/friend <add/accept/remove/decline/list/seen> <username>");
                 return true;
             }
-            if (args[0].equalsIgnoreCase("accept")) {
-                FriendUtils friendUtils = new FriendUtils(plugin);
-                if (friendUtils.hasPendingRequest(player, friendUtils.getRequester(player))) {
-                    friendUtils.addFriend(friendUtils.getRequester(player), player);
-                    return true;
-                }
-            }
-            if (args[0].equalsIgnoreCase("decline")) {
-                FriendUtils friendUtils = new FriendUtils(plugin);
-                if (friendUtils.hasPendingRequest(player, friendUtils.getRequester(player))) {
-                    friendUtils.removePendingRequest(friendUtils.getRequester(player), false);
-                    return true;
-                }
-            }
+
             if (args[0].equalsIgnoreCase("list")) {
-                FriendMessages friendMessages = new FriendMessages(plugin);
-                friendMessages.sendFriendList(player, 0);
+                // TODO: Show list in GUI
                 return true;
             }
         }
 
         if (args.length == 2) {
-            if (args[0].equalsIgnoreCase("add")) {
-                if (plugin.getGameProfile(args[1]) == null) {
-                    player.sendMessage(ChatColor.RED + "That player hasn't joined before!");
-                    EventSound.playSound(player, EventSound.ACTION_FAIL);
-                    return true;
-                }
-                if (args[0].equalsIgnoreCase("list")) {
-                    if (!args[1].matches("[0-9]+")) {
-                        plugin.sendIncorrectUsage(player, "/friend list [page #]");
-                        return true;
-                    }
-                    FriendMessages friendMessages = new FriendMessages(plugin);
-                    friendMessages.sendFriendList(player, Integer.parseInt(args[1]));
-                    return true;
-                }
-                GameProfile targetProfile = plugin.getGameProfile(args[1]);
-                if (!plugin.getServer().getPlayer(targetProfile.getUuid()).isOnline()) {
-                    player.sendMessage(ChatColor.RED + "That player isn't online!");
-                    EventSound.playSound(player, EventSound.ACTION_FAIL);
-                    return true;
-                }
-                Player target = plugin.getServer().getPlayer(args[1]);
-                FriendUtils friendUtils = new FriendUtils(plugin);
-                if (friendUtils.areFriends(player, target)) {
-                    player.sendMessage(ChatColor.RED + "You are already friends with " + target.getName() + "!");
-                    EventSound.playSound(player, EventSound.ACTION_FAIL);
-                    return true;
-                }
-                friendUtils.createPendingRequest(player, target);
-                plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-                    if (BattlegroundsCore.pendingFriends.containsKey(target)) {
-                        BattlegroundsCore.pendingFriends.remove(target);
-                        player.sendMessage(org.bukkit.ChatColor.RED + "You friend request to "
-                                + ChatColor.GOLD + target.getName() + ChatColor.RED + " has expired!");
-                        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BASS, 2, 0.5F);
-
-                        target.sendMessage(ChatColor.GOLD + player.getName() + "'s" + ChatColor.RED + " friend request has expired!");
-                        target.playSound(target.getLocation(), Sound.BLOCK_NOTE_BASS, 2, 0.5F);
-                    }
-                }, 1200L);
+            if (plugin.getGameProfile(args[1]) == null) {
+                player.sendMessage(ChatColor.RED + "That player hasn't joined before!");
+                EventSound.playSound(player, EventSound.ACTION_FAIL);
                 return true;
             }
-            if (args[0].equalsIgnoreCase("remove")) {
-                if (plugin.getGameProfile(args[1]) == null) {
-                    player.sendMessage(ChatColor.RED + "That player hasn't joined before!");
+            GameProfile targetProfile = plugin.getGameProfile(args[1]);
+            if (args[0].equalsIgnoreCase("add")) {
+                if (gameProfile.hasFriendRequestCooldown(targetProfile)) {
+                    player.sendMessage(new ColorBuilder(ChatColor.RED).bold().create() + "Sorry! " + ChatColor.GRAY + "You have to wait " + ChatColor.RED
+                            + Time.toString(gameProfile.getFriendRequestCooldown(targetProfile), true) + ChatColor.GRAY + "before you can send "
+                            + targetProfile.getName() + " another friend request!");
+                }
+                gameProfile.sendFriendRequest(targetProfile);
+                return true;
+            } else if (args[0].equalsIgnoreCase("remove")) {
+                if (!gameProfile.hasFriend(targetProfile)) {
+                    player.sendMessage(ChatColor.RED + "You aren't friends with " + targetProfile.getName() + " yet!");
                     EventSound.playSound(player, EventSound.ACTION_FAIL);
                     return true;
                 }
-                GameProfile friendData = plugin.getGameProfile(args[1]);
-                Player target = plugin.getServer().getPlayer(args[1]);
-                if (!gameProfile.getFriends().contains(friendData.getUuid() + ",")) {
-                    player.sendMessage(ChatColor.RED + "That player isn't your friend!");
+                gameProfile.removeFriend(targetProfile);
+                player.sendMessage(ChatColor.GRAY + "Removed " + ChatColor.RED + targetProfile.getName() + ChatColor.GRAY + " from your friends list");
+                EventSound.playSound(player, EventSound.CLICK);
+            } else if (args[0].equalsIgnoreCase("accept")) {
+                if (!gameProfile.hasFriendRequestFrom(targetProfile)) {
+                    player.sendMessage(ChatColor.RED + "You don't have a friend request from " + targetProfile.getName() + "!");
                     EventSound.playSound(player, EventSound.ACTION_FAIL);
                     return true;
                 }
-                FriendUtils friendUtils = new FriendUtils(plugin);
-                friendUtils.deleteFriend(player, target);
-                player.sendMessage(ChatColor.RED + "You are no longer friends with " + target.getName());
+                targetProfile.addFriend(gameProfile);
+            } else if (args[0].equalsIgnoreCase("decline")) {
+                if (!gameProfile.hasFriendRequestFrom(targetProfile)) {
+                    player.sendMessage(ChatColor.RED + "You don't have a friend request from " + targetProfile.getName() + "!");
+                    EventSound.playSound(player, EventSound.ACTION_FAIL);
+                    return true;
+                }
+                gameProfile.removeFriend(targetProfile);
+            } else if (args[0].equalsIgnoreCase("seen")) {
+                if (!gameProfile.hasFriend(targetProfile)) {
+                    player.sendMessage(ChatColor.RED + "You aren't friends with " + targetProfile.getName() + " yet!");
+                    EventSound.playSound(player, EventSound.ACTION_FAIL);
+                    return true;
+                }
+                player.sendMessage(ChatColor.GRAY + targetProfile.getName() + " was last online " + ChatColor.GOLD + Time.toString(targetProfile.getLastOnlineTime(), false));
+            } else {
+                plugin.sendIncorrectUsage(player, "/friend <add/accept/remove/decline/list/seen> <username>");
+                return true;
             }
         }
 

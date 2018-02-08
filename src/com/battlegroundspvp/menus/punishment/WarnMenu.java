@@ -1,4 +1,4 @@
-package com.battlegroundspvp.menus.Punishment;
+package com.battlegroundspvp.menus.punishment;
 /* Created by GamerBah on 8/25/2016 */
 
 import com.battlegroundspvp.BattlegroundsCore;

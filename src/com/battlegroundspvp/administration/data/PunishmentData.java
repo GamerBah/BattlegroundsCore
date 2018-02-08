@@ -30,7 +30,7 @@ public class PunishmentData {
     @Getter
     private GameProfilesEntity gameProfilesEntity;
 
-    public PunishmentData(List<PunishmentsEntity> list, GameProfilesEntity gameProfilesEntity) {
+    PunishmentData(List<PunishmentsEntity> list, GameProfilesEntity gameProfilesEntity) {
         this.id = gameProfilesEntity.getId();
         ArrayList<Punishment> punishments = new ArrayList<>();
         if (list != null) {
@@ -81,7 +81,6 @@ public class PunishmentData {
             }
             if (!registered) {
                 PunishmentsEntity entity = new PunishmentsEntity();
-                punishment.setId(entity.getPunishmentId());
                 entity.setDate(punishment.getDate());
                 entity.setDuration(punishment.getDuration());
                 entity.setEnforcerId(punishment.getEnforcerId());
