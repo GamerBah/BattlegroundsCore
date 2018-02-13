@@ -43,6 +43,9 @@ public class GameProfile {
     private Rank rank;
     @Getter
     @Setter
+    private boolean online;
+    @Getter
+    @Setter
     private int coins, playersRecruited;
     @Getter
     @Setter
@@ -63,11 +66,13 @@ public class GameProfile {
     @Setter
     private ArrayList<Integer> cosmetics;
     @Getter
-    @Setter
     private String token;
     @Getter
     @Setter
     private String password;
+    @Getter
+    @Setter
+    private String email;
     @Getter
     private final KitPvpData kitPvpData;
     @Getter
@@ -90,7 +95,8 @@ public class GameProfile {
         this.id = entity.getId();
         this.uuid = UUID.fromString(entity.getUuid());
         this.name = entity.getName();
-        this.rank = Rank.fromString(entity.getRank());
+        this.rank = Rank.ofId(entity.getRank());
+        this.online = entity.isOnline();
         this.coins = entity.getCoins();
         this.playersRecruited = entity.getPlayersRecruited();
         this.recruitedBy = entity.getRecruitedBy();
@@ -98,6 +104,7 @@ public class GameProfile {
         this.dailyRewardLast = entity.getDailyRewardLast();
         this.lastOnline = entity.getLastOnline();
         this.password = entity.getPassword();
+        this.email = entity.getEmail();
         this.kitPvpData = new KitPvpData(entity.getKitPvpData());
         this.playerSettings = new PlayerSettings(entity.getSettings());
         this.essenceData = new EssenceData(entity.getEssences());
@@ -134,7 +141,8 @@ public class GameProfile {
             }
             this.cosmetics = list;
         }
-        if (token == null || token.isEmpty()) this.token = UUID.randomUUID().toString();
+        if (entity.getToken() == null)
+            this.token = UUID.randomUUID().toString();
         else this.token = entity.getToken();
     }
 
@@ -253,12 +261,6 @@ public class GameProfile {
         for (Punishment punishment : getPunishmentData().getMutes())
             if (!punishment.isPardoned())
                 return true;
-        return false;
-    }
-
-    public boolean isOnline() {
-        if (BattlegroundsCore.getInstance().getServer().getPlayer(uuid) != null)
-            return BattlegroundsCore.getInstance().getServer().getPlayer(uuid).isOnline();
         return false;
     }
 
@@ -451,36 +453,64 @@ public class GameProfile {
         return total;
     }
 
-    public void sync() {
-        Session session = BattlegroundsCore.getSessionFactory().openSession();
-        session.beginTransaction();
-        entity.setName(this.name);
-        entity.setRank(this.rank.toString());
-        entity.setCoins(this.coins);
-        entity.setPlayersRecruited(this.playersRecruited);
-        entity.setRecruitedBy(this.recruitedBy);
-        entity.setDailyReward(this.dailyReward);
-        entity.setDailyRewardLast(this.dailyRewardLast);
-        entity.setLastOnline(this.lastOnline);
-        entity.setFriends(this.friends.toString());
-        entity.setFriendRequests(this.friendRequests.toString());
-        entity.setToken(this.token);
-        entity.setPassword(this.password);
-        this.kitPvpData.sync();
-        this.essenceData.sync();
-        this.playerSettings.sync();
-        this.cratesData.sync();
-        this.punishmentData.sync();
-        this.bugReportData.sync();
-        entity.setKitPvpData(this.kitPvpData.getEntity());
-        entity.setSettings(this.playerSettings.getEntity());
-        entity.setEssences(this.essenceData.getEntity());
-        entity.setCrates(this.cratesData.getEntity());
-        entity.setPunishments(this.punishmentData.getEntities());
-        entity.setBugReports(this.bugReportData.getEntities());
-        session.saveOrUpdate(entity);
-        session.getTransaction().commit();
-        session.close();
+    public void fullSync() {
+        BattlegroundsCore.executorService.execute(() -> {
+            Session session = BattlegroundsCore.getSessionFactory().openSession();
+            session.beginTransaction();
+            entity.setName(this.name);
+            entity.setRank(this.rank.getId());
+            entity.setOnline(this.online);
+            entity.setCoins(this.coins);
+            entity.setPlayersRecruited(this.playersRecruited);
+            entity.setRecruitedBy(this.recruitedBy);
+            entity.setDailyReward(this.dailyReward);
+            entity.setDailyRewardLast(this.dailyRewardLast);
+            entity.setLastOnline(this.lastOnline);
+            entity.setFriends(this.friends.toString());
+            entity.setFriendRequests(this.friendRequests.toString());
+            entity.setToken(this.token);
+            entity.setPassword(this.password);
+            entity.setEmail(this.email);
+            this.kitPvpData.fullSync();
+            this.essenceData.sync();
+            this.playerSettings.sync();
+            this.cratesData.sync();
+            this.punishmentData.sync(session);
+            this.bugReportData.sync(session);
+            entity.setKitPvpData(this.kitPvpData.getEntity());
+            entity.setSettings(this.playerSettings.getEntity());
+            entity.setEssences(this.essenceData.getEntity());
+            entity.setCrates(this.cratesData.getEntity());
+            entity.setPunishments(this.punishmentData.getEntities());
+            entity.setBugReports(this.bugReportData.getEntities());
+            session.merge(entity);
+            session.getTransaction().commit();
+            session.close();
+        });
+    }
+
+    public void partialSync() {
+        BattlegroundsCore.executorService.execute(() -> {
+            Session session = BattlegroundsCore.getSessionFactory().openSession();
+            session.beginTransaction();
+            entity.setRank(this.rank.getId());
+            entity.setOnline(this.online);
+            entity.setCoins(this.coins);
+            entity.setPlayersRecruited(this.playersRecruited);
+            entity.setRecruitedBy(this.recruitedBy);
+            entity.setFriends(this.friends.toString());
+            entity.setFriendRequests(this.friendRequests.toString());
+            entity.setToken(this.token);
+            entity.setPassword(this.password);
+            entity.setEmail(this.email);
+            this.kitPvpData.partialSync();
+            this.playerSettings.sync();
+            entity.setKitPvpData(this.kitPvpData.getEntity());
+            entity.setSettings(this.playerSettings.getEntity());
+            session.merge(entity);
+            session.getTransaction().commit();
+            session.close();
+        });
     }
 
 }

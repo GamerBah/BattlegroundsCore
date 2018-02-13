@@ -1,12 +1,10 @@
 package com.battlegroundspvp.administration.data;
 /* Created by GamerBah on 8/22/2016 */
 
-import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.sql.EssencesEntity;
 import com.battlegroundspvp.administration.donations.Essence;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.hibernate.Session;
 
 @AllArgsConstructor
 public class EssenceData {
@@ -75,8 +73,6 @@ public class EssenceData {
     }
 
     void sync() {
-        Session session = BattlegroundsCore.getSessionFactory().openSession();
-        session.beginTransaction();
         entity.setOne50(this.one50);
         entity.setOne100(this.one100);
         entity.setOne150(this.one150);
@@ -86,7 +82,5 @@ public class EssenceData {
         entity.setSix50(this.six50);
         entity.setSix100(this.six100);
         entity.setSix150(this.six150);
-        session.getTransaction().commit();
-        session.close();
     }
 }

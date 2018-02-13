@@ -1,12 +1,10 @@
 package com.battlegroundspvp.administration.data;
 /* Created by GamerBah on 1/3/2017 */
 
-import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.sql.SettingsEntity;
 import com.battlegroundspvp.utils.enums.ParticleQuality;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.Session;
 
 public class PlayerSettings {
 
@@ -31,13 +29,9 @@ public class PlayerSettings {
     }
 
     void sync() {
-        Session session = BattlegroundsCore.getSessionFactory().openSession();
-        session.beginTransaction();
         entity.setTeamRequests(this.teamRequests);
         entity.setPrivateMessaging(this.privateMessaging);
         entity.setStealthyJoin(this.stealthyJoin);
         entity.setParticleQuality(this.particleQuality.toString());
-        session.getTransaction().commit();
-        session.close();
     }
 }

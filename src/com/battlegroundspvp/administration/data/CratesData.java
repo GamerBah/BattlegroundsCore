@@ -1,13 +1,11 @@
 package com.battlegroundspvp.administration.data;
 /* Created by GamerBah on 8/22/2016 */
 
-import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.sql.CratesEntity;
 import com.battlegroundspvp.administration.data.sql.GameProfilesEntity;
 import com.battlegroundspvp.utils.enums.Rarity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.hibernate.Session;
 
 @AllArgsConstructor
 public class CratesData {
@@ -68,15 +66,11 @@ public class CratesData {
     }
 
     void sync() {
-        Session session = BattlegroundsCore.getSessionFactory().openSession();
-        session.beginTransaction();
         entity.setCommon(this.common);
         entity.setRare(this.rare);
         entity.setEpic(this.epic);
         entity.setLegendary(this.legendary);
         entity.setSeasonal(this.seasonal);
         entity.setGift(this.gift);
-        session.getTransaction().commit();
-        session.close();
     }
 }

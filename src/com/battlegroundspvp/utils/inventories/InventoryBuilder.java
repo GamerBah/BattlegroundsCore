@@ -152,7 +152,6 @@ public class InventoryBuilder {
      * Opens to the page set by <code>page(int number)</code>, or the first page if unset
      */
     public void open() {
-        page(page);
         player.openInventory(this.gameInventory.getInventory());
         inventoryUsers.put(player, this);
     }

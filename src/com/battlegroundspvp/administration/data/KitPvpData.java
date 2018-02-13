@@ -2,11 +2,9 @@ package com.battlegroundspvp.administration.data;
 /* Created by GamerBah on 1/3/2017 */
 
 
-import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.sql.KitPvpDataEntity;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.Session;
 
 import java.util.ArrayList;
 
@@ -50,6 +48,7 @@ public class KitPvpData {
             if (!owned.equals(""))
                 for (String id : owned.split(","))
                     ownedKits.add(Integer.parseInt(id));
+            else ownedKits.add(1);
         }
         this.ownedKits = ownedKits;
         ArrayList<Integer> duplicateKits = new ArrayList<>();
@@ -106,9 +105,7 @@ public class KitPvpData {
         setCombatLevel(getCombatLevel() + 1);
     }
 
-    void sync() {
-        Session session = BattlegroundsCore.getSessionFactory().openSession();
-        session.beginTransaction();
+    void fullSync() {
         entity.setKills(this.kills);
         entity.setDeaths(this.deaths);
         entity.setSouls(this.souls);
@@ -124,7 +121,19 @@ public class KitPvpData {
         entity.setOwnedKits(this.ownedKits.toString());
         entity.setDuplicateKits(this.duplicateKits.toString());
         entity.setQuickSelectKits(this.quickSelectKits.toString());
-        session.getTransaction().commit();
-        session.close();
+    }
+
+    void partialSync() {
+        entity.setKills(this.kills);
+        entity.setDeaths(this.deaths);
+        entity.setSouls(this.souls);
+        entity.setCombatLevel(this.combatLevel);
+        entity.setKillstreaksEnded(this.killstreaksEnded);
+        entity.setRevengeKills(this.revengeKills);
+        entity.setHighestKillstreak(this.highestKillstreak);
+        entity.setTitle(this.title);
+        entity.setOwnedKits(this.ownedKits.toString());
+        entity.setDuplicateKits(this.duplicateKits.toString());
+        entity.setQuickSelectKits(this.quickSelectKits.toString());
     }
 }

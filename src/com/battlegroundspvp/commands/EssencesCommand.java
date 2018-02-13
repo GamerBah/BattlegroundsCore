@@ -29,7 +29,7 @@ public class EssencesCommand implements CommandExecutor {
             return true;
         }
 
-        int amount = plugin.getTotalEssenceAmount(player);
+        int amount = plugin.getGameProfile(player.getUniqueId()).getTotalEssenceAmount();
         if (amount == 0) {
             player.sendMessage(ChatColor.RED + "You don't have any Battle Essences!");
             player.sendMessage(ChatColor.YELLOW + "Buy one from our store! " + ChatColor.GOLD + "battlegroundspvp.com/store");

@@ -1,7 +1,6 @@
 package com.battlegroundspvp.administration.data;
 /* Created by GamerBah on 11/11/2017 */
 
-import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.sql.BugReportsEntity;
 import com.battlegroundspvp.administration.data.sql.GameProfilesEntity;
 import com.battlegroundspvp.utils.BugReport;
@@ -9,7 +8,7 @@ import lombok.Getter;
 import org.hibernate.Session;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 public class BugReportData {
 
@@ -19,11 +18,11 @@ public class BugReportData {
     private ArrayList<BugReport> bugReports;
     private ArrayList<BugReport> removed = new ArrayList<>();
     @Getter
-    private List<BugReportsEntity> entities;
+    private Set<BugReportsEntity> entities;
     @Getter
     private GameProfilesEntity gameProfilesEntity;
 
-    BugReportData(List<BugReportsEntity> list, GameProfilesEntity gameProfilesEntity) {
+    BugReportData(Set<BugReportsEntity> list, GameProfilesEntity gameProfilesEntity) {
         this.id = gameProfilesEntity.getId();
         ArrayList<BugReport> bugReports = new ArrayList<>();
         if (list != null) {
@@ -43,19 +42,16 @@ public class BugReportData {
         this.gameProfilesEntity = gameProfilesEntity;
     }
 
-    public void sync() {
-        Session session = BattlegroundsCore.getSessionFactory().openSession();
-        session.beginTransaction();
+    public void sync(Session session) {
         for (BugReport bugReport : removed)
-            for (int i = 0; i < this.entities.size(); i++) {
-                BugReportsEntity entity = this.entities.get(i);
+            this.entities.forEach(entity -> {
                 if (entity.getId() == bugReport.getId()) {
-                    this.entities.remove(i);
+                    this.entities.remove(entity);
                     this.gameProfilesEntity.getBugReports().remove(entity);
                     entity.setGameProfilesEntity(null);
                     session.delete(entity);
                 }
-            }
+            });
         for (BugReport bugReport : bugReports) {
             boolean registered = false;
             for (BugReportsEntity entity : this.entities) {
@@ -85,8 +81,6 @@ public class BugReportData {
                 session.merge(entity);
             }
         }
-        session.getTransaction().commit();
-        session.close();
     }
 
     public void delete(BugReport bugReport) {

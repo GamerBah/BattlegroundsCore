@@ -5,6 +5,7 @@ import lombok.Data;
 import org.hibernate.annotations.Generated;
 import org.hibernate.annotations.GenerationTime;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Parameter;
 
 import javax.persistence.*;
 
@@ -13,14 +14,14 @@ import javax.persistence.*;
 @Table(name = "Settings", schema = "mc2162")
 public class SettingsEntity {
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @PrimaryKeyJoinColumn
     private GameProfilesEntity gameProfile;
 
     @Id
     @Column
     @GenericGenerator(name = "generator", strategy = "foreign",
-            parameters = @org.hibernate.annotations.Parameter(name = "property", value = "gameProfile"))
+            parameters = @Parameter(name = "property", value = "gameProfile"))
     @GeneratedValue(generator = "generator")
     private int id;
     @Column(insertable = false)

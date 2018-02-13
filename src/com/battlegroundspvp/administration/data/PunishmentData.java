@@ -16,7 +16,7 @@ import org.hibernate.Session;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 public class PunishmentData {
 
@@ -26,11 +26,11 @@ public class PunishmentData {
     private ArrayList<Punishment> punishments;
     private ArrayList<Punishment> removed = new ArrayList<>();
     @Getter
-    private List<PunishmentsEntity> entities;
+    private Set<PunishmentsEntity> entities;
     @Getter
     private GameProfilesEntity gameProfilesEntity;
 
-    PunishmentData(List<PunishmentsEntity> list, GameProfilesEntity gameProfilesEntity) {
+    PunishmentData(Set<PunishmentsEntity> list, GameProfilesEntity gameProfilesEntity) {
         this.id = gameProfilesEntity.getId();
         ArrayList<Punishment> punishments = new ArrayList<>();
         if (list != null) {
@@ -50,19 +50,16 @@ public class PunishmentData {
         this.gameProfilesEntity = gameProfilesEntity;
     }
 
-    public void sync() {
-        Session session = BattlegroundsCore.getSessionFactory().openSession();
-        session.beginTransaction();
+    public void sync(Session session) {
         for (Punishment punishment : removed) {
-            for (int i = 0; i < this.entities.size(); i++) {
-                PunishmentsEntity entity = this.entities.get(i);
+            this.entities.forEach(entity -> {
                 if (entity.getPunishmentId() == punishment.getId()) {
-                    this.entities.remove(i);
+                    this.entities.remove(entity);
                     this.gameProfilesEntity.getPunishments().remove(entity);
                     entity.setGameProfilesEntity(null);
                     session.delete(entity);
                 }
-            }
+            });
         }
         for (Punishment punishment : punishments) {
             boolean registered = false;
@@ -93,8 +90,6 @@ public class PunishmentData {
                 session.merge(entity);
             }
         }
-        session.getTransaction().commit();
-        session.close();
     }
 
     public void delete(Player player, GameProfile targetProfile, Punishment punishment) {

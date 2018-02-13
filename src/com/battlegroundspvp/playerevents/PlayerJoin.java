@@ -7,14 +7,14 @@ import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.punishments.Punishment;
 import com.battlegroundspvp.runnables.DonationUpdater;
+import com.battlegroundspvp.runnables.RegisterRunnable;
 import com.battlegroundspvp.runnables.UpdateRunnable;
-import com.battlegroundspvp.utils.enums.Advancements;
 import com.battlegroundspvp.utils.enums.Rarity;
 import com.battlegroundspvp.utils.enums.Time;
 import com.battlegroundspvp.utils.messages.ColorBuilder;
 import de.Herbystar.TTA.TTA_Methods;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -49,6 +49,7 @@ public class PlayerJoin implements Listener {
         }
 
         GameProfile gameProfile = plugin.getGameProfile(event.getUniqueId());
+        BattlegroundsCore.getGameProfiles().add(gameProfile);
 
         for (Punishment punishment : gameProfile.getPunishmentData().getBans()) {
             if (!punishment.isPardoned()) {
@@ -92,16 +93,23 @@ public class PlayerJoin implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
+        gameProfile.setOnline(true);
 
-        if (!player.hasPlayedBefore()) {
-            event.setJoinMessage(new ColorBuilder(ChatColor.GOLD).bold().create() + "New! " + new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "[" + new ColorBuilder(ChatColor.GREEN).bold().create() + "+"
-                    + new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName());
-            if (Bukkit.getAdvancement(Advancements.BASE.getCustomAdvancement().getAdvancement().getKey()) != null)
-                player.getAdvancementProgress(Bukkit.getAdvancement(Advancements.BASE.getCustomAdvancement().getAdvancement().getKey())).awardCriteria("impossible");
+        if (gameProfile.getPassword() == null || gameProfile.getPassword().isEmpty()) {
+            event.setJoinMessage(null);
+            plugin.respawn(player, (Location) plugin.getConfig().get("locations.afk"));
+            player.setWalkSpeed(0F);
+            player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, -50, true, false));
+            player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true, false));
+            player.setFoodLevel(6);
+            player.setSaturation(0);
+            player.getInventory().clear();
+            player.getInventory().setHeldItemSlot(4);
+            BattlegroundsCore.sendRegisterMessage(player);
+            plugin.getAwaitingRegistration().add(player);
+            BattlegroundsCore.getExecutorService().execute(new RegisterRunnable(plugin, player));
         } else {
-            if (Advancements.BASE.getCustomAdvancement().getAdvancement() != null)
-                player.getAdvancementProgress(Bukkit.getAdvancement(Advancements.BASE.getCustomAdvancement().getAdvancement().getKey())).awardCriteria("impossible");
-
+            plugin.respawn(player);
             if (gameProfile.getPlayerSettings().isStealthyJoin()) {
                 event.setJoinMessage(null);
                 plugin.getServer().getOnlinePlayers().stream().filter(staff ->
@@ -109,47 +117,46 @@ public class PlayerJoin implements Listener {
                         staff.sendMessage(new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "[" + new ColorBuilder(ChatColor.GREEN).bold().create() + "+"
                                 + new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GRAY + " (Stealth Join)"));
             } else {
-                if (!gameProfile.getName().equals(player.getName())) {
-                    String oldName = gameProfile.getPlayer().getName();
-                    gameProfile.setName(player.getName());
-                    event.setJoinMessage(new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "[" + new ColorBuilder(ChatColor.GREEN).bold().create() + "+"
-                            + new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GRAY + " (" + oldName + ")");
-                } else {
-                    event.setJoinMessage(new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "[" + new ColorBuilder(ChatColor.GREEN).bold().create() + "+"
-                            + new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName());
+                if (!event.getJoinMessage().startsWith(new ColorBuilder(ChatColor.GOLD).bold().create() + "New! ")) {
+                    if (!gameProfile.getName().equals(player.getName())) {
+                        String oldName = gameProfile.getPlayer().getName();
+                        gameProfile.setName(player.getName());
+                        event.setJoinMessage(new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "[" + new ColorBuilder(ChatColor.GREEN).bold().create() + "+"
+                                + new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GRAY + " (" + oldName + ")");
+                    } else {
+                        event.setJoinMessage(new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "[" + new ColorBuilder(ChatColor.GREEN).bold().create() + "+"
+                                + new ColorBuilder(ChatColor.DARK_GRAY).bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName());
+                    }
                 }
             }
-        }
+            if (Math.random() <= 0.05) {
+                double chance = Math.random();
+                Rarity reward = Rarity.COMMON;
+                for (Rarity rarity : Rarity.values())
+                    if (chance <= Math.pow(rarity.getChance(), 2) && chance >= Math.pow(rarity.getMinChance(Rarity.COMMON), 2))
+                        reward = rarity;
+                gameProfile.getCratesData().addCrate(reward, 1);
+                player.sendMessage(reward.getColor() + "\u00BB " + ChatColor.GRAY + "You found a " + reward.getCrateName() + ChatColor.GRAY + "!");
+            }
 
-        if (Math.random() <= 0.05) {
-            double chance = Math.random();
-            Rarity reward = Rarity.COMMON;
-            for (Rarity rarity : Rarity.values())
-                if (chance <= Math.pow(rarity.getChance(), 2) && chance >= Math.pow(rarity.getMinChance(Rarity.COMMON), 2))
-                    reward = rarity;
-            gameProfile.getCratesData().addCrate(reward, 1);
-            player.sendMessage(reward.getColor() + "\u00BB " + ChatColor.GRAY + "You found a " + reward.getCrateName() + ChatColor.GRAY + "!");
-        }
+            if ((FreezeCommand.frozen && !gameProfile.hasRank(Rank.MODERATOR)) || FreezeCommand.frozenPlayers.contains(player) || FreezeCommand.reloadFreeze) {
+                player.setWalkSpeed(0F);
+                player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, -50, true, false));
+                player.setFoodLevel(6);
+                player.setSaturation(0);
+            } else {
+                player.setWalkSpeed(0.2F);
+            }
 
-        if ((FreezeCommand.frozen && !gameProfile.hasRank(Rank.MODERATOR)) || FreezeCommand.frozenPlayers.contains(player) || FreezeCommand.reloadFreeze) {
-            player.setWalkSpeed(0F);
-            player.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, -50, true, false));
-            player.setFoodLevel(6);
-            player.setSaturation(0);
-        } else {
-            player.setWalkSpeed(0.2F);
+            if (DonationUpdater.essenceBar != null)
+                if (!DonationUpdater.essenceBar.getPlayers().contains(player))
+                    DonationUpdater.essenceBar.addPlayer(player);
         }
-
-        if (DonationUpdater.essenceBar != null)
-            if (!DonationUpdater.essenceBar.getPlayers().contains(player))
-                DonationUpdater.essenceBar.addPlayer(player);
 
         player.setPlayerListName((gameProfile.hasRank(Rank.WARRIOR) ? gameProfile.getRank().getColor().create() + "" + ChatColor.BOLD + gameProfile.getRank().getName().toUpperCase() + " " : "")
                 + (gameProfile.hasRank(Rank.WARRIOR) ? ChatColor.WHITE : ChatColor.GRAY) + player.getName());
 
         TTA_Methods.sendTablist(player, ChatColor.AQUA + "   You're playing on " + new ColorBuilder(ChatColor.GOLD).bold().create() + "BATTLEGROUNDS   ",
                 ChatColor.YELLOW + "Visit our store! store.battlegroundspvp.com");
-
-        plugin.respawn(player);
     }
 }

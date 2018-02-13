@@ -2,7 +2,6 @@ package com.battlegroundspvp.administration.data.sql;
 /* Created by GamerBah on 9/28/2017 */
 
 import lombok.Data;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Generated;
 import org.hibernate.annotations.GenerationTime;
 import org.hibernate.annotations.GenericGenerator;
@@ -38,13 +37,7 @@ public class KitPvpDataEntity {
     private int souls;
     @Generated(value = GenerationTime.INSERT)
     private String title;
-    @Generated(value = GenerationTime.INSERT)
-    @ColumnDefault(value = "[1]")
     private String ownedKits;
-    @Generated(value = GenerationTime.INSERT)
-    @ColumnDefault(value = "[]")
     private String duplicateKits;
-    @Generated(value = GenerationTime.INSERT)
-    @ColumnDefault(value = "[]")
     private String quickSelectKits;
 }

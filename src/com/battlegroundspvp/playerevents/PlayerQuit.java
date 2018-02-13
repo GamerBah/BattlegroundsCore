@@ -63,6 +63,11 @@ public class PlayerQuit implements Listener {
             if (DonationUpdater.essenceBar.getPlayers().contains(player))
                 DonationUpdater.essenceBar.removePlayer(player);
 
-        gameProfile.sync();
+        if (plugin.getAwaitingRegistration().contains(player))
+            plugin.getAwaitingRegistration().remove(player);
+
+        gameProfile.setOnline(false);
+        gameProfile.fullSync();
+        BattlegroundsCore.getGameProfiles().remove(gameProfile);
     }
 }

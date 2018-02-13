@@ -62,7 +62,7 @@ public class FreezeCommand implements CommandExecutor {
                         p.setWalkSpeed(0F);
                         p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, -50, true, false));
                         p.setFoodLevel(6);
-                        player.setSaturation(0);
+                        p.setSaturation(0);
                     }
                 }
             } else {

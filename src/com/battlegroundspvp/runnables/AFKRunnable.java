@@ -21,7 +21,7 @@ public class AFKRunnable implements Runnable {
     @Override
     public void run() {
         for (Player player : plugin.getServer().getOnlinePlayers())
-            if (afkTimer.containsKey(player)) {
+            if (afkTimer.containsKey(player) && !plugin.getAwaitingRegistration().contains(player)) {
                 if (afkTimer.get(player) < 300)
                     afkTimer.put(player, afkTimer.get(player) + 1);
                 if (afkTimer.get(player) == 300)

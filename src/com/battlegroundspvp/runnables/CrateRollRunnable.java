@@ -186,7 +186,7 @@ public class CrateRollRunnable implements Runnable {
                     }
 
                     if (reward.getServerType() == Cosmetic.ServerType.LOBBY) {
-                        if (gameProfile.getCosmeticsData().getLobbyCosmetics().contains(reward.getId())) {
+                        if (gameProfile.getCosmetics().contains(reward.getId())) {
                             if (player.isOnline()) {
                                 player.sendMessage(ChatColor.GRAY + "You already have " + reward.getRarity().getColor() + (reward.getRarity() == Rarity.EPIC
                                         || reward.getRarity() == Rarity.LEGENDARY ? "" + ChatColor.BOLD : "") + reward.getName()
@@ -197,13 +197,13 @@ public class CrateRollRunnable implements Runnable {
                             }
                             gameProfile.addCoins(coins);
                         } else {
-                            gameProfile.getCosmeticsData().getLobbyCosmetics().add(reward.getId());
+                            gameProfile.getCosmetics().add(reward.getId());
                             if (player.isOnline())
                                 player.sendMessage(ChatColor.GRAY + "You received " + reward.getRarity().getColor() + (reward.getRarity() == Rarity.EPIC
                                         || reward.getRarity() == Rarity.LEGENDARY ? "" + ChatColor.BOLD : "") + reward.getName() + ChatColor.GRAY + " for use in lobbies!");
                         }
                     } else if (reward.getServerType() == Cosmetic.ServerType.KITPVP) {
-                        if (gameProfile.getCosmeticsData().getKitPvpCosmetics().contains(reward.getId())) {
+                        if (gameProfile.getCosmetics().contains(reward.getId())) {
                             if (player.isOnline()) {
                                 player.sendMessage(ChatColor.GRAY + "You already have " + reward.getRarity().getColor() + (reward.getRarity() == Rarity.EPIC
                                         || reward.getRarity() == Rarity.LEGENDARY ? "" + ChatColor.BOLD : "") + reward.getName()
@@ -214,7 +214,7 @@ public class CrateRollRunnable implements Runnable {
                             }
                             gameProfile.addCoins(coins);
                         } else {
-                            gameProfile.getCosmeticsData().getKitPvpCosmetics().add(reward.getId());
+                            gameProfile.getCosmetics().add(reward.getId());
                             if (player.isOnline())
                                 player.sendMessage(ChatColor.GRAY + "You received " + reward.getRarity().getColor() + (reward.getRarity() == Rarity.EPIC
                                         || reward.getRarity() == Rarity.LEGENDARY ? "" + ChatColor.BOLD : "") + reward.getName() + ChatColor.GRAY + " for use in KitPvP!");
