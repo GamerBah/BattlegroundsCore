@@ -99,9 +99,6 @@ public class BattlegroundsCore extends JavaPlugin {
     private static List<Launcher> launchers = new ArrayList<>();
 
     @Getter
-    private GlobalStatsEntity globalStats = null;
-
-    @Getter
     private static Map<Player, Player> pendingFriends = new HashMap<>();
     @Getter
     private static Map<UUID, UUID> messagers = new HashMap<>();
@@ -147,12 +144,6 @@ public class BattlegroundsCore extends JavaPlugin {
             TTA_Methods.sendTitle(p, null, 0, 0, 0, null, 0, 0, 0);
         });
 
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        this.globalStats = session.createQuery("from GlobalStatsEntity where id = 1", GlobalStatsEntity.class).getSingleResult();
-        session.getTransaction().commit();
-        session.close();
-
         moduleLoader = new BattleModuleLoader();
         moduleLoader.enableModules();
 
@@ -173,16 +164,6 @@ public class BattlegroundsCore extends JavaPlugin {
     }
 
     public void onDisable() {
-        effectManager.dispose();
-
-        activeThreads.forEach(Thread::interrupt);
-        entities.forEach(Entity::remove);
-
-        if (DonationUpdater.essenceBar != null) {
-            DonationUpdater.essenceBar.removeAll();
-            DonationUpdater.essenceBar.setVisible(false);
-        }
-
         getConfig().set("launchers", "");
         launchers.forEach(launcher -> {
             getConfig().set("launchers." + launcher.getId() + ".type", launcher.getType().toString());
@@ -208,6 +189,14 @@ public class BattlegroundsCore extends JavaPlugin {
             sessionFactory.close();
         if (!executorService.isShutdown())
             executorService.shutdown();
+
+        effectManager.dispose();
+        activeThreads.forEach(Thread::interrupt);
+        entities.forEach(Entity::remove);
+        if (DonationUpdater.essenceBar != null) {
+            DonationUpdater.essenceBar.removeAll();
+            DonationUpdater.essenceBar.setVisible(false);
+        }
     }
 
     private void setupSessionFactory() {
@@ -337,9 +326,8 @@ public class BattlegroundsCore extends JavaPlugin {
                                     getConfig().getInt("crates." + id + ".z")))));
 
         File filterFile = new File(getDataFolder(), "filter.txt");
-        if (!filterFile.exists()) {
+        if (!filterFile.exists())
             saveResource("filter.txt", false);
-        }
         try {
             Files.lines(FileSystems.getDefault().getPath(filterFile.getPath())).forEach(filterLine ->
                     filteredWords.add(ChatColor.translateAlternateColorCodes('&', filterLine)));
@@ -349,9 +337,8 @@ public class BattlegroundsCore extends JavaPlugin {
 
         // Save SafeWords File
         File safeWordsFile = new File(getDataFolder(), "safewords.txt");
-        if (!filterFile.exists()) {
+        if (!filterFile.exists())
             saveResource("safewords.txt", false);
-        }
         try {
             Files.lines(FileSystems.getDefault().getPath(safeWordsFile.getPath())).forEach(wordLine ->
                     safeWords.add(ChatColor.translateAlternateColorCodes('&', wordLine)));
@@ -369,6 +356,9 @@ public class BattlegroundsCore extends JavaPlugin {
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new WorldParticlesRunnable(this), 0, 2L);
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new MessageRunnable(this), 0, 6000L);
         getServer().getScheduler().scheduleSyncRepeatingTask(this, () -> gameProfiles.forEach(GameProfile::partialSync), 6000L, 6000L);
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, new TPSRunnable(), 0L, 0L);
+        Thread thread = new Thread(new PanelRunnables());
+        thread.start();
     }
 
     public GameProfile getGameProfile(UUID uuid) {

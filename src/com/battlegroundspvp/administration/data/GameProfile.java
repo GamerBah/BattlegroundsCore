@@ -173,7 +173,8 @@ public class GameProfile {
         if (!WarnCommand.getWarned().containsKey(this.uuid))
             WarnCommand.getWarned().remove(this.uuid);
 
-        BattlegroundsCore.getInstance().getGlobalStats().setTotalBans(BattlegroundsCore.getInstance().getGlobalStats().getTotalBans() + 1);
+        // TODO:
+        // BattlegroundsCore.getInstance().getGlobalStats().setTotalBans(BattlegroundsCore.getInstance().getGlobalStats().getTotalBans() + 1);
 
         punishmentData.getPunishments().add(new Punishment(this.id, Punishment.Type.BAN, LocalDateTime.now(),
                 -1, LocalDateTime.parse("1998-03-27T17:31:41.592"), enforcerProfile.id, reason, false));
@@ -274,7 +275,8 @@ public class GameProfile {
         if (!WarnCommand.getWarned().containsKey(this.uuid))
             WarnCommand.getWarned().remove(this.uuid);
 
-        BattlegroundsCore.getInstance().getGlobalStats().setTotalKicks(BattlegroundsCore.getInstance().getGlobalStats().getTotalKicks() + 1);
+        // TODO:
+        // BattlegroundsCore.getInstance().getGlobalStats().setTotalKicks(BattlegroundsCore.getInstance().getGlobalStats().getTotalKicks() + 1);
 
         punishmentData.getPunishments().add(new Punishment(this.id, Punishment.Type.KICK, LocalDateTime.now(),
                 0, LocalDateTime.now(), enforcerProfile.id, reason, true));
@@ -301,7 +303,8 @@ public class GameProfile {
         if (!WarnCommand.getWarned().containsKey(this.uuid))
             WarnCommand.getWarned().remove(this.uuid);
 
-        BattlegroundsCore.getInstance().getGlobalStats().setTotalMutes(BattlegroundsCore.getInstance().getGlobalStats().getTotalMutes() + 1);
+        // TODO:
+        // BattlegroundsCore.getInstance().getGlobalStats().setTotalMutes(BattlegroundsCore.getInstance().getGlobalStats().getTotalMutes() + 1);
 
         punishmentData.getPunishments().add(new Punishment(this.id, Punishment.Type.MUTE, LocalDateTime.now(),
                 duration * 1000, LocalDateTime.now().plusSeconds(duration), enforcerProfile.id, reason, false));
@@ -370,7 +373,8 @@ public class GameProfile {
         if (!WarnCommand.getWarned().containsKey(this.uuid))
             WarnCommand.getWarned().remove(this.uuid);
 
-        BattlegroundsCore.getInstance().getGlobalStats().setTotalBans(BattlegroundsCore.getInstance().getGlobalStats().getTotalBans() + 1);
+        // TODO:
+        // BattlegroundsCore.getInstance().getGlobalStats().setTotalBans(BattlegroundsCore.getInstance().getGlobalStats().getTotalBans() + 1);
 
         punishmentData.getPunishments().add(new Punishment(this.id, Punishment.Type.TEMP_BAN, LocalDateTime.now(),
                 duration * 1000, LocalDateTime.now().plusSeconds(duration), enforcerProfile.id, reason, false));

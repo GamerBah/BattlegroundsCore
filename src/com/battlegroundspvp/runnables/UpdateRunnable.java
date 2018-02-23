@@ -45,49 +45,48 @@ public class UpdateRunnable implements Runnable {
                     moduleUpdate(module);
             return;
         }
-
         runPreUpdate();
-
-        // Push Updates
+        // Begin updating
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
             try {
                 // Sync data with database
                 BattlegroundsCore.syncGameProfiles();
+                // Push updates after 3 seconds (to allow profiles to sync)
+                plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+                    // Unload modules
+                    for (BattleModule module : BattleModuleLoader.modules.keySet())
+                        PluginUtil.unload(BattleModuleLoader.modules.get(module));
+                    // Unload Core
+                    PluginUtil.unload(plugin);
+                    try {
+                        Files.move(Paths.get(currentFile.getPath()), Paths.get(plugin.getDataFolder().getPath() + File.separator + "BattlegroundsCore.jar"),
+                                StandardCopyOption.REPLACE_EXISTING);
+                        currentFile = new File(plugin.getDataFolder().getPath() + File.separator + "BattlegroundsCore.jar");
+                        Files.move(Paths.get(updateFile.getPath()), Paths.get(plugin.getServer().getUpdateFolderFile().getParentFile().getPath()
+                                + File.separator + "BattlegroundsCore.jar"), StandardCopyOption.REPLACE_EXISTING);
+                    } catch (IOException exception) {
+                        plugin.getLogger().severe("Unable to complete update!");
+                        plugin.getLogger().severe(exception.getCause().toString());
+                        deleteUpdateFile(updateFile);
+                    }
 
-                // Unload modules
-                for (BattleModule module : BattleModuleLoader.modules.keySet())
-                    PluginUtil.unload(BattleModuleLoader.modules.get(module));
+                    // Check for per-module updates, run accordingly
+                    for (BattleModule module : BattleModuleLoader.modules.keySet())
+                        if (moduleHasUpdate(module))
+                            updateModule(module);
 
-                // Unload Core
-                PluginUtil.unload(plugin);
-                try {
-                    Files.move(Paths.get(currentFile.getPath()), Paths.get(plugin.getDataFolder().getPath() + File.separator + "BattlegroundsCore.jar"),
-                            StandardCopyOption.REPLACE_EXISTING);
-                    currentFile = new File(plugin.getDataFolder().getPath() + File.separator + "BattlegroundsCore.jar");
-                    Files.move(Paths.get(updateFile.getPath()), Paths.get(plugin.getServer().getUpdateFolderFile().getParentFile().getPath()
-                            + File.separator + "BattlegroundsCore.jar"), StandardCopyOption.REPLACE_EXISTING);
-                } catch (IOException exception) {
-                    plugin.getLogger().severe("Unable to complete update!");
-                    plugin.getLogger().severe(exception.getCause().toString());
-                    deleteUpdateFile(updateFile);
-                }
-
-                // Check for per-module updates, run accordingly
-                for (BattleModule module : BattleModuleLoader.modules.keySet())
-                    if (moduleHasUpdate(module))
-                        updateModule(module);
-
-                try {
-                    // Load Core
-                    PluginUtil.load("BattlegroundsCore");
-                } catch (Throwable throwable) {
-                    plugin.getLogger().severe("Unable to preform plugin update!");
-                    throwable.printStackTrace();
-                    revert();
-                    return;
-                }
-                plugin.getServer().broadcastMessage(new ColorBuilder(ChatColor.RED).bold().create() + "SERVER: " + ChatColor.GRAY
-                        + "Update was a " + new ColorBuilder(ChatColor.GREEN).bold().create() + "success" + ChatColor.GRAY + "! Now go have fun!");
+                    try {
+                        // Load Core
+                        PluginUtil.load("BattlegroundsCore");
+                    } catch (Throwable throwable) {
+                        plugin.getLogger().severe("Unable to preform plugin update!");
+                        throwable.printStackTrace();
+                        revert();
+                        return;
+                    }
+                    plugin.getServer().broadcastMessage(new ColorBuilder(ChatColor.RED).bold().create() + "SERVER: " + ChatColor.GRAY
+                            + "Update was a " + new ColorBuilder(ChatColor.GREEN).bold().create() + "success" + ChatColor.GRAY + "! Now go have fun!");
+                }, 60L);
             } catch (Throwable throwable) {
                 plugin.getLogger().severe("Error during pre-update, sticking with the current version");
                 throwable.printStackTrace();

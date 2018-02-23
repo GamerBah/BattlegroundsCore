@@ -35,7 +35,8 @@ public class Essence {
         plugin.getConfig().set("essence.timeRemaining", type.getDuration() * 60 * 60);
         plugin.saveConfig();
         plugin.getGameProfile(player.getUniqueId()).getEssenceData().removeEssence(type);
-        plugin.getGlobalStats().setTotalUsedEssences(plugin.getGlobalStats().getTotalUsedEssences() + 1);
+        // TODO:
+        // plugin.getGlobalStats().setTotalUsedEssences(plugin.getGlobalStats().getTotalUsedEssences() + 1);
 
         long milliseconds = plugin.getConfig().getInt("essence.timeRemaining") * 1000;
         DonationUpdater.essenceBar = Bukkit.createBossBar(type.getChatColor() + Time.toString(milliseconds, true)

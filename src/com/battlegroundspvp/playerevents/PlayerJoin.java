@@ -38,54 +38,55 @@ public class PlayerJoin implements Listener {
     public void onLogin(AsyncPlayerPreLoginEvent event) {
         if (event.getLoginResult() == AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST) {
             event.setKickMessage(new ColorBuilder(ChatColor.RED).bold().create() + "You're not on the whitelist!\n\n"
-                    + ChatColor.GRAY + "Access to the Development Server is only given§7to donators with the " + Rank.WARLORD.getColor().create() + Rank.WARLORD.toString() + "§7 rank.\n\n"
+                    + ChatColor.GRAY + "Access to the Development Server is only given\n§7to donators with the " + Rank.WARLORD.getColor().create() + Rank.WARLORD.toString() + "§7 rank.\n\n"
                     + ChatColor.GRAY + "You can purchase the rank at our store!\n§e§lstore.battlegroundspvp.com");
-            return;
-        }
-
-        if (plugin.getGameProfile(event.getUniqueId()) == null) {
-            BattlegroundsCore.createNewGameProfile(event.getName(), event.getUniqueId());
-            plugin.getGlobalStats().setTotalUniqueJoins(plugin.getGlobalStats().getTotalUniqueJoins() + 1);
-        }
-
-        GameProfile gameProfile = plugin.getGameProfile(event.getUniqueId());
-        BattlegroundsCore.getGameProfiles().add(gameProfile);
-
-        for (Punishment punishment : gameProfile.getPunishmentData().getBans()) {
-            if (!punishment.isPardoned()) {
-                GameProfile enforcerProfile = plugin.getGameProfile(punishment.getEnforcerId());
-                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, ChatColor.RED + "You were banned by " + ChatColor.GOLD + enforcerProfile.getName()
-                        + ChatColor.RED + " for " + ChatColor.GOLD + punishment.getReason().getName() + "\n" + ChatColor.AQUA
-                        + punishment.getDate().minusHours(9).format(DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a '(PST)'")) + "\n\n" + ChatColor.YELLOW
-                        + punishment.getReason().getMessage() + "\n\n" + ChatColor.GRAY + "Appeal your ban on the forums: battlegroundspvp.com/forums");
-                return;
-            }
-        }
-        for (Punishment punishment : gameProfile.getPunishmentData().getTempBans()) {
-            if (!punishment.isPardoned()) {
-                GameProfile enforcerProfile = plugin.getGameProfile(punishment.getEnforcerId());
-                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, ChatColor.RED + "You were temporarily banned by " + ChatColor.GOLD + enforcerProfile.getName()
-                        + ChatColor.RED + " for " + ChatColor.GOLD + punishment.getReason().getName() + "\n" + ChatColor.AQUA
-                        + punishment.getDate().minusHours(9).format(DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a '(PST)'")) + "\n\n"
-                        + ChatColor.GRAY + "Time Remaining in Ban: " + ChatColor.RED + Time.toString(Time.punishmentTimeRemaining(punishment.getExpiration()), true) + "\n" + ChatColor.YELLOW
-                        + punishment.getReason().getMessage() + "\n\n" + ChatColor.GRAY + "You can appeal your ban on the forums: battlegroundspvp.com/forums");
-                return;
+            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, event.getKickMessage());
+        } else {
+            if (plugin.getGameProfile(event.getUniqueId()) == null) {
+                BattlegroundsCore.createNewGameProfile(event.getName(), event.getUniqueId());
+                // TODO:
+                // plugin.getGlobalStats().setTotalUniqueJoins(plugin.getGlobalStats().getTotalUniqueJoins() + 1);
             }
 
-        }
+            GameProfile gameProfile = plugin.getGameProfile(event.getUniqueId());
+            BattlegroundsCore.getGameProfiles().add(gameProfile);
 
-        if (plugin.getConfig().getBoolean("developmentMode")) {
-            if (plugin.getGameProfile(event.getUniqueId()) == null || !plugin.getGameProfile(event.getUniqueId()).hasRank(Rank.HELPER)) {
-                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, ChatColor.RED + "You were not able to join the server because it is in\n" + new ColorBuilder(ChatColor.GOLD).bold().underline().create()
-                        + "MAINTENANCE MODE\n\n" + ChatColor.AQUA + "This means that we are fixing bugs, or found another issue we needed to take care of\n\n"
-                        + ChatColor.GRAY + "We put the server into Maintenance Mode in order to reduce the risk of\n§7corrupting player data, etc. The server should be open shortly!");
-                return;
+            for (Punishment punishment : gameProfile.getPunishmentData().getBans()) {
+                if (!punishment.isPardoned()) {
+                    GameProfile enforcerProfile = plugin.getGameProfile(punishment.getEnforcerId());
+                    event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, ChatColor.RED + "You were banned by " + ChatColor.GOLD + enforcerProfile.getName()
+                            + ChatColor.RED + " for " + ChatColor.GOLD + punishment.getReason().getName() + "\n" + ChatColor.AQUA
+                            + punishment.getDate().minusHours(9).format(DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a '(PST)'")) + "\n\n" + ChatColor.YELLOW
+                            + punishment.getReason().getMessage() + "\n\n" + ChatColor.GRAY + "Appeal your ban on the forums: battlegroundspvp.com/forums");
+                    return;
+                }
             }
-        }
+            for (Punishment punishment : gameProfile.getPunishmentData().getTempBans()) {
+                if (!punishment.isPardoned()) {
+                    GameProfile enforcerProfile = plugin.getGameProfile(punishment.getEnforcerId());
+                    event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, ChatColor.RED + "You were temporarily banned by " + ChatColor.GOLD + enforcerProfile.getName()
+                            + ChatColor.RED + " for " + ChatColor.GOLD + punishment.getReason().getName() + "\n" + ChatColor.AQUA
+                            + punishment.getDate().minusHours(9).format(DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a '(PST)'")) + "\n\n"
+                            + ChatColor.GRAY + "Time Remaining in Ban: " + ChatColor.RED + Time.toString(Time.punishmentTimeRemaining(punishment.getExpiration()), true) + "\n" + ChatColor.YELLOW
+                            + punishment.getReason().getMessage() + "\n\n" + ChatColor.GRAY + "You can appeal your ban on the forums: battlegroundspvp.com/forums");
+                    return;
+                }
 
-        if (UpdateRunnable.updating) {
-            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, new ColorBuilder(ChatColor.YELLOW).bold().create() + "SERVER IS UPDATING!\n"
-                    + ChatColor.RED + "To prevent your data from being corrupted, you didn't connect\n\n" + ChatColor.GRAY + "You should be able to join in a few seconds! Hang in there!");
+            }
+
+            if (plugin.getConfig().getBoolean("developmentMode")) {
+                if (plugin.getGameProfile(event.getUniqueId()) == null || !plugin.getGameProfile(event.getUniqueId()).hasRank(Rank.HELPER)) {
+                    event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, ChatColor.RED + "You were not able to join the server because it is in\n" + new ColorBuilder(ChatColor.GOLD).bold().underline().create()
+                            + "MAINTENANCE MODE\n\n" + ChatColor.AQUA + "This means that we are fixing bugs, or found another issue we needed to take care of\n\n"
+                            + ChatColor.GRAY + "We put the server into Maintenance Mode in order to reduce the risk of\n§7corrupting player data, etc. The server should be open shortly!");
+                    return;
+                }
+            }
+
+            if (UpdateRunnable.updating) {
+                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, new ColorBuilder(ChatColor.YELLOW).bold().create() + "SERVER IS UPDATING!\n"
+                        + ChatColor.RED + "To prevent your data from being corrupted, you didn't connect\n\n" + ChatColor.GRAY + "You should be able to join in a few seconds! Hang in there!");
+            }
         }
     }
 

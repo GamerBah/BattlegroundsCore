@@ -19,9 +19,9 @@ public class GameInventory {
     @Getter
     private Inventory inventory;
     @Getter
-    private int itemCount = 0, topOffset = 0, bottomOffset = 0, searchStart = -1, searchEnd = -1;
+    private int itemCount = 0, topOffset = 0, bottomOffset = 0, searchStart = -1, searchEnd = -1, pageRow = 0;
     @Getter
-    private boolean inlineNavigation = false, noBackButton = false;
+    private boolean inlineNavigation = false, noBackButton = true;
 
     private ArrayList<ItemBuilder> items = new ArrayList<>();
     private HashMap<Integer, ItemBuilder> buttons = new HashMap<>();
@@ -182,7 +182,7 @@ public class GameInventory {
      * @return the amount of rows
      */
     public int getSearchRows() {
-        return searchEnd - searchStart;
+        return (searchEnd - searchStart) + 1;
     }
 
     /**
@@ -196,8 +196,8 @@ public class GameInventory {
      * @param bottom the amount of slots to keep empty at the bottom of the search box
      */
     protected void setSearchOffset(final int top, final int bottom) {
-        topOffset = top;
-        bottomOffset = bottom;
+        this.topOffset = top;
+        this.bottomOffset = bottom;
     }
 
     /**
@@ -208,7 +208,7 @@ public class GameInventory {
      * @param offset the offset to apply to each end of the search box
      */
     protected void setSearchOffset(final int offset) {
-        setSearchOffset(offset, offset);
+        this.setSearchOffset(offset, offset);
     }
 
     /**
@@ -254,11 +254,27 @@ public class GameInventory {
         if (searchStart == -1 && searchEnd == -1)
             throw new UnsupportedOperationException("Cannot alter navigation is no search box is set!");
         if (inline) {
-            this.topOffset += 1;
+            if (!noBackButton)
+                this.topOffset += 1;
             this.bottomOffset += 1;
         }
         this.inlineNavigation = inline;
         this.noBackButton = noBackButton;
+    }
+
+    /**
+     * Sets which row page navigation buttons will appear on
+     *
+     * @param row the inventory row (0-based) to put the buttons on
+     * @throws UnsupportedOperationException if there are no search rows, or if{@code alterNavigation} has been used to make buttons inline.
+     * @throws IllegalArgumentException      if row is {@literal >} the max rows in the inventory
+     */
+    protected void setPageRow(final int row) {
+        if (searchStart == -1 && searchEnd == -1)
+            throw new UnsupportedOperationException("Cannot alter navigation is no search box is set!");
+        if (row > (inventory.getSize() / 9))
+            throw new IllegalArgumentException("Row cannot be > max rows of inventory!");
+        this.pageRow = row;
     }
 
     /**
@@ -267,7 +283,7 @@ public class GameInventory {
      * @param player the {@link Player} to build this {@link Inventory} for
      * @return a new {@link InventoryBuilder} instance of this GameInventory
      */
-    protected InventoryBuilder build(final Player player) {
+    public InventoryBuilder build(final Player player) {
         if (!borders.isEmpty())
             borders.forEach((row, color) -> {
                 for (int i = row; i > (row + 9); i++)
