@@ -1,8 +1,8 @@
-package com.battlegroundspvp.utils.messages;
+package com.battlegroundspvp.util.message;
 
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
-import com.battlegroundspvp.utils.enums.EventSound;
+import com.battlegroundspvp.util.enums.EventSound;
 import net.md_5.bungee.api.chat.BaseComponent;
 
 import static org.bukkit.ChatColor.*;

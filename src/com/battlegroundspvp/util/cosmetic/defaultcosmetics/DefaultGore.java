@@ -1,9 +1,9 @@
-package com.battlegroundspvp.utils.cosmetics.defaultcosmetics;
+package com.battlegroundspvp.util.cosmetic.defaultcosmetics;
 /* Created by GamerBah on 10/29/2017 */
 
-import com.battlegroundspvp.utils.cosmetics.Gore;
-import com.battlegroundspvp.utils.enums.Rarity;
-import com.battlegroundspvp.utils.inventories.ItemBuilder;
+import com.battlegroundspvp.util.cosmetic.Gore;
+import com.battlegroundspvp.util.enums.Rarity;
+import com.gamerbah.inventorytoolkit.ItemBuilder;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

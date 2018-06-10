@@ -1,4 +1,4 @@
-package com.battlegroundspvp.utils.hackprevention;
+package com.battlegroundspvp.util.anticheat;
 /* Created by GamerBah on 9/20/2016 */
 
 

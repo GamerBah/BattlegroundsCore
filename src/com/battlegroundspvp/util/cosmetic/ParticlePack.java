@@ -1,9 +1,9 @@
-package com.battlegroundspvp.utils.cosmetics;
+package com.battlegroundspvp.util.cosmetic;
 /* Created by GamerBah on 10/25/2017 */
 
 import com.battlegroundspvp.BattlegroundsCore;
-import com.battlegroundspvp.utils.enums.Rarity;
-import com.battlegroundspvp.utils.inventories.ItemBuilder;
+import com.battlegroundspvp.util.enums.Rarity;
+import com.gamerbah.inventorytoolkit.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 

@@ -6,7 +6,7 @@ import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.gui.punishment.PunishmentMenus;
 import com.battlegroundspvp.util.enums.EventSound;
-import com.battlegroundspvp.util.gui.InventoryBuilder;
+import com.gamerbah.inventorytoolkit.InventoryBuilder;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;

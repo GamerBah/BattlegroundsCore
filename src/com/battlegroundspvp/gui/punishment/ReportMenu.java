@@ -5,9 +5,9 @@ import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.command.ReportCommand;
 import com.battlegroundspvp.util.enums.EventSound;
-import com.battlegroundspvp.util.gui.GameInventory;
-import com.battlegroundspvp.util.gui.ItemBuilder;
 import com.battlegroundspvp.util.message.MessageBuilder;
+import com.gamerbah.inventorytoolkit.GameInventory;
+import com.gamerbah.inventorytoolkit.ItemBuilder;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
@@ -35,7 +35,7 @@ public class ReportMenu extends GameInventory {
                 .lore(ChatColor.GRAY + "looking at you, select this.").lore(" ")
                 .lore(ChatColor.WHITE + "Difficulty to Detect: " + ChatColor.YELLOW + "■■ □ □");
 
-            //killAura.clickEvent(new ClickEvent(ClickEvent.ClickType.ANY, new Action(() -> CustomCall.addListItem(getSelected(), killAura))));
+        //killAura.onClick(new ClickEvent(ClickEvent.ClickType.ANY, new Action(() -> CustomCall.addListItem(getSelected(), killAura))));
 
         ItemBuilder regen = new ItemBuilder(Material.BOOK).name(ChatColor.RED + "Regen Hacks")
                 .lore(ChatColor.AQUA + "Click to add to your report!").lore(" ")
@@ -80,7 +80,7 @@ public class ReportMenu extends GameInventory {
         getInventory().setItem(32, new ItemBuilder(Material.WOOL)
                 .name(ChatColor.RED + "" + ChatColor.BOLD + "CANCEL REPORT")
                 .durability(14));
-                //.clickEvent(new ClickEvent(ClickEvent.ClickType.ANY, new Action(this.getClass(), "cancel", player))));
+        //.onClick(new ClickEvent(ClickEvent.ClickType.ANY, new Action(this.getClass(), "cancel", player))));
 
         ItemBuilder wool = new ItemBuilder(Material.WOOL)
                 .name(ChatColor.GREEN + "" + ChatColor.BOLD + "ACCEPT & SEND")
@@ -88,7 +88,7 @@ public class ReportMenu extends GameInventory {
                 .durability(5);
 
         if (message != null) {
-            //wool.lore(ChatColor.GRAY + "For: " + ChatColor.GOLD + message).clickEvent(new ClickEvent(ClickEvent.ClickType.ANY, new Action(player, this.getClass(), "report", player, targetProfile, getMessage())));
+            //wool.lore(ChatColor.GRAY + "For: " + ChatColor.GOLD + message).onClick(new ClickEvent(ClickEvent.ClickType.ANY, new Action(player, this.getClass(), "report", player, targetProfile, getMessage())));
         } else {
            // wool.lore(ChatColor.GRAY + "For: " + ChatColor.RED + "Nothing here yet! Click the books").lore(ChatColor.RED + "        to add reasons to your report!");
         }

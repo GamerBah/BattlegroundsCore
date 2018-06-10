@@ -1,4 +1,4 @@
-package com.battlegroundspvp.utils.messages;
+package com.battlegroundspvp.util.message;
 /* Created by GamerBah on 8/15/2016 */
 
 import com.battlegroundspvp.BattlegroundsCore;
@@ -17,8 +17,7 @@ public class ChatFilter implements Listener {
 
     public static boolean isClean(String message) {
         String[] words = message.toLowerCase().split(" ");
-        ArrayList<String> wordsArray = new ArrayList<>();
-        wordsArray.addAll(Arrays.asList(words));
+        ArrayList<String> wordsArray = new ArrayList<>(Arrays.asList(words));
         String joined = null;
         if (words.length == 2) joined = String.join("", words[0], words[1]);
         if (words.length == 3) joined = String.join("", words[0], words[1], words[2]);

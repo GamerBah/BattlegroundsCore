@@ -1,7 +1,7 @@
-package com.battlegroundspvp.utils.messages;
+package com.battlegroundspvp.util.message;
 // AUTHOR: gamer_000 (12/28/2015)
 
-import com.battlegroundspvp.utils.Launcher;
+import com.battlegroundspvp.util.Launcher;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
 import org.bukkit.entity.Player;

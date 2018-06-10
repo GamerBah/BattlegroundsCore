@@ -1,26 +1,25 @@
-package com.battlegroundspvp.utils.cosmetics;
+package com.battlegroundspvp.util.cosmetic;
 /* Created by GamerBah on 9/8/2016 */
 
-import com.battlegroundspvp.utils.cosmetics.defaultcosmetics.DefaultGore;
-import com.battlegroundspvp.utils.cosmetics.defaultcosmetics.DefaultParticlePack;
-import com.battlegroundspvp.utils.cosmetics.defaultcosmetics.DefaultWarcry;
-import com.battlegroundspvp.utils.enums.Rarity;
-import com.battlegroundspvp.utils.inventories.ItemBuilder;
+import com.battlegroundspvp.util.cosmetic.defaultcosmetics.DefaultGore;
+import com.battlegroundspvp.util.cosmetic.defaultcosmetics.DefaultParticlePack;
+import com.battlegroundspvp.util.cosmetic.defaultcosmetics.DefaultWarcry;
+import com.battlegroundspvp.util.enums.Rarity;
+import com.gamerbah.inventorytoolkit.ItemBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Material;
 
 public abstract class Cosmetic {
 
     @Getter
     private int id;
     @Getter
-    private String name = "";
+    private String name;
     @Getter
-    private ItemBuilder item = new ItemBuilder(Material.AIR);
+    private ItemBuilder item;
     @Getter
-    private Rarity rarity = Rarity.COMMON;
+    private Rarity rarity;
     @Getter
     private EffectType effectType;
     @Getter

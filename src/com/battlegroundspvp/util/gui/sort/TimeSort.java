@@ -1,7 +1,7 @@
-package com.battlegroundspvp.utils.inventories.sortingtypes;
+package com.battlegroundspvp.util.gui.sort;
 /* Created by GamerBah on 12/22/2017 */
 
-import com.battlegroundspvp.utils.inventories.ItemBuilder;
+import com.gamerbah.inventorytoolkit.ItemBuilder;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;

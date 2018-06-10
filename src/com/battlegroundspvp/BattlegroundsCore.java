@@ -8,7 +8,6 @@ import com.battlegroundspvp.administration.donation.Essence;
 import com.battlegroundspvp.command.*;
 import com.battlegroundspvp.event.*;
 import com.battlegroundspvp.listener.BlockListeners;
-import com.battlegroundspvp.listener.InventoryClickListener;
 import com.battlegroundspvp.listener.ServerListPingListener;
 import com.battlegroundspvp.listener.WeatherChangeListener;
 import com.battlegroundspvp.punishment.command.*;
@@ -28,7 +27,6 @@ import com.battlegroundspvp.util.cosmetic.CosmeticManager;
 import com.battlegroundspvp.util.enums.EventSound;
 import com.battlegroundspvp.util.enums.Rarity;
 import com.battlegroundspvp.util.enums.Time;
-import com.battlegroundspvp.util.gui.InventoryBuilder;
 import com.battlegroundspvp.util.message.MessageBuilder;
 import com.battlegroundspvp.util.nms.Hologram;
 import com.comphenix.protocol.PacketType;
@@ -267,7 +265,7 @@ public class BattlegroundsCore extends JavaPlugin {
                                     Player player = event.getPlayer();
                                     PacketContainer packetContainer = event.getPacket();
                                     String term = packetContainer.getStringArrays().read(0)[0];
-                                    InventoryBuilder.getInventoryUsers().get(player).search(term).open();
+                                    //InventoryBuilder.getInventoryUsers().get(player).search(term).open();
                                     EventSound.playSound(player, EventSound.INVENTORY_OPEN_MENU);
                                     Location loc = new Location(player.getWorld(), 0, 0, 0);
                                     Sign sign = (Sign) loc.getBlock().getState();
@@ -334,7 +332,6 @@ public class BattlegroundsCore extends JavaPlugin {
         pluginManager.registerEvents(new PlayerInteractEntity(), this);
 
         pluginManager.registerEvents(new ServerListPingListener(this), this);
-        pluginManager.registerEvents(new InventoryClickListener(), this);
         pluginManager.registerEvents(new WeatherChangeListener(), this);
         pluginManager.registerEvents(new BlockListeners(this), this);
         pluginManager.registerEvents(new CosmeticManager(this), this);

@@ -4,10 +4,10 @@ package com.battlegroundspvp.gui.cosmetic;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.util.enums.EventSound;
 import com.battlegroundspvp.util.enums.Rarity;
-import com.battlegroundspvp.util.gui.ClickEvent;
-import com.battlegroundspvp.util.gui.GameInventory;
-import com.battlegroundspvp.util.gui.InventoryBuilder;
 import com.battlegroundspvp.util.gui.InventoryItems;
+import com.gamerbah.inventorytoolkit.ClickEvent;
+import com.gamerbah.inventorytoolkit.GameInventory;
+import com.gamerbah.inventorytoolkit.InventoryBuilder;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -21,7 +21,7 @@ public class ForgeMenu extends GameInventory {
         addButton(14, InventoryItems.crateItem(player, Rarity.EPIC, true, null));
         addButton(16, InventoryItems.crateItem(player, Rarity.LEGENDARY, true, null));
 
-        addButton(27, InventoryItems.back.clone().clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
+        addButton(27, InventoryItems.back.clone().onClick(new ClickEvent(() -> {
             new InventoryBuilder(player, new CrateMenu(player, location)).open();
             EventSound.playSound(player, EventSound.INVENTORY_GO_BACK);
         })));

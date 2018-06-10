@@ -1,4 +1,4 @@
-package com.battlegroundspvp.utils.hackprevention;
+package com.battlegroundspvp.util.anticheat;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

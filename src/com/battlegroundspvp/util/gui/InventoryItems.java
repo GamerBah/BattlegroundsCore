@@ -1,17 +1,19 @@
-package com.battlegroundspvp.utils.inventories;
+package com.battlegroundspvp.util.gui;
 /* Created by GamerBah on 8/2/2017 */
 
 import com.battlegroundspvp.BattleModule;
 import com.battlegroundspvp.BattleModuleLoader;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
-import com.battlegroundspvp.administration.donations.CrateItem;
-import com.battlegroundspvp.punishments.Punishment;
-import com.battlegroundspvp.runnables.CrateRollRunnable;
-import com.battlegroundspvp.utils.enums.EventSound;
-import com.battlegroundspvp.utils.enums.Rarity;
-import com.battlegroundspvp.utils.enums.Time;
-import com.battlegroundspvp.utils.messages.ColorBuilder;
+import com.battlegroundspvp.administration.donation.CrateItem;
+import com.battlegroundspvp.punishment.Punishment;
+import com.battlegroundspvp.runnable.game.CrateRollRunnable;
+import com.battlegroundspvp.util.enums.EventSound;
+import com.battlegroundspvp.util.enums.Rarity;
+import com.battlegroundspvp.util.enums.Time;
+import com.battlegroundspvp.util.message.MessageBuilder;
+import com.gamerbah.inventorytoolkit.ClickEvent;
+import com.gamerbah.inventorytoolkit.ItemBuilder;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
@@ -56,7 +58,7 @@ public class InventoryItems {
                 .lore(ChatColor.GRAY + "Reason: " + ChatColor.GOLD + punishment.getReason().getName());
         if (punishment.getType() != Punishment.Type.KICK)
             item = new ItemBuilder(item).lore(ChatColor.GRAY + "Duration: " + ChatColor.YELLOW + Time.toString(punishment.getDuration(), false))
-                    .lore(ChatColor.GRAY + "Active: " + (!punishment.isPardoned() ? new ColorBuilder(ChatColor.GREEN).bold().create() + "Yes" : ChatColor.RED + "No"));
+                    .lore(ChatColor.GRAY + "Active: " + (!punishment.isPardoned() ? new MessageBuilder(ChatColor.GREEN).bold().create() + "Yes" : ChatColor.RED + "No"));
 
         item.lore("").lore(ChatColor.YELLOW + "Click for options!");
 
@@ -82,12 +84,12 @@ public class InventoryItems {
             crate.lore(ChatColor.GRAY + "Rewards " + Rarity.SEASONAL.getColor() + "SEASONAL" + ChatColor.GRAY + " cosmetics only!");
         if (buying) {
             crate.lore(" ").lore(ChatColor.GRAY + "Cost: " + (gameProfile.getCoins() >= rarity.getCrateCost() ? ChatColor.LIGHT_PURPLE + "" + rarity.getCrateCost() + " Battle Coins"
-                    : ChatColor.RED + "" + rarity.getCrateCost() + " Battle Coins")).lore(" ");
+                    : ChatColor.RED + "" + rarity.getCrateCost() + " Battle Coin" + (rarity.getCrateCost() != 1 ? "s" : ""))).lore(" ");
             if (gameProfile.getCoins() >= rarity.getCrateCost()) {
                 crate.lore(ChatColor.GRAY + "You'll have " + ChatColor.LIGHT_PURPLE + (gameProfile.getCoins() - rarity.getCrateCost())
                         + " Battle Coin" + (gameProfile.getCoins() - rarity.getCrateCost() != 1 ? "s" : "") + ChatColor.GRAY + " remaining")
-                        .lore(" ").lore(new ColorBuilder(ChatColor.YELLOW).bold().create() + "CLICK TO BUY!")
-                        .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
+                        .lore(" ").lore(new MessageBuilder(ChatColor.YELLOW).bold().create() + "CLICK TO BUY!")
+                        .onClick(new ClickEvent(() -> {
                             EventSound.playSound(player, EventSound.ACTION_SUCCESS);
                             player.closeInventory();
                             player.sendMessage(ChatColor.GRAY + "You bought a " + rarity.getCrateName() + ChatColor.GRAY + "!");
@@ -98,16 +100,16 @@ public class InventoryItems {
                         }));
             } else {
                 crate.lore(ChatColor.RED + "You need " + ChatColor.LIGHT_PURPLE + (rarity.getCrateCost() - gameProfile.getCoins()) + " Battle Coins" + ChatColor.RED + " to buy this!")
-                        .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> EventSound.playSound(player, EventSound.ACTION_FAIL)));
+                        .onClick(new ClickEvent(() -> EventSound.playSound(player, EventSound.ACTION_FAIL)));
             }
         } else {
-            crate.lore(" ").lore(new ColorBuilder(ChatColor.YELLOW).bold().create() + "CLICK TO OPEN!")
-                    .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
+            crate.lore(" ").lore(new MessageBuilder(ChatColor.YELLOW).bold().create() + "CLICK TO OPEN!")
+                    .onClick(new ClickEvent(() -> {
                         player.closeInventory();
                         if (CrateItem.isInUse(location)) {
                             EventSound.playSound(player, EventSound.ACTION_FAIL);
-                            player.sendMessage(new ColorBuilder(ChatColor.RED).bold().create() + "Sorry! "
-                                    + ChatColor.GRAY + "Someone is already opening a Battle Crate!");
+                            player.sendMessage(new MessageBuilder(ChatColor.RED).bold().create() + "Sorry! "
+                                    + ChatColor.GRAY + "Someone is already opening a Battle BattleCrate!");
                             return;
                         }
                         EventSound.playSound(player, EventSound.ACTION_SUCCESS);

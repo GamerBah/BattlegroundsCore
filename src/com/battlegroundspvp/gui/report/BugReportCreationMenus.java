@@ -3,10 +3,10 @@ package com.battlegroundspvp.gui.report;
 
 import com.battlegroundspvp.util.BugReport;
 import com.battlegroundspvp.util.enums.EventSound;
-import com.battlegroundspvp.util.gui.ClickEvent;
-import com.battlegroundspvp.util.gui.GameInventory;
-import com.battlegroundspvp.util.gui.InventoryBuilder;
-import com.battlegroundspvp.util.gui.ItemBuilder;
+import com.gamerbah.inventorytoolkit.ClickEvent;
+import com.gamerbah.inventorytoolkit.GameInventory;
+import com.gamerbah.inventorytoolkit.InventoryBuilder;
+import com.gamerbah.inventorytoolkit.ItemBuilder;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
@@ -23,7 +23,7 @@ public class BugReportCreationMenus {
             for (BugReport.Type type : BugReport.Type.values()) {
                 String[] lore = type.getDescription().split("><");
                 ItemBuilder itemBuilder = new ItemBuilder(Material.CHEST).name(type.name())
-                        .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
+                        .onClick(new ClickEvent(() -> {
                             new InventoryBuilder(player, new CreationMenu(player, type)).open();
                             EventSound.playSound(player, EventSound.INVENTORY_OPEN_SUBMENU);
                         }));

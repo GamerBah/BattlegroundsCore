@@ -4,7 +4,6 @@ package com.battlegroundspvp.event;
 import com.battlegroundspvp.BattleModule;
 import com.battlegroundspvp.BattleModuleLoader;
 import com.battlegroundspvp.command.ReportCommand;
-import com.battlegroundspvp.util.gui.InventoryBuilder;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -22,8 +21,8 @@ public class PlayerCloseInventory implements Listener {
         for (BattleModule module : BattleModuleLoader.modules.keySet())
             module.onPlayerCloseInventory(event);
 
-        if (InventoryBuilder.getInventoryUsers().keySet().contains(player))
-            InventoryBuilder.getInventoryUsers().remove(player);
+        //if (InventoryBuilder.getInventoryUsers().keySet().contains(player))
+        //    InventoryBuilder.getInventoryUsers().remove(player);
 
         if (inventory.getName().contains("Reporting:")) {
             ReportCommand.getReportBuilders().remove(player.getUniqueId());

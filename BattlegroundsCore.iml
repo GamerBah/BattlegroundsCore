@@ -80,5 +80,6 @@
     <orderEntry type="library" name="Maven: org.hibernate:hibernate-hikaricp:5.2.10.Final" level="project" />
     <orderEntry type="library" name="Maven: me.confuser:BarAPI:3.5" level="project" />
     <orderEntry type="library" name="craftbukkit-1.12.2" level="project" />
+    <orderEntry type="library" name="InventoryToolkit" level="project" />
   </component>
 </module>

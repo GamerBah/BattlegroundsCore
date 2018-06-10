@@ -5,8 +5,12 @@ import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.util.enums.EventSound;
 import com.battlegroundspvp.util.enums.Rarity;
-import com.battlegroundspvp.util.gui.*;
+import com.battlegroundspvp.util.gui.InventoryItems;
 import com.battlegroundspvp.util.message.MessageBuilder;
+import com.gamerbah.inventorytoolkit.ClickEvent;
+import com.gamerbah.inventorytoolkit.GameInventory;
+import com.gamerbah.inventorytoolkit.InventoryBuilder;
+import com.gamerbah.inventorytoolkit.ItemBuilder;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -48,7 +52,7 @@ public class CrateMenu extends GameInventory {
                     .lore(ChatColor.GRAY + "forge some by clicking the anvil!")
                     .lore("")
                     .lore(ChatColor.YELLOW + "Click to get a link to the store!")
-                    .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
+                    .onClick(new ClickEvent(() -> {
                         BaseComponent baseComponent = new TextComponent(ChatColor.YELLOW + "Click ");
                         BaseComponent button = new TextComponent(new MessageBuilder(ChatColor.RED).bold().create() + "HERE");
                         button.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GRAY + "store.battlegroundspvp.com").create()));
@@ -64,7 +68,7 @@ public class CrateMenu extends GameInventory {
                 .lore(ChatColor.GRAY + "a variety of Battle Crates!")
                 .lore("")
                 .lore(ChatColor.GRAY + "You have " + ChatColor.LIGHT_PURPLE + gameProfile.getCoins() + " Battle Coins")
-                .clickEvent(new ClickEvent(ClickEvent.Type.ANY, () -> {
+                .onClick(new ClickEvent(() -> {
                     new InventoryBuilder(player, new ForgeMenu(player, location)).open();
                     EventSound.playSound(player, EventSound.INVENTORY_OPEN_SUBMENU);
                 })));

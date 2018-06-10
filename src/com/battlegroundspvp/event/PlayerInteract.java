@@ -10,7 +10,7 @@ import com.battlegroundspvp.gui.cosmetic.CrateMenu;
 import com.battlegroundspvp.runnable.misc.UpdateRunnable;
 import com.battlegroundspvp.util.BattleCrate;
 import com.battlegroundspvp.util.enums.EventSound;
-import com.battlegroundspvp.util.gui.InventoryBuilder;
+import com.gamerbah.inventorytoolkit.InventoryBuilder;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;

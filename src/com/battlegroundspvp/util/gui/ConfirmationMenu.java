@@ -1,7 +1,10 @@
-package com.battlegroundspvp.utils.inventories;
+package com.battlegroundspvp.util.gui;
 /* Created by GamerBah on 11/9/2017 */
 
-import com.battlegroundspvp.utils.messages.ColorBuilder;
+import com.battlegroundspvp.util.message.MessageBuilder;
+import com.gamerbah.inventorytoolkit.ClickEvent;
+import com.gamerbah.inventorytoolkit.GameInventory;
+import com.gamerbah.inventorytoolkit.ItemBuilder;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 
@@ -11,13 +14,13 @@ public class ConfirmationMenu extends GameInventory {
         super("Confirmation", 27, previousInventory);
 
         addButton(12, new ItemBuilder(Material.CONCRETE).durability(5)
-                .name(new ColorBuilder(ChatColor.GREEN).bold().create() + "CONFIRM")
+                .name(new MessageBuilder(ChatColor.GREEN).bold().create() + "CONFIRM")
                 .lore(ChatColor.GRAY + "Confirms your previous action")
-                .clickEvent(new ClickEvent(ClickEvent.Type.ANY, confirmAction)));
+                .onClick(new ClickEvent(confirmAction)));
         addButton(14, new ItemBuilder(Material.CONCRETE).durability(14)
-                .name(new ColorBuilder(ChatColor.RED).bold().create() + "CANCEL")
+                .name(new MessageBuilder(ChatColor.RED).bold().create() + "CANCEL")
                 .lore(ChatColor.GRAY + "Cancels your previous action")
-                .clickEvent(new ClickEvent(ClickEvent.Type.ANY, cancelAction)));
+                .onClick(new ClickEvent(cancelAction)));
     }
 
 }

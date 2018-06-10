@@ -1,12 +1,12 @@
-package com.battlegroundspvp.utils.cosmetics;
+package com.battlegroundspvp.util.cosmetic;
 /* Created by GamerBah on 10/25/2017 */
 
 import com.battlegroundspvp.BattleModule;
 import com.battlegroundspvp.BattleModuleLoader;
 import com.battlegroundspvp.BattlegroundsCore;
-import com.battlegroundspvp.utils.cosmetics.defaultcosmetics.DefaultGore;
-import com.battlegroundspvp.utils.cosmetics.defaultcosmetics.DefaultParticlePack;
-import com.battlegroundspvp.utils.cosmetics.defaultcosmetics.DefaultWarcry;
+import com.battlegroundspvp.util.cosmetic.defaultcosmetics.DefaultGore;
+import com.battlegroundspvp.util.cosmetic.defaultcosmetics.DefaultParticlePack;
+import com.battlegroundspvp.util.cosmetic.defaultcosmetics.DefaultWarcry;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
