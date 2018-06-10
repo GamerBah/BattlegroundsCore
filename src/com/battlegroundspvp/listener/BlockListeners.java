@@ -4,6 +4,7 @@ package com.battlegroundspvp.listener;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.command.CrateCommand;
 import com.battlegroundspvp.util.BattleCrate;
+import com.battlegroundspvp.util.BattleCrateManager;
 import com.battlegroundspvp.util.enums.EventSound;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -34,7 +35,7 @@ public class BlockListeners implements Listener {
         if (CrateCommand.getRemoving().contains(player)) {
             if (block.getType().equals(Material.ENDER_CHEST)) {
                 BattleCrate removal = null;
-                for (BattleCrate battleCrate : BattlegroundsCore.getBattleCrates())
+                for (BattleCrate battleCrate : BattleCrateManager.getCrates())
                     if (battleCrate.getLocation().hashCode() == block.getLocation().hashCode()) removal = battleCrate;
                 if (removal == null) {
                     player.sendMessage(ChatColor.RED + "That wasn't a BattleCrate Location!"
@@ -44,7 +45,7 @@ public class BlockListeners implements Listener {
                     return;
                 }
                 removal.getHologram().getStands().forEach(ArmorStand::remove);
-                BattlegroundsCore.getBattleCrates().remove(removal);
+                BattleCrateManager.getCrates().remove(removal);
                 player.sendMessage(ChatColor.GREEN + "Successfully removed that BattleCrate Location!");
                 EventSound.playSound(player, EventSound.ACTION_SUCCESS);
                 CrateCommand.getRemoving().remove(player);
@@ -60,7 +61,7 @@ public class BlockListeners implements Listener {
                 return;
             }
             if (block.getType().equals(Material.ENDER_CHEST)) {
-                for (BattleCrate battleCrate : BattlegroundsCore.getBattleCrates())
+                for (BattleCrate battleCrate : BattleCrateManager.getCrates())
                     if (battleCrate.getLocation().hashCode() == block.getLocation().hashCode()) {
                         event.setCancelled(true);
                         player.sendMessage(ChatColor.RED + "That Enderchest is a Battle BattleCrate location!");
@@ -86,7 +87,7 @@ public class BlockListeners implements Listener {
                     return;
                 }
 
-                for (BattleCrate battleCrate : BattlegroundsCore.getBattleCrates()) {
+                for (BattleCrate battleCrate : BattleCrateManager.getCrates()) {
                     if (battleCrate.getLocation().hashCode() == block.getLocation().hashCode()) {
                         player.sendMessage(ChatColor.RED + "That's already a BattleCrate Location!"
                                 + ChatColor.GRAY + " Use" + ChatColor.RED + " /battleCrate remove " + ChatColor.GRAY + "to remove this location!");
@@ -97,14 +98,8 @@ public class BlockListeners implements Listener {
                 }
 
                 BattleCrate battleCrate = new BattleCrate(block.getLocation());
-                /*battleCrate.getHologram().addConditionalLine(ChatColor.RED + "$data$ Available!");
-                plugin.getServer().getOnlinePlayers().forEach(p -> {
-                    GameProfile gameProfile = BattlegroundsCore.getInstance().getGameProfile(p.getUniqueId());
-                    battleCrate.getHologram().displayConditionalLines(p);
-                    battleCrate.getHologram().updateConditionalLine(0, gameProfile.getCratesData().getTotal());
-                });*/
 
-                BattlegroundsCore.getBattleCrates().add(battleCrate);
+                BattleCrateManager.getCrates().add(battleCrate);
 
                 player.sendMessage(ChatColor.GREEN + "Added a BattleCrate Location " + ChatColor.GRAY + "with an ID of " + ChatColor.YELLOW + battleCrate.getId());
                 EventSound.playSound(player, EventSound.ACTION_SUCCESS);

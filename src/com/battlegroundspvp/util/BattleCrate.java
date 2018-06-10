@@ -7,6 +7,7 @@ import com.battlegroundspvp.util.message.MessageBuilder;
 import com.battlegroundspvp.util.nms.Hologram;
 import com.battlegroundspvp.util.nms.HologramData;
 import lombok.Getter;
+import lombok.Setter;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
@@ -26,13 +27,16 @@ public class BattleCrate implements HologramData {
     private Location itemInHandLocation, blockInHandLocation, toolInHandLocation;
     @Getter
     private ArmorStand itemStand, blockStand, toolStand;
+    @Getter
+    @Setter
+    private boolean inUse;
 
     public BattleCrate(final int id, final Location location) {
         this.id = id;
         this.location = location;
         this.hologram = new Hologram(location.clone().add(0.5, 0.25, 0.5), false,
-                new MessageBuilder(ChatColor.YELLOW).bold().create() + "RIGHT CLICK",
-                new MessageBuilder(ChatColor.LIGHT_PURPLE).bold().create() + "BATTLE CRATES").addNMS(this, 1);
+                ChatColor.YELLOW + "RIGHT CLICK", new MessageBuilder(ChatColor.LIGHT_PURPLE).bold().create() + "BATTLE CRATES")
+                .addNMS(this, 1);
 
         RelativeDirection itemDirection = new RelativeDirection(location);
         this.itemInHandLocation = itemDirection.towards(RelativeDirection.Rotation.FRONT, 0.28)
@@ -89,23 +93,18 @@ public class BattleCrate implements HologramData {
         toolStand.setArms(true);
         toolStand.setBasePlate(false);
         toolStand.setRightArmPose(new EulerAngle(Math.toRadians(295), 0, 0));
-        BattlegroundsCore.getEntities().add(toolStand);
+
+        if (!BattleCrateManager.addCrate(this)) {
+            itemStand.remove();
+            blockStand.remove();
+            toolStand.remove();
+            hologram.remove();
+            throw new IllegalArgumentException("unable to add a crate, as one with the same id already exists");
+        } else BattlegroundsCore.getEntities().add(toolStand);
     }
 
     public BattleCrate(final Location location) {
-        this((BattlegroundsCore.getBattleCrates().size() != 0 ? BattlegroundsCore.getBattleCrates().get(BattlegroundsCore.getBattleCrates().size() - 1).id + 1 : 0), location);
-    }
-
-    public static BattleCrate fromLocation(Location location) {
-        for (BattleCrate battleCrate : BattlegroundsCore.getBattleCrates())
-            if (battleCrate.getLocation().hashCode() == location.hashCode()) return battleCrate;
-        return null;
-    }
-
-    public static BattleCrate fromId(int id) {
-        for (BattleCrate battleCrate : BattlegroundsCore.getBattleCrates())
-            if (battleCrate.getId() == id) return battleCrate;
-        return null;
+        this((BattleCrateManager.getCrates().size() != 0 ? BattleCrateManager.getCrates().get(BattleCrateManager.getCrates().size() - 1).id + 1 : 0), location);
     }
 
     @Override

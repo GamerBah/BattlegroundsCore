@@ -40,7 +40,7 @@ public class Hologram {
             stand.setBasePlate(false);
             stand.setSmall(true);
             stand.setCustomName(line);
-            stand.setCustomNameVisible(!hidden);
+            stand.setCustomNameVisible(!hidden && !line.isEmpty());
             stand.setCollidable(false);
             stand.setGravity(false);
             stand.setAI(false);

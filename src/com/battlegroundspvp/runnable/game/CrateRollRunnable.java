@@ -5,8 +5,8 @@ import com.battlegroundspvp.BattleModule;
 import com.battlegroundspvp.BattleModuleLoader;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
-import com.battlegroundspvp.administration.donation.CrateItem;
 import com.battlegroundspvp.util.BattleCrate;
+import com.battlegroundspvp.util.BattleCrateManager;
 import com.battlegroundspvp.util.RelativeDirection;
 import com.battlegroundspvp.util.cosmetic.Cosmetic;
 import com.battlegroundspvp.util.cosmetic.CosmeticManager;
@@ -56,15 +56,13 @@ public class CrateRollRunnable implements Runnable {
                 possibleRewards.add(cosmetic);
 
         this.reward = possibleRewards.get(new Random().nextInt(possibleRewards.size() - 1));
-        BattlegroundsCore.getUsingCrates().put(location, player);
-        BattlegroundsCore.getCrateOpening().put(player, rarity);
-
-        new CrateItem().open(location);
-        this.battleCrate = BattleCrate.fromLocation(location);
+        this.battleCrate = BattleCrateManager.fromLocation(location);
         if (battleCrate != null && battleCrate.getHologram() != null) {
             this.rewardagram = new Hologram(battleCrate.getHologram().getStands().get(battleCrate.getHologram().getStands().size() - 1)
                     .getLocation().clone().add(0, 0.75, 0), true, reward.getFullDisplayName());
         }
+        BattleCrateManager.open(battleCrate);
+        battleCrate.setInUse(true);
     }
 
     public void run() {
@@ -245,9 +243,9 @@ public class CrateRollRunnable implements Runnable {
                         exception.printStackTrace();
                         return;
                     }
-                    if (BattlegroundsCore.getCrateOpening().keySet().contains(player))
-                        BattlegroundsCore.getCrateOpening().remove(player);
-                    BattlegroundsCore.getUsingCrates().remove(location);
+
+                    BattleCrateManager.getPlayersUsing().remove(player.getUniqueId());
+                    battleCrate.setInUse(false);
                     thread.interrupt();
                 }
         }

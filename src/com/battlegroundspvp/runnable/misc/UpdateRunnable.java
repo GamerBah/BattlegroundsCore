@@ -5,6 +5,7 @@ import com.battlegroundspvp.BattleModuleLoader;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.command.FreezeCommand;
 import com.battlegroundspvp.administration.data.GameProfile;
+import com.battlegroundspvp.util.BattleCrateManager;
 import com.battlegroundspvp.util.PluginUtil;
 import com.battlegroundspvp.util.enums.EventSound;
 import com.battlegroundspvp.util.message.MessageBuilder;
@@ -145,12 +146,11 @@ public class UpdateRunnable implements Runnable {
         updating = true;
         FreezeCommand.reloadFreeze = true;
         for (Player player : plugin.getServer().getOnlinePlayers()) {
-
-            for (Player players : BattlegroundsCore.getCrateOpening().keySet()) {
-                GameProfile gameProfile = BattlegroundsCore.getInstance().getGameProfile(players.getUniqueId());
-                gameProfile.getCratesData().addCrate(BattlegroundsCore.getCrateOpening().get(player), 1);
+            if (BattleCrateManager.isUsing(player)) {
+                GameProfile gameProfile = BattlegroundsCore.getInstance().getGameProfile(player.getUniqueId());
+                gameProfile.getCratesData().addCrate(BattleCrateManager.getPlayersUsing().get(player.getUniqueId()), 1);
                 player.sendMessage(" ");
-                player.sendMessage(ChatColor.GRAY + "The " + BattlegroundsCore.getCrateOpening().get(player).getName()
+                player.sendMessage(ChatColor.GRAY + "The " + BattleCrateManager.getPlayersUsing().get(player.getUniqueId()).getName()
                         + ChatColor.GRAY + " you were opening has been given back to you");
             }
 

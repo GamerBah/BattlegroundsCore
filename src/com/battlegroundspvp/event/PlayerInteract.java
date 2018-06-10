@@ -3,12 +3,11 @@ package com.battlegroundspvp.event;
 
 import com.battlegroundspvp.BattleModule;
 import com.battlegroundspvp.BattleModuleLoader;
-import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.command.FreezeCommand;
-import com.battlegroundspvp.administration.donation.CrateItem;
 import com.battlegroundspvp.gui.cosmetic.CrateMenu;
 import com.battlegroundspvp.runnable.misc.UpdateRunnable;
 import com.battlegroundspvp.util.BattleCrate;
+import com.battlegroundspvp.util.BattleCrateManager;
 import com.battlegroundspvp.util.enums.EventSound;
 import com.gamerbah.inventorytoolkit.InventoryBuilder;
 import net.md_5.bungee.api.ChatColor;
@@ -41,17 +40,17 @@ public class PlayerInteract implements Listener {
         if (event.getClickedBlock() != null) {
             if (event.getClickedBlock().getType() == Material.ENDER_CHEST) {
                 if (player.getGameMode() != GameMode.CREATIVE) {
-                    for (BattleCrate battleCrate : BattlegroundsCore.getBattleCrates()) {
+                    for (BattleCrate battleCrate : BattleCrateManager.getCrates()) {
                         if (battleCrate.getLocation().hashCode() == event.getClickedBlock().getLocation().hashCode()) {
                             event.setCancelled(true);
                             if (UpdateRunnable.updating) {
                                 return;
                             }
-                            if (!CrateItem.isOpening(player)) {
+                            if (!BattleCrateManager.isUsing(player)) {
                                 new InventoryBuilder(player, new CrateMenu(player, event.getClickedBlock().getLocation())).open();
                             } else {
                                 EventSound.playSound(player, EventSound.ACTION_FAIL);
-                                player.sendMessage(ChatColor.RED + "Wait for this battleCrate to finish opening!");
+                                player.sendMessage(ChatColor.RED + "Wait for this Battle Crate to finish opening!");
                                 return;
                             }
                         }

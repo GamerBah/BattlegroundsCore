@@ -22,10 +22,10 @@ import com.battlegroundspvp.runnable.timer.AFKRunnable;
 import com.battlegroundspvp.runnable.timer.DonationUpdater;
 import com.battlegroundspvp.runnable.timer.PunishmentRunnable;
 import com.battlegroundspvp.util.BattleCrate;
+import com.battlegroundspvp.util.BattleCrateManager;
 import com.battlegroundspvp.util.Launcher;
 import com.battlegroundspvp.util.cosmetic.CosmeticManager;
 import com.battlegroundspvp.util.enums.EventSound;
-import com.battlegroundspvp.util.enums.Rarity;
 import com.battlegroundspvp.util.enums.Time;
 import com.battlegroundspvp.util.message.MessageBuilder;
 import com.battlegroundspvp.util.nms.Hologram;
@@ -115,8 +115,6 @@ public class BattlegroundsCore extends JavaPlugin {
     @Getter
     private static List<Thread> activeThreads = new ArrayList<>();
     @Getter
-    private static List<BattleCrate> battleCrates = new ArrayList<>();
-    @Getter
     private static List<Launcher> launchers = new ArrayList<>();
 
     @Getter
@@ -139,10 +137,6 @@ public class BattlegroundsCore extends JavaPlugin {
     private List<String> safeWords = new ArrayList<>();
     @Getter
     private List<String> autoMessages = new ArrayList<>();
-    @Getter
-    private static HashMap<Location, Player> usingCrates = new HashMap<>();
-    @Getter
-    private static HashMap<Player, Rarity> crateOpening = new HashMap<>();
     @Getter
     private static ArrayList<Entity> entities = new ArrayList<>();
     @Getter
@@ -214,7 +208,7 @@ public class BattlegroundsCore extends JavaPlugin {
         });
 
         getConfig().set("battleCrates", "");
-        battleCrates.forEach(crate -> {
+        BattleCrateManager.getCrates().forEach(crate -> {
             crate.getHologram().getStands().forEach(ArmorStand::remove);
             getConfig().set("battleCrates." + crate.getId() + ".world", crate.getLocation().getWorld().getName());
             getConfig().set("battleCrates." + crate.getId() + ".x", crate.getLocation().getBlockX());
@@ -357,7 +351,7 @@ public class BattlegroundsCore extends JavaPlugin {
 
         if (getConfig().getConfigurationSection("battleCrates") != null)
             getConfig().getConfigurationSection("battleCrates").getKeys(false).forEach(id ->
-                    battleCrates.add(new BattleCrate(Integer.parseInt(id),
+                    BattleCrateManager.addCrate(new BattleCrate(Integer.parseInt(id),
                             new Location(getServer().getWorld(getConfig().getString("battleCrates." + id + ".world")),
                                     getConfig().getInt("battleCrates." + id + ".x"),
                                     getConfig().getInt("battleCrates." + id + ".y"),

@@ -5,9 +5,9 @@ import com.battlegroundspvp.BattleModule;
 import com.battlegroundspvp.BattleModuleLoader;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
-import com.battlegroundspvp.administration.donation.CrateItem;
 import com.battlegroundspvp.punishment.Punishment;
 import com.battlegroundspvp.runnable.game.CrateRollRunnable;
+import com.battlegroundspvp.util.BattleCrateManager;
 import com.battlegroundspvp.util.enums.EventSound;
 import com.battlegroundspvp.util.enums.Rarity;
 import com.battlegroundspvp.util.enums.Time;
@@ -106,10 +106,10 @@ public class InventoryItems {
             crate.lore(" ").lore(new MessageBuilder(ChatColor.YELLOW).bold().create() + "CLICK TO OPEN!")
                     .onClick(new ClickEvent(() -> {
                         player.closeInventory();
-                        if (CrateItem.isInUse(location)) {
+                        if (BattleCrateManager.fromLocation(location).isInUse()) {
                             EventSound.playSound(player, EventSound.ACTION_FAIL);
                             player.sendMessage(new MessageBuilder(ChatColor.RED).bold().create() + "Sorry! "
-                                    + ChatColor.GRAY + "Someone is already opening a Battle BattleCrate!");
+                                    + ChatColor.GRAY + "Someone is already opening a Battle Crate!");
                             return;
                         }
                         EventSound.playSound(player, EventSound.ACTION_SUCCESS);
