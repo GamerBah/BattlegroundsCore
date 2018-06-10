@@ -2,10 +2,11 @@ package com.battlegroundspvp;
 /* Created by GamerBah on 10/15/2017 */
 
 import com.battlegroundspvp.administration.data.Rank;
-import com.battlegroundspvp.utils.cosmetics.Cosmetic;
-import com.battlegroundspvp.utils.cosmetics.Gore;
-import com.battlegroundspvp.utils.cosmetics.ParticlePack;
-import com.battlegroundspvp.utils.cosmetics.Warcry;
+import com.battlegroundspvp.util.cosmetic.Cosmetic;
+import com.battlegroundspvp.util.cosmetic.Gore;
+import com.battlegroundspvp.util.cosmetic.ParticlePack;
+import com.battlegroundspvp.util.cosmetic.Warcry;
+import lombok.Getter;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -15,6 +16,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.weather.WeatherChangeEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,10 +33,19 @@ import java.util.UUID;
  * BattleModuleLoader.java, and will run the code for each module where it needs
  * to be run to avoid as many conflicts as possible.
  */
-public class BattleModule {
+public class BattleModule<T extends JavaPlugin> {
 
-    public String getName() {
-        return "";
+    @Getter
+    private final int hash;
+    @Getter
+    private final String name;
+    @Getter
+    private final T plugin;
+
+    public BattleModule(final String name, final T plugin) {
+        this.hash = name.hashCode();
+        this.name = name;
+        this.plugin = plugin;
     }
 
     public List<UUID> getInCombat() {

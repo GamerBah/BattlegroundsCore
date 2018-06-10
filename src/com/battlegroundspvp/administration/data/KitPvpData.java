@@ -10,10 +10,14 @@ import java.util.ArrayList;
 
 public class KitPvpData {
 
+
     @Getter
     private final KitPvpDataEntity entity;
     @Getter
     private final int id;
+    @Getter
+    private final GameProfile gameProfile;
+
     @Getter
     @Setter
     private int kills, deaths, souls, combatLevel, killstreaksEnded, revengeKills,
@@ -25,9 +29,10 @@ public class KitPvpData {
     @Setter
     private ArrayList<Integer> ownedKits, duplicateKits, quickSelectKits;
 
-    KitPvpData(KitPvpDataEntity entity) {
+    KitPvpData(KitPvpDataEntity entity, GameProfile gameProfile) {
         this.entity = entity;
         this.id = entity.getId();
+        this.gameProfile = gameProfile;
         this.kills = entity.getKills();
         this.deaths = entity.getDeaths();
         this.souls = entity.getSouls();
@@ -69,40 +74,65 @@ public class KitPvpData {
         this.quickSelectKits = quickSelectKits;
     }
 
-    public void addKill(int amount) {
+    public KitPvpData addKills(int amount) {
         setKills(getKills() + amount);
+        getGameProfile().getStatistics().updateKills(amount);
+        return this;
     }
 
-    public void addDeath(int amount) {
+    public KitPvpData addKill() {
+        addKills(1);
+        return this;
+    }
+
+    public KitPvpData addDeaths(int amount) {
         setDeaths(getDeaths() + amount);
+        getGameProfile().getStatistics().updateDeaths(amount);
+        return this;
     }
 
-    public void addSouls(int amount) {
+    public KitPvpData addDeath() {
+        addDeaths(1);
+        return this;
+    }
+
+    public KitPvpData addSouls(int amount) {
         setSouls(getSouls() + amount);
+        getGameProfile().getStatistics().updateSouls(amount);
+        return this;
     }
 
-    public void addCombatLog() {
+    public KitPvpData addCombatLog() {
         setCombatLogs(getCombatLogs() + 1);
+        return this;
     }
 
-    public void addOwnedKit(int kitId) {
+    public KitPvpData addOwnedKit(int kitId) {
         ownedKits.add(kitId);
+        return this;
     }
 
-    public void addDuplicateKit(int kitId) {
+    public KitPvpData addDuplicateKit(int kitId) {
         duplicateKits.add(kitId);
+        getGameProfile().getStatistics().setAlltimeDuplicateKits(getGameProfile().getStatistics().getAlltimeDuplicateKits() + 1);
+        return this;
     }
 
-    public void addKillstreakEnded() {
+    public KitPvpData addKillstreakEnded() {
         setKillstreaksEnded(getKillstreaksEnded() + 1);
+        getGameProfile().getStatistics().updateKillstreaksEnded(1);
+        return this;
     }
 
-    public void addRevengeKill() {
+    public KitPvpData addRevengeKill() {
         setRevengeKills(getRevengeKills() + 1);
+        getGameProfile().getStatistics().updateRevengeKills(1);
+        return this;
     }
 
-    public void addCombatRating() {
+    public KitPvpData addCombatRating() {
         setCombatLevel(getCombatLevel() + 1);
+        return this;
     }
 
     void fullSync() {

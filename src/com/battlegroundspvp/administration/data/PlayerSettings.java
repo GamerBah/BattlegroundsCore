@@ -2,7 +2,7 @@ package com.battlegroundspvp.administration.data;
 /* Created by GamerBah on 1/3/2017 */
 
 import com.battlegroundspvp.administration.data.sql.SettingsEntity;
-import com.battlegroundspvp.utils.enums.ParticleQuality;
+import com.battlegroundspvp.util.enums.ParticleQuality;
 import lombok.Getter;
 import lombok.Setter;
 

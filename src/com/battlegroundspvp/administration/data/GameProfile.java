@@ -2,15 +2,17 @@ package com.battlegroundspvp.administration.data;
 /* Created by GamerBah on 6/18/2016 */
 
 import com.battlegroundspvp.BattlegroundsCore;
-import com.battlegroundspvp.administration.commands.WarnCommand;
+import com.battlegroundspvp.administration.command.WarnCommand;
+import com.battlegroundspvp.administration.data.sql.GameProfileStatisticsEntity;
 import com.battlegroundspvp.administration.data.sql.GameProfilesEntity;
-import com.battlegroundspvp.administration.donations.Essence;
-import com.battlegroundspvp.punishments.Punishment;
-import com.battlegroundspvp.punishments.commands.BanCommand;
-import com.battlegroundspvp.punishments.commands.MuteCommand;
-import com.battlegroundspvp.utils.enums.EventSound;
-import com.battlegroundspvp.utils.enums.Time;
-import com.battlegroundspvp.utils.messages.FriendMessages;
+import com.battlegroundspvp.administration.donation.Essence;
+import com.battlegroundspvp.punishment.Punishment;
+import com.battlegroundspvp.punishment.command.BanCommand;
+import com.battlegroundspvp.punishment.command.MuteCommand;
+import com.battlegroundspvp.util.enums.EventSound;
+import com.battlegroundspvp.util.enums.Time;
+import com.battlegroundspvp.util.message.FriendMessages;
+import com.google.common.base.Splitter;
 import lombok.Getter;
 import lombok.Setter;
 import net.md_5.bungee.api.ChatColor;
@@ -21,73 +23,40 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 import org.hibernate.Session;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
+@Getter
+@Setter
 public class GameProfile {
 
-    @Getter
     private final GameProfilesEntity entity;
-    @Getter
     private final int id;
-    @Getter
     private final UUID uuid;
-    @Getter
-    @Setter
     private String name;
-    @Getter
-    @Setter
     private Rank rank;
-    @Getter
-    @Setter
     private boolean online;
-    @Getter
-    @Setter
     private int coins, playersRecruited;
-    @Getter
-    @Setter
     private int recruitedBy;
-    @Getter
-    @Setter
     private boolean dailyReward;
-    @Getter
-    @Setter
     private LocalDateTime dailyRewardLast, lastOnline;
-    @Getter
-    @Setter
     private ArrayList<Integer> friends;
-    @Getter
-    @Setter
     private ArrayList<Integer> friendRequests;
-    @Getter
-    @Setter
     private ArrayList<Integer> cosmetics;
-    @Getter
     private String token;
-    @Getter
-    @Setter
     private String password;
-    @Getter
-    @Setter
     private String email;
-    @Getter
     private final KitPvpData kitPvpData;
-    @Getter
     private final PlayerSettings playerSettings;
-    @Getter
     private final EssenceData essenceData;
-    @Getter
     private final CratesData cratesData;
-    @Getter
     private final PunishmentData punishmentData;
-    @Getter
     private final BugReportData bugReportData;
-
-    @Getter
-    @Setter
+    private final Statistics statistics;
     public HashMap<GameProfile, Integer> friendRequestCooldowns = new HashMap<>();
 
     public GameProfile(GameProfilesEntity entity) {
@@ -105,16 +74,17 @@ public class GameProfile {
         this.lastOnline = entity.getLastOnline();
         this.password = entity.getPassword();
         this.email = entity.getEmail();
-        this.kitPvpData = new KitPvpData(entity.getKitPvpData());
+        this.kitPvpData = new KitPvpData(entity.getKitPvpData(), this);
         this.playerSettings = new PlayerSettings(entity.getSettings());
         this.essenceData = new EssenceData(entity.getEssences());
         this.cratesData = new CratesData(entity.getCrates());
         this.punishmentData = new PunishmentData(entity.getPunishments(), entity);
         this.bugReportData = new BugReportData(entity.getBugReports(), entity);
+        this.statistics = new Statistics(entity.getGameProfileStatistics());
         {
             ArrayList<Integer> list = new ArrayList<>();
             if (entity.getFriends() != null) {
-                String friends = entity.getFriends().replace("[", "").replace("]", "").replace(" ", "");
+                String friends = entity.getFriends().replaceAll("[\\[\\] ]", "");
                 if (!friends.equals(""))
                     for (String id : friends.split(","))
                         list.add(Integer.parseInt(id));
@@ -124,7 +94,7 @@ public class GameProfile {
         {
             ArrayList<Integer> list = new ArrayList<>();
             if (entity.getFriendRequests() != null) {
-                String requests = entity.getFriendRequests().replace("[", "").replace("]", "").replace(" ", "");
+                String requests = entity.getFriendRequests().replaceAll("[\\[\\] ]", "");
                 if (!requests.equals(""))
                     for (String id : requests.split(","))
                         list.add(Integer.parseInt(id));
@@ -134,7 +104,7 @@ public class GameProfile {
         {
             ArrayList<Integer> list = new ArrayList<>();
             if (entity.getCosmetics() != null) {
-                String cosmetics = entity.getCosmetics().replace("[", "").replace("]", "").replace(" ", "");
+                String cosmetics = entity.getCosmetics().replaceAll("[\\[\\] ]", "");
                 if (!cosmetics.equals(""))
                     for (String id : cosmetics.split(","))
                         list.add(Integer.parseInt(id));
@@ -148,6 +118,7 @@ public class GameProfile {
 
     public GameProfile addCoins(int amount) {
         setCoins(getCoins() + amount);
+        statistics.updateCoins(amount);
         return this;
     }
 
@@ -515,6 +486,134 @@ public class GameProfile {
             session.getTransaction().commit();
             session.close();
         });
+    }
+
+    @Getter
+    @Setter
+    public class Statistics {
+
+        private final GameProfileStatisticsEntity entity;
+        private final int id;
+        private HashMap<LocalDate, Long> dailyKills;
+        private HashMap<LocalDate, Long> monthlyKills;
+        private HashMap<LocalDate, Long> yearlyKills;
+        private long alltimeKills;
+        private HashMap<LocalDate, Long> dailyDeaths;
+        private HashMap<LocalDate, Long> monthlyDeaths;
+        private HashMap<LocalDate, Long> yearlyDeaths;
+        private long alltimeDeaths;
+        private HashMap<LocalDate, Long> dailySouls;
+        private HashMap<LocalDate, Long> monthlySouls;
+        private HashMap<LocalDate, Long> yearlySouls;
+        private long alltimeSouls;
+        private HashMap<LocalDate, Long> dailyCoins;
+        private HashMap<LocalDate, Long> monthlyCoins;
+        private HashMap<LocalDate, Long> yearlyCoins;
+        private long alltimeCoins;
+        private HashMap<LocalDate, Long> dailyHours;
+        private HashMap<LocalDate, Long> monthlyHours;
+        private HashMap<LocalDate, Long> yearlyHours;
+        private long alltimeHours;
+        private HashMap<LocalDate, Long> dailyKillstreaksEnded;
+        private HashMap<LocalDate, Long> monthlyKillstreaksEnded;
+        private HashMap<LocalDate, Long> yearlyKillstreaksEnded;
+        private long alltimeKillstreaksEnded;
+        private HashMap<LocalDate, Long> dailyRevengeKills;
+        private HashMap<LocalDate, Long> monthlyRevengeKills;
+        private HashMap<LocalDate, Long> yearlyRevengeKills;
+        private long alltimeRevengeKills;
+        private long alltimeDuplicateKits;
+
+        public Statistics(GameProfileStatisticsEntity entity) {
+            this.entity = entity;
+            this.id = entity.getId();
+            this.dailyKills = toHashMap(entity.getDailyKills());
+            this.monthlyKills = toHashMap(entity.getMonthlyKills());
+            this.yearlyKills = toHashMap(entity.getYearlyKills());
+            this.alltimeKills = entity.getAlltimeKills();
+            this.dailyDeaths = toHashMap(entity.getDailyDeaths());
+            this.monthlyDeaths = toHashMap(entity.getMonthlyDeaths());
+            this.yearlyDeaths = toHashMap(entity.getYearlyDeaths());
+            this.alltimeDeaths = entity.getAlltimeDeaths();
+            this.dailySouls = toHashMap(entity.getDailySouls());
+            this.monthlySouls = toHashMap(entity.getMonthlySouls());
+            this.yearlySouls = toHashMap(entity.getYearlySouls());
+            this.alltimeSouls = entity.getAlltimeSouls();
+            this.dailyCoins = toHashMap(entity.getDailyCoins());
+            this.monthlyCoins = toHashMap(entity.getMonthlyCoins());
+            this.yearlyCoins = toHashMap(entity.getDailyCoins());
+            this.alltimeCoins = entity.getAlltimeCoins();
+            this.dailyHours = toHashMap(entity.getYearlyHours());
+            this.monthlyHours = toHashMap(entity.getMonthlyHours());
+            this.yearlyHours = toHashMap(entity.getYearlyHours());
+            this.alltimeHours = entity.getAlltimeHours();
+            this.dailyKillstreaksEnded = toHashMap(entity.getDailyKillstreaksEnded());
+            this.monthlyKillstreaksEnded = toHashMap(entity.getMonthlyKillstreaksEnded());
+            this.yearlyKillstreaksEnded = toHashMap(entity.getYearlyKillstreaksEnded());
+            this.alltimeKillstreaksEnded = entity.getAlltimeKillstreaksEnded();
+            this.dailyRevengeKills = toHashMap(entity.getDailyRevengeKills());
+            this.monthlyRevengeKills = toHashMap(entity.getMonthlyRevengeKills());
+            this.yearlyRevengeKills = toHashMap(entity.getYearlyRevengeKills());
+            this.alltimeRevengeKills = entity.getAlltimeRevengeKills();
+        }
+
+        protected void updateCoins(int amount) {
+            getDailyCoins().put(BattlegroundsCore.getDaySnapshot(), getDailyCoins().getOrDefault(BattlegroundsCore.getDaySnapshot(), 0L) + amount);
+            getMonthlyCoins().put(BattlegroundsCore.getMonthSnapshot(), getMonthlyCoins().getOrDefault(BattlegroundsCore.getMonthSnapshot(), 0L) + amount);
+            getYearlyCoins().put(BattlegroundsCore.getYearSnapshot(), getYearlyCoins().getOrDefault(BattlegroundsCore.getYearSnapshot(), 0L) + amount);
+            setAlltimeCoins(getAlltimeCoins() + amount);
+        }
+
+        protected void updateSouls(int amount) {
+            getDailySouls().put(BattlegroundsCore.getDaySnapshot(), getDailySouls().getOrDefault(BattlegroundsCore.getDaySnapshot(), 0L) + amount);
+            getMonthlySouls().put(BattlegroundsCore.getMonthSnapshot(), getMonthlySouls().getOrDefault(BattlegroundsCore.getMonthSnapshot(), 0L) + amount);
+            getYearlySouls().put(BattlegroundsCore.getYearSnapshot(), getYearlySouls().getOrDefault(BattlegroundsCore.getYearSnapshot(), 0L) + amount);
+            setAlltimeSouls(getAlltimeSouls() + amount);
+        }
+
+        protected void updateKills(int amount) {
+            getDailyKills().put(BattlegroundsCore.getDaySnapshot(), getDailyKills().getOrDefault(BattlegroundsCore.getDaySnapshot(), 0L) + amount);
+            getMonthlyKills().put(BattlegroundsCore.getMonthSnapshot(), getMonthlyKills().getOrDefault(BattlegroundsCore.getMonthSnapshot(), 0L) + amount);
+            getYearlyKills().put(BattlegroundsCore.getYearSnapshot(), getYearlyKills().getOrDefault(BattlegroundsCore.getYearSnapshot(), 0L) + amount);
+            setAlltimeKills(getAlltimeKills() + amount);
+        }
+
+        protected void updateDeaths(int amount) {
+            getDailyDeaths().put(BattlegroundsCore.getDaySnapshot(), getDailyDeaths().getOrDefault(BattlegroundsCore.getDaySnapshot(), 0L) + amount);
+            getMonthlyDeaths().put(BattlegroundsCore.getMonthSnapshot(), getMonthlyDeaths().getOrDefault(BattlegroundsCore.getMonthSnapshot(), 0L) + amount);
+            getYearlyDeaths().put(BattlegroundsCore.getYearSnapshot(), getYearlyDeaths().getOrDefault(BattlegroundsCore.getYearSnapshot(), 0L) + amount);
+            setAlltimeDeaths(getAlltimeDeaths() + amount);
+        }
+
+        protected void updateHours(int amount) {
+            getDailyHours().put(BattlegroundsCore.getDaySnapshot(), getDailyHours().getOrDefault(BattlegroundsCore.getDaySnapshot(), 0L) + amount);
+            getMonthlyHours().put(BattlegroundsCore.getMonthSnapshot(), getMonthlyHours().getOrDefault(BattlegroundsCore.getMonthSnapshot(), 0L) + amount);
+            getYearlyHours().put(BattlegroundsCore.getYearSnapshot(), getYearlyHours().getOrDefault(BattlegroundsCore.getYearSnapshot(), 0L) + amount);
+            setAlltimeHours(getAlltimeHours() + amount);
+        }
+
+        protected void updateKillstreaksEnded(int amount) {
+            getDailyKillstreaksEnded().put(BattlegroundsCore.getDaySnapshot(), getDailyKillstreaksEnded().getOrDefault(BattlegroundsCore.getDaySnapshot(), 0L) + amount);
+            getMonthlyKillstreaksEnded().put(BattlegroundsCore.getMonthSnapshot(), getMonthlyKillstreaksEnded().getOrDefault(BattlegroundsCore.getMonthSnapshot(), 0L) + amount);
+            getYearlyKillstreaksEnded().put(BattlegroundsCore.getYearSnapshot(), getYearlyKillstreaksEnded().getOrDefault(BattlegroundsCore.getYearSnapshot(), 0L) + amount);
+            setAlltimeKillstreaksEnded(getAlltimeKillstreaksEnded() + amount);
+        }
+
+        protected void updateRevengeKills(int amount) {
+            getDailyRevengeKills().put(BattlegroundsCore.getDaySnapshot(), getDailyRevengeKills().getOrDefault(BattlegroundsCore.getDaySnapshot(), 0L) + amount);
+            getMonthlyRevengeKills().put(BattlegroundsCore.getMonthSnapshot(), getMonthlyRevengeKills().getOrDefault(BattlegroundsCore.getMonthSnapshot(), 0L) + amount);
+            getYearlyRevengeKills().put(BattlegroundsCore.getYearSnapshot(), getYearlyRevengeKills().getOrDefault(BattlegroundsCore.getYearSnapshot(), 0L) + amount);
+            setAlltimeRevengeKills(getAlltimeRevengeKills() + amount);
+        }
+
+        private HashMap<LocalDate, Long> toHashMap(final String string) {
+            HashMap<LocalDate, Long> map = new HashMap<>();
+            if (string.equalsIgnoreCase("[]") || string.isEmpty())
+                return map;
+            String kv = string.replaceAll("[\\[\\]{} ]", "");
+            Splitter.on(',').withKeyValueSeparator('=').split(kv).forEach((k, v) -> map.put(LocalDate.parse(k), Long.valueOf(v)));
+            return map;
+        }
     }
 
 }

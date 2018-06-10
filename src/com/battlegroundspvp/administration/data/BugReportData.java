@@ -3,7 +3,7 @@ package com.battlegroundspvp.administration.data;
 
 import com.battlegroundspvp.administration.data.sql.BugReportsEntity;
 import com.battlegroundspvp.administration.data.sql.GameProfilesEntity;
-import com.battlegroundspvp.utils.BugReport;
+import com.battlegroundspvp.util.BugReport;
 import lombok.Getter;
 import org.hibernate.Session;
 

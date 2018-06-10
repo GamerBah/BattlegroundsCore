@@ -3,7 +3,7 @@ package com.battlegroundspvp.administration.data;
 
 import com.battlegroundspvp.administration.data.sql.CratesEntity;
 import com.battlegroundspvp.administration.data.sql.GameProfilesEntity;
-import com.battlegroundspvp.utils.enums.Rarity;
+import com.battlegroundspvp.util.enums.Rarity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

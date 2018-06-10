@@ -2,7 +2,7 @@ package com.battlegroundspvp.administration.data;
 /* Created by GamerBah on 8/22/2016 */
 
 import com.battlegroundspvp.administration.data.sql.EssencesEntity;
-import com.battlegroundspvp.administration.donations.Essence;
+import com.battlegroundspvp.administration.donation.Essence;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
