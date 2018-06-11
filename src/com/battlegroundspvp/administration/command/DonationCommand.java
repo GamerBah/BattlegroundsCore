@@ -3,9 +3,9 @@ package com.battlegroundspvp.administration.command;
 
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
-import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.administration.donation.DonationMessages;
 import com.battlegroundspvp.administration.donation.Essence;
+import com.battlegroundspvp.util.enums.Rank;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

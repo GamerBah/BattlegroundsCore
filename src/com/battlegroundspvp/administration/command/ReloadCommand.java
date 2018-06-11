@@ -4,10 +4,10 @@ package com.battlegroundspvp.administration.command;
 
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
-import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.runnable.misc.UpdateRunnable;
 import com.battlegroundspvp.util.PluginUtil;
 import com.battlegroundspvp.util.enums.EventSound;
+import com.battlegroundspvp.util.enums.Rank;
 import com.battlegroundspvp.util.message.MessageBuilder;
 import de.Herbystar.TTA.TTA_Methods;
 import net.md_5.bungee.api.ChatColor;

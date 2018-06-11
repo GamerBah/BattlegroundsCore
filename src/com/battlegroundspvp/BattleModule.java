@@ -1,11 +1,11 @@
 package com.battlegroundspvp;
 /* Created by GamerBah on 10/15/2017 */
 
-import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.util.cosmetic.Cosmetic;
 import com.battlegroundspvp.util.cosmetic.Gore;
 import com.battlegroundspvp.util.cosmetic.ParticlePack;
 import com.battlegroundspvp.util.cosmetic.Warcry;
+import com.battlegroundspvp.util.enums.Rank;
 import lombok.Getter;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.entity.Player;

@@ -5,6 +5,7 @@ import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.sql.GameProfilesEntity;
 import com.battlegroundspvp.administration.data.sql.PunishmentsEntity;
 import com.battlegroundspvp.punishment.Punishment;
+import com.battlegroundspvp.util.enums.Rank;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;

@@ -36,6 +36,7 @@
         <mapping class="com.battlegroundspvp.administration.data.sql.BugReportsEntity"/>
         <mapping class="com.battlegroundspvp.administration.data.sql.ServerDataEntity"/>
         <mapping class="com.battlegroundspvp.administration.data.sql.GameProfileStatisticsEntity"/>
+        <mapping class="com.battlegroundspvp.administration.data.sql.UpdateHistoryEntity"/>
 
         <!-- DB schema will be updated if needed -->
         <!-- <property name="hbm2ddl.auto">update</property> -->

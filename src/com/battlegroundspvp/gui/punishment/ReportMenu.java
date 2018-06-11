@@ -2,9 +2,9 @@ package com.battlegroundspvp.gui.punishment;
 
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
-import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.command.ReportCommand;
 import com.battlegroundspvp.util.enums.EventSound;
+import com.battlegroundspvp.util.enums.Rank;
 import com.battlegroundspvp.util.message.MessageBuilder;
 import com.gamerbah.inventorytoolkit.GameInventory;
 import com.gamerbah.inventorytoolkit.ItemBuilder;

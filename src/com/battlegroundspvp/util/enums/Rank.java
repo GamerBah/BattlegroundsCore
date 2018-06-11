@@ -1,10 +1,12 @@
-package com.battlegroundspvp.administration.data;
+package com.battlegroundspvp.util.enums;
 /* Created by GamerBah on 8/7/2016 */
 
 import com.battlegroundspvp.util.message.MessageBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
+
+import java.util.Arrays;
 
 @Getter
 @AllArgsConstructor
@@ -26,20 +28,17 @@ public enum Rank {
     private final int level;
 
     public static Rank fromString(final String name) {
-        Rank r = null;
-        for (Rank rank : Rank.values())
-            if (name.trim().toUpperCase().equals(rank.toString()))
-                r = rank;
-        if (r == null)
-            throw new IllegalArgumentException("Name doesn't match a Rank");
-        return r;
+        return Arrays.stream(Rank.values())
+                .filter(rank -> name.trim().equalsIgnoreCase(rank.toString()))
+                .findFirst()
+                .orElse(DEFAULT);
     }
 
-    public static Rank ofId(final int id) {
-        for (Rank rank : Rank.values())
-            if (rank.id == id)
-                return rank;
-        return DEFAULT;
+    public static Rank fromId(final int id) {
+        return Arrays.stream(Rank.values())
+                .filter(rank -> id == rank.getId())
+                .findFirst()
+                .orElse(DEFAULT);
     }
 
 }

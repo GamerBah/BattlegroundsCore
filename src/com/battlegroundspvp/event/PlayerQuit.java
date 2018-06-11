@@ -3,9 +3,9 @@ package com.battlegroundspvp.event;
 
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
-import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.command.ReportCommand;
 import com.battlegroundspvp.runnable.timer.DonationUpdater;
+import com.battlegroundspvp.util.enums.Rank;
 import com.battlegroundspvp.util.message.MessageBuilder;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;

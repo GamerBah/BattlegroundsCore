@@ -3,10 +3,10 @@ package com.battlegroundspvp.punishment.command;
 
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
-import com.battlegroundspvp.administration.data.Rank;
 import com.battlegroundspvp.gui.punishment.PunishmentMenus;
 import com.battlegroundspvp.punishment.Punishment;
 import com.battlegroundspvp.util.enums.EventSound;
+import com.battlegroundspvp.util.enums.Rank;
 import com.battlegroundspvp.util.enums.Time;
 import com.gamerbah.inventorytoolkit.InventoryBuilder;
 import net.md_5.bungee.api.ChatColor;

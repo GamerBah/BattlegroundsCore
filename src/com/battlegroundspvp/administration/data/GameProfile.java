@@ -10,6 +10,7 @@ import com.battlegroundspvp.punishment.Punishment;
 import com.battlegroundspvp.punishment.command.BanCommand;
 import com.battlegroundspvp.punishment.command.MuteCommand;
 import com.battlegroundspvp.util.enums.EventSound;
+import com.battlegroundspvp.util.enums.Rank;
 import com.battlegroundspvp.util.enums.Time;
 import com.battlegroundspvp.util.message.FriendMessages;
 import com.google.common.base.Splitter;
@@ -64,7 +65,7 @@ public class GameProfile {
         this.id = entity.getId();
         this.uuid = UUID.fromString(entity.getUuid());
         this.name = entity.getName();
-        this.rank = Rank.ofId(entity.getRank());
+        this.rank = Rank.fromId(entity.getRank());
         this.online = entity.isOnline();
         this.coins = entity.getCoins();
         this.playersRecruited = entity.getPlayersRecruited();

@@ -1,7 +1,7 @@
 package com.battlegroundspvp.util.gui.sort;
 /* Created by GamerBah on 12/22/2017 */
 
-import com.battlegroundspvp.administration.data.Rank;
+import com.battlegroundspvp.util.enums.Rank;
 import com.gamerbah.inventorytoolkit.ItemBuilder;
 
 import java.util.Comparator;
