@@ -5,9 +5,9 @@ import com.battlegroundspvp.BattleModule;
 import com.battlegroundspvp.BattleModuleLoader;
 import com.battlegroundspvp.administration.command.FreezeCommand;
 import com.battlegroundspvp.gui.cosmetic.CrateMenu;
-import com.battlegroundspvp.runnable.misc.UpdateRunnable;
 import com.battlegroundspvp.util.BattleCrate;
 import com.battlegroundspvp.util.BattleCrateManager;
+import com.battlegroundspvp.util.UpdateManager;
 import com.battlegroundspvp.util.enums.EventSound;
 import com.gamerbah.inventorytoolkit.InventoryBuilder;
 import net.md_5.bungee.api.ChatColor;
@@ -43,7 +43,7 @@ public class PlayerInteract implements Listener {
                     for (BattleCrate battleCrate : BattleCrateManager.getCrates()) {
                         if (battleCrate.getLocation().hashCode() == event.getClickedBlock().getLocation().hashCode()) {
                             event.setCancelled(true);
-                            if (UpdateRunnable.updating) {
+                            if (UpdateManager.isUpdating()) {
                                 return;
                             }
                             if (!BattleCrateManager.isUsing(player)) {
@@ -68,7 +68,7 @@ public class PlayerInteract implements Listener {
             module.onPlayerInteractItem(event);
 
         if (item != null) {
-            if (UpdateRunnable.updating) {
+            if (UpdateManager.isUpdating()) {
                 event.setCancelled(true);
             }
         }

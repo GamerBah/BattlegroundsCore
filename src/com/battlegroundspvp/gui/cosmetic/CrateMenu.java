@@ -30,6 +30,8 @@ public class CrateMenu extends GameInventory {
 
     public CrateMenu(Player player, Location location) {
         super("Battle Crates", BattlegroundsCore.getInstance().getGameProfile(player.getUniqueId()).getCratesData().getTotal(), 54, null);
+        setBackButton(false);
+
         this.gameProfile = BattlegroundsCore.getInstance().getGameProfile(player.getUniqueId());
         this.location = location;
 

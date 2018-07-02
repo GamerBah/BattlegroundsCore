@@ -3,6 +3,7 @@ package com.battlegroundspvp.runnable.misc;
 
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.sql.ServerDataEntity;
+import com.battlegroundspvp.util.SessionManager;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -27,7 +28,7 @@ public class PanelRunnables implements Runnable {
             int status = 0;
 
             try {
-                Session session = BattlegroundsCore.getSessionFactory().openSession();
+                Session session = SessionManager.openSession();
                 Transaction transaction;
                 try {
                     transaction = session.beginTransaction();
@@ -44,7 +45,7 @@ public class PanelRunnables implements Runnable {
                     break;
                 }
                 if (Thread.currentThread().isInterrupted()) {
-                    session.close();
+                    SessionManager.closeSession(session);
                     transaction = session.beginTransaction();
                     ServerDataEntity serverData = session.get(ServerDataEntity.class, 1);
                     serverData.setRamUsed(0);
@@ -60,7 +61,7 @@ public class PanelRunnables implements Runnable {
                 } catch (InterruptedException e) {
                     break;
                 } finally {
-                    session.close();
+                    SessionManager.closeSession(session);
                 }
             } catch (IllegalStateException e) {
                 break;

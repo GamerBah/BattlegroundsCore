@@ -2,7 +2,7 @@ package com.battlegroundspvp.listener;
 /* Created by GamerBah on 8/16/2016 */
 
 import com.battlegroundspvp.BattlegroundsCore;
-import com.battlegroundspvp.runnable.misc.UpdateRunnable;
+import com.battlegroundspvp.util.UpdateManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -18,7 +18,7 @@ public class ServerListPingListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onServerPing(ServerListPingEvent event) {
-        if (UpdateRunnable.updating) {
+        if (UpdateManager.isUpdating()) {
             event.setMotd("           §7\u00AB  §f\u00AB  §7\u00AB   §6§lBATTLEGROUNDS   §7\u00BB  §f\u00BB  §7\u00BB\n" +
                     "               §f§lUPDATING... HANG IN THERE!");
         } else if (plugin.getConfig().getBoolean("developmentMode")) {

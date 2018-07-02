@@ -3,7 +3,7 @@ package com.battlegroundspvp.runnable.timer;
 
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.donation.Essence;
-import com.battlegroundspvp.runnable.misc.UpdateRunnable;
+import com.battlegroundspvp.util.UpdateManager;
 import com.battlegroundspvp.util.enums.Time;
 import com.battlegroundspvp.util.message.MessageBuilder;
 import net.md_5.bungee.api.ChatColor;
@@ -31,7 +31,7 @@ public class DonationUpdater implements Runnable {
         int timeRemaining = plugin.getConfig().getInt("essence.timeRemaining");
         if (timeRemaining > 0) {
             if (!plugin.getConfig().getBoolean("developmentMode")) {
-                if (!UpdateRunnable.updating) {
+                if (!UpdateManager.isUpdating()) {
                     plugin.getConfig().set("essence.timeRemaining", timeRemaining - 1);
                     plugin.saveConfig();
                 }

@@ -9,6 +9,7 @@ import com.battlegroundspvp.administration.donation.Essence;
 import com.battlegroundspvp.punishment.Punishment;
 import com.battlegroundspvp.punishment.command.BanCommand;
 import com.battlegroundspvp.punishment.command.MuteCommand;
+import com.battlegroundspvp.util.SessionManager;
 import com.battlegroundspvp.util.enums.EventSound;
 import com.battlegroundspvp.util.enums.Rank;
 import com.battlegroundspvp.util.enums.Time;
@@ -430,8 +431,8 @@ public class GameProfile {
     }
 
     public void fullSync() {
-        BattlegroundsCore.executorService.execute(() -> {
-            Session session = BattlegroundsCore.getSessionFactory().openSession();
+        SessionManager.getService().execute(() -> {
+            Session session = SessionManager.openSession();
             session.beginTransaction();
             entity.setName(this.name);
             entity.setRank(this.rank.getId());
@@ -461,13 +462,13 @@ public class GameProfile {
             entity.setBugReports(this.bugReportData.getEntities());
             session.merge(entity);
             session.getTransaction().commit();
-            session.close();
+            SessionManager.closeSession(session);
         });
     }
 
     public void partialSync() {
-        BattlegroundsCore.executorService.execute(() -> {
-            Session session = BattlegroundsCore.getSessionFactory().openSession();
+        SessionManager.getService().execute(() -> {
+            Session session = SessionManager.openSession();
             session.beginTransaction();
             entity.setRank(this.rank.getId());
             entity.setOnline(this.online);
@@ -485,7 +486,7 @@ public class GameProfile {
             entity.setSettings(this.playerSettings.getEntity());
             session.merge(entity);
             session.getTransaction().commit();
-            session.close();
+            SessionManager.closeSession(session);
         });
     }
 

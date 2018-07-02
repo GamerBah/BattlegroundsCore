@@ -1,6 +1,7 @@
 package com.battlegroundspvp;
 /* Created by GamerBah on 10/16/2017 */
 
+import lombok.Getter;
 import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
 
@@ -11,6 +12,7 @@ public class BattleModuleLoader {
 
     private BattlegroundsCore plugin = BattlegroundsCore.getInstance();
 
+    @Getter
     public static HashMap<BattleModule, Plugin> modules = new HashMap<>();
 
     BattleModuleLoader() {

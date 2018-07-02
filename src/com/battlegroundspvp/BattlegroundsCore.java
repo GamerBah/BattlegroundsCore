@@ -24,6 +24,7 @@ import com.battlegroundspvp.runnable.timer.PunishmentRunnable;
 import com.battlegroundspvp.util.BattleCrate;
 import com.battlegroundspvp.util.BattleCrateManager;
 import com.battlegroundspvp.util.Launcher;
+import com.battlegroundspvp.util.SessionManager;
 import com.battlegroundspvp.util.cosmetic.CosmeticManager;
 import com.battlegroundspvp.util.enums.EventSound;
 import com.battlegroundspvp.util.enums.Time;
@@ -64,11 +65,7 @@ import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
 import java.io.File;
 import java.io.IOException;
@@ -80,25 +77,17 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class BattlegroundsCore extends JavaPlugin {
 
     @Getter
     private static BattlegroundsCore instance = null;
-    @Getter
-    private static BattleModuleLoader moduleLoader = null;
 
-    @Getter
-    private static SessionFactory sessionFactory = null;
     @Getter
     private static ProtocolManager protocolManager = null;
     @Getter
     private static EffectManager effectManager = null;
-    @Getter
-    public static ExecutorService executorService = null;
 
     @Getter
     @Setter
@@ -146,14 +135,8 @@ public class BattlegroundsCore extends JavaPlugin {
         instance = this;
         protocolManager = ProtocolLibrary.getProtocolManager();
         effectManager = new EffectManager(this);
-        executorService = Executors.newCachedThreadPool();
 
-        try {
-            setupSessionFactory();
-        } catch (Exception e) {
-            e.printStackTrace();
-            this.getServer().shutdown();
-        }
+        new SessionManager(this);
 
         reloadGameProfiles();
         reloadSnapshots();
@@ -162,8 +145,7 @@ public class BattlegroundsCore extends JavaPlugin {
             TTA_Methods.sendTitle(p, null, 0, 0, 0, null, 0, 0, 0);
         });
 
-        moduleLoader = new BattleModuleLoader();
-        moduleLoader.enableModules();
+        new BattleModuleLoader().enableModules();
 
         setUpPacketHandlers();
         registerCommands();
@@ -182,7 +164,7 @@ public class BattlegroundsCore extends JavaPlugin {
     }
 
     public void onDisable() {
-        Session session = BattlegroundsCore.getSessionFactory().openSession();
+        Session session = SessionManager.openSession();
         Transaction transaction;
         try {
             transaction = session.beginTransaction();
@@ -193,6 +175,7 @@ public class BattlegroundsCore extends JavaPlugin {
             session.update(serverData);
             transaction.commit();
         } catch (HibernateException e) {
+            getLogger().warning(e.getLocalizedMessage());
         }
 
         getConfig().set("launchers", "");
@@ -217,33 +200,12 @@ public class BattlegroundsCore extends JavaPlugin {
         });
         saveConfig();
 
-
-        if (!sessionFactory.isClosed())
-            sessionFactory.close();
-        if (!executorService.isShutdown())
-            executorService.shutdown();
-
         effectManager.dispose();
         activeThreads.forEach(Thread::interrupt);
         entities.forEach(Entity::remove);
         if (DonationUpdater.essenceBar != null) {
             DonationUpdater.essenceBar.removeAll();
             DonationUpdater.essenceBar.setVisible(false);
-        }
-    }
-
-    private void setupSessionFactory() {
-        // sessionFactory SessionFactory is set up once for an application!
-        final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
-                .configure() // configures settings from hibernate.cfg.xml
-                .build();
-        try {
-            sessionFactory = new MetadataSources(registry).buildMetadata().buildSessionFactory();
-        } catch (Exception e) {
-            e.printStackTrace();
-            // The registry would be destroyed by the SessionFactory, but we had trouble building the SessionFactory
-            // so destroy it manually.
-            StandardServiceRegistryBuilder.destroy(registry);
         }
     }
 
@@ -380,7 +342,7 @@ public class BattlegroundsCore extends JavaPlugin {
     }
 
     private void startTaskTimers() {
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, new UpdateRunnable(this), 120, 120);
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, new UpdateRunnable(), 120, 120);
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new DonationUpdater(this), 0, 20);
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new TrailRunnable(this), 0, 2);
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new AFKRunnable(this), 0, 20);
@@ -395,7 +357,7 @@ public class BattlegroundsCore extends JavaPlugin {
     }
 
     public GameProfile getGameProfile(UUID uuid) {
-        Future<GameProfile> future = executorService.submit(() -> {
+        Future<GameProfile> future = SessionManager.getService().submit(() -> {
             Optional<GameProfile> gameProfileStream = gameProfiles.stream().filter(gameProfile ->
                     gameProfile.getUuid().equals(uuid)).findFirst();
 
@@ -403,14 +365,14 @@ public class BattlegroundsCore extends JavaPlugin {
                 return gameProfileStream.get();
             } else {
                 GameProfilesEntity dbGameProfile = null;
-                Session session = sessionFactory.openSession();
+                Session session = SessionManager.openSession();
                 session.beginTransaction();
                 if (!session.createQuery("from GameProfilesEntity where uuid = :uuid", GameProfilesEntity.class)
                         .setParameter("uuid", uuid.toString()).getResultList().isEmpty())
                     dbGameProfile = session.createQuery("from GameProfilesEntity where uuid = :uuid", GameProfilesEntity.class)
                             .setParameter("uuid", uuid.toString()).getSingleResult();
                 session.getTransaction().commit();
-                session.close();
+                SessionManager.closeSession(session);
                 if (dbGameProfile != null) {
                     gameProfiles.add(new GameProfile(dbGameProfile));
                     return getGameProfile(uuid);
@@ -429,7 +391,7 @@ public class BattlegroundsCore extends JavaPlugin {
     }
 
     public GameProfile getGameProfile(String name) {
-        Future<GameProfile> future = executorService.submit(() -> {
+        Future<GameProfile> future = SessionManager.getService().submit(() -> {
             Optional<GameProfile> playerDataStream = gameProfiles.stream().filter(gameProfile ->
                     gameProfile.getName().equalsIgnoreCase(name)).findFirst();
 
@@ -437,14 +399,14 @@ public class BattlegroundsCore extends JavaPlugin {
                 return playerDataStream.get();
             } else {
                 GameProfilesEntity dbGameProfile = null;
-                Session session = sessionFactory.openSession();
+                Session session = SessionManager.openSession();
                 session.beginTransaction();
                 if (!session.createQuery("from GameProfilesEntity where name = :name", GameProfilesEntity.class)
                         .setParameter("name", name).getResultList().isEmpty())
                     dbGameProfile = session.createQuery("from GameProfilesEntity where name = :name", GameProfilesEntity.class)
                             .setParameter("name", name).getSingleResult();
                 session.getTransaction().commit();
-                session.close();
+                SessionManager.closeSession(session);
                 if (dbGameProfile != null) {
                     gameProfiles.add(new GameProfile(dbGameProfile));
                     return getGameProfile(name);
@@ -462,7 +424,7 @@ public class BattlegroundsCore extends JavaPlugin {
     }
 
     public GameProfile getGameProfile(int id) {
-        Future<GameProfile> future = executorService.submit(() -> {
+        Future<GameProfile> future = SessionManager.getService().submit(() -> {
             Optional<GameProfile> playerDataStream = gameProfiles.stream().filter(gameProfile ->
                     gameProfile.getId() == id).findFirst();
 
@@ -470,14 +432,14 @@ public class BattlegroundsCore extends JavaPlugin {
                 return playerDataStream.get();
             } else {
                 GameProfilesEntity dbGameProfile = null;
-                Session session = sessionFactory.openSession();
+                Session session = SessionManager.openSession();
                 session.beginTransaction();
                 if (!session.createQuery("from GameProfilesEntity where id = :id", GameProfilesEntity.class)
                         .setParameter("id", id).getResultList().isEmpty())
                     dbGameProfile = session.createQuery("from GameProfilesEntity where id = :id", GameProfilesEntity.class)
                             .setParameter("id", id).getSingleResult();
                 session.getTransaction().commit();
-                session.close();
+                SessionManager.closeSession(session);
                 if (dbGameProfile != null) {
                     gameProfiles.add(new GameProfile(dbGameProfile));
                     return getGameProfile(id);
@@ -495,15 +457,15 @@ public class BattlegroundsCore extends JavaPlugin {
     }
 
     private void reloadGameProfiles() {
-        executorService.execute(() -> {
-            Session session = sessionFactory.openSession();
+        SessionManager.getService().execute(() -> {
+            Session session = SessionManager.openSession();
             session.beginTransaction();
             if (!session.createQuery("from GameProfilesEntity", GameProfilesEntity.class).getResultList().isEmpty())
                 for (GameProfilesEntity entity : session.createQuery("from GameProfilesEntity", GameProfilesEntity.class).getResultList())
                     if (entity.isOnline())
                         gameProfiles.add(new GameProfile(entity));
             session.getTransaction().commit();
-            session.close();
+            SessionManager.closeSession(session);
         });
     }
 
@@ -513,8 +475,8 @@ public class BattlegroundsCore extends JavaPlugin {
     }
 
     public static void createNewGameProfile(String name, UUID uuid) {
-        executorService.execute(() -> {
-            Session session = BattlegroundsCore.getSessionFactory().openSession();
+        SessionManager.getService().execute(() -> {
+            Session session = SessionManager.openSession();
 
             GameProfilesEntity gameProfilesEntity = new GameProfilesEntity();
             gameProfilesEntity.setName(name);
@@ -538,7 +500,7 @@ public class BattlegroundsCore extends JavaPlugin {
             session.beginTransaction();
             session.saveOrUpdate(gameProfilesEntity);
             session.getTransaction().commit();
-            session.close();
+            SessionManager.closeSession(session);
 
 
             gameProfiles.add(new GameProfile(gameProfilesEntity));
@@ -611,13 +573,13 @@ public class BattlegroundsCore extends JavaPlugin {
     }
 
     private static void reloadSnapshots() {
-        executorService.submit(() -> {
-            Session session = sessionFactory.openSession();
+        SessionManager.getService().submit(() -> {
+            Session session = SessionManager.openSession();
             ServerDataEntity serverData = session.get(ServerDataEntity.class, 1);
             setDaySnapshot(serverData.getSnapshotDay());
             setMonthSnapshot(serverData.getSnapshotMonth());
             setYearSnapshot(serverData.getSnapshotYear());
-            session.close();
+            SessionManager.closeSession(session);
         });
     }
 

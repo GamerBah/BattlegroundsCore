@@ -6,8 +6,9 @@ import com.battlegroundspvp.administration.command.FreezeCommand;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.punishment.Punishment;
 import com.battlegroundspvp.runnable.game.RegisterRunnable;
-import com.battlegroundspvp.runnable.misc.UpdateRunnable;
 import com.battlegroundspvp.runnable.timer.DonationUpdater;
+import com.battlegroundspvp.util.SessionManager;
+import com.battlegroundspvp.util.UpdateManager;
 import com.battlegroundspvp.util.enums.Rank;
 import com.battlegroundspvp.util.enums.Rarity;
 import com.battlegroundspvp.util.enums.Time;
@@ -83,7 +84,7 @@ public class PlayerJoin implements Listener {
                 }
             }
 
-            if (UpdateRunnable.updating) {
+            if (UpdateManager.isUpdating()) {
                 event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, new MessageBuilder(ChatColor.YELLOW).bold().create() + "SERVER IS UPDATING!\n"
                         + ChatColor.RED + "To prevent your data from being corrupted, you didn't connect\n\n" + ChatColor.GRAY + "You should be able to join in a few seconds! Hang in there!");
             }
@@ -108,7 +109,7 @@ public class PlayerJoin implements Listener {
             player.getInventory().setHeldItemSlot(4);
             BattlegroundsCore.sendRegisterMessage(player);
             plugin.getAwaitingRegistration().add(player);
-            BattlegroundsCore.getExecutorService().execute(new RegisterRunnable(plugin, player));
+            SessionManager.getService().execute(new RegisterRunnable(plugin, player));
         } else {
             plugin.respawn(player);
             BattlegroundsCore.getHolograms().forEach(hologram -> hologram.displayNMS(player));

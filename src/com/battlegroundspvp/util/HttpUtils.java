@@ -33,14 +33,14 @@ public class HttpUtils {
 
     /**
      * Creates a HTTP GET request from the {@value BASE_URL} with the appended extension
-     * Runs through an {@code ExecutorService} to prevent running I/O on the main thread
+     * Runs through an {@code SessionManager.getService()} to prevent running I/O on the main thread
      *
      * @param extension the extension to give the {@value BASE_URL}
      * @return a new instance of StreamManager
      * @see StreamManager
      */
     public static StreamManager get(final String extension) {
-        Future<StreamManager> future = BattlegroundsCore.executorService.submit(() -> {
+        Future<StreamManager> future = SessionManager.getService().submit(() -> {
             try {
                 URL url = new URL(BASE_URL + extension);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -74,7 +74,7 @@ public class HttpUtils {
     /**
      * Creates an HTTP POST request with the given parameters to the {@value BASE_URL}
      * with the given extension appended to the end of it
-     * Runs through an {@code ExecutorService} to prevent running I/O on the main thread
+     * Runs through an {@code SessionManager.getService()} to prevent running I/O on the main thread
      *
      * @param extension the extension to give the {@value BASE_URL}
      * @param params    the tags to apply to the address
@@ -83,7 +83,7 @@ public class HttpUtils {
      */
     @Deprecated
     public static boolean post(final String extension, final String[] params) {
-        Future<Boolean> future = BattlegroundsCore.executorService.submit(() -> {
+        Future<Boolean> future = SessionManager.getService().submit(() -> {
             try {
                 URL url = new URL(BASE_URL + extension);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();

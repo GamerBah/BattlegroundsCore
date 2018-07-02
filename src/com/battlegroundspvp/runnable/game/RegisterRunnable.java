@@ -3,6 +3,7 @@ package com.battlegroundspvp.runnable.game;
 
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.sql.GameProfilesEntity;
+import com.battlegroundspvp.util.SessionManager;
 import com.battlegroundspvp.util.enums.EventSound;
 import com.battlegroundspvp.util.message.MessageBuilder;
 import de.Herbystar.TTA.TTA_Methods;
@@ -64,7 +65,7 @@ public class RegisterRunnable implements Runnable {
 
     private boolean checkRegistration(Player player) {
         final ExecutorService executorService = Executors.newSingleThreadExecutor();
-        Session session = BattlegroundsCore.getSessionFactory().openSession();
+        Session session = SessionManager.openSession();
         session.beginTransaction();
         Future<Boolean> result = executorService.submit(() -> {
             String password = null;
@@ -116,8 +117,8 @@ public class RegisterRunnable implements Runnable {
             BattlegroundsCore.getInstance().getLogger().severe("Result failed to execute or was interrupted!");
         } finally {
             session.getTransaction().commit();
-            session.close();
-            executorService.shutdown();
+            SessionManager.closeSession(session);
+            SessionManager.getService().shutdown();
         }
         return false;
     }
