@@ -8,6 +8,7 @@ import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.util.enums.EventSound;
 import com.battlegroundspvp.util.enums.Rank;
+import com.battlegroundspvp.util.manager.GameProfileManager;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.OfflinePlayer;
@@ -34,12 +35,14 @@ public class RankCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
-            if (!gameProfile.hasRank(Rank.OWNER) && !player.isOp()) {
+            GameProfile gameProfile = GameProfileManager.getGameProfile(player.getUniqueId());
+            if (gameProfile != null) {
+                if (!gameProfile.hasRank(Rank.OWNER) && !player.isOp()) {
                     plugin.sendNoPermission(player);
                     return true;
                 }
             }
+        }
 
         if (args.length != 2) {
             if (sender instanceof Player) plugin.sendIncorrectUsage((Player) sender, "/rank <player> <rank>");
@@ -58,7 +61,7 @@ public class RankCommand implements CommandExecutor, TabCompleter {
 
             for (Rank rank : Rank.values()) {
                 if (rank.getName().equalsIgnoreCase(args[1])) {
-                    GameProfile gameProfile = plugin.getGameProfile(target.getUniqueId());
+                    GameProfile gameProfile = GameProfileManager.getGameProfile(target.getUniqueId());
                     //ScoreboardListener scoreboardListener = new ScoreboardListener(plugin);
                     if (gameProfile != null) {
                         if (gameProfile.getRank() == rank) {

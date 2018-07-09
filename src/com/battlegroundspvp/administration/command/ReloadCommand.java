@@ -3,8 +3,9 @@ package com.battlegroundspvp.administration.command;
 
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
-import com.battlegroundspvp.util.UpdateManager;
 import com.battlegroundspvp.util.enums.Rank;
+import com.battlegroundspvp.util.manager.GameProfileManager;
+import com.battlegroundspvp.util.manager.UpdateManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -25,21 +26,24 @@ public class ReloadCommand implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
+        GameProfile gameProfile = GameProfileManager.getGameProfile(player.getUniqueId());
 
-        if (!gameProfile.hasRank(Rank.OWNER)) {
-            plugin.sendNoPermission(player);
-        } else {
-            if (args.length > 1) {
-                plugin.sendIncorrectUsage(player, "/reload <server | plugin>");
-                return true;
+        if (gameProfile != null) {
+            if (!gameProfile.hasRank(Rank.OWNER)) {
+                plugin.sendNoPermission(player);
+            } else {
+                if (args.length != 1) {
+                    plugin.sendIncorrectUsage(player, "/reload <server | plugin>");
+                    return true;
+                }
+                if (args[0].equalsIgnoreCase("server")) {
+                    UpdateManager.update(UpdateManager.UpdateType.SERVER);
+                }
+                if (args[0].equalsIgnoreCase("plugin")) {
+                    UpdateManager.update(UpdateManager.UpdateType.PLUGIN);
+                }
             }
-            if (args[0].equalsIgnoreCase("server")) {
-                UpdateManager.update(UpdateManager.UpdateType.SERVER);
-            }
-            if (args[0].equalsIgnoreCase("plugin")) {
-                UpdateManager.update(UpdateManager.UpdateType.PLUGIN);
-            }
+            return true;
         }
         return false;
     }

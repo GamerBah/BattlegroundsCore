@@ -5,6 +5,7 @@ import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.punishment.Punishment;
 import com.battlegroundspvp.util.enums.EventSound;
+import com.battlegroundspvp.util.manager.GameProfileManager;
 import net.md_5.bungee.api.ChatColor;
 
 import java.time.LocalDateTime;
@@ -19,7 +20,7 @@ public class PunishmentRunnable implements Runnable {
 
     @Override
     public void run() {
-        for (GameProfile gameProfile : BattlegroundsCore.getGameProfiles()) {
+        for (GameProfile gameProfile : GameProfileManager.getGameProfiles()) {
             for (Punishment punishment : gameProfile.getPunishmentData().getPunishments()) {
                 if (!punishment.isPardoned()) {
                     LocalDateTime expiration = punishment.getExpiration();

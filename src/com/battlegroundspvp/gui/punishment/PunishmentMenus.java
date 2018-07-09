@@ -1,13 +1,13 @@
 package com.battlegroundspvp.gui.punishment;
 /* Created by GamerBah on 8/25/2016 */
 
-import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.punishment.Punishment;
 import com.battlegroundspvp.util.enums.EventSound;
 import com.battlegroundspvp.util.enums.Time;
 import com.battlegroundspvp.util.gui.InventoryItems;
 import com.battlegroundspvp.util.gui.sort.TimeSort;
+import com.battlegroundspvp.util.manager.GameProfileManager;
 import com.battlegroundspvp.util.message.MessageBuilder;
 import com.comphenix.packetwrapper.WrapperPlayServerOpenSignEditor;
 import com.comphenix.protocol.wrappers.BlockPosition;
@@ -60,7 +60,7 @@ public class PunishmentMenus {
                     : type.equals(Punishment.Type.KICK) ? new KickMenu(player, targetProfile)
                     : type.equals(Punishment.Type.TEMP_BAN) ? new TempBanMenu(player, targetProfile)
                     : new BanMenu(player, targetProfile)));
-            GameProfile gameProfile = BattlegroundsCore.getInstance().getGameProfile(player.getUniqueId());
+            GameProfile gameProfile = GameProfileManager.getGameProfile(player.getUniqueId());
 
             ItemBuilder clock = new ItemBuilder(Material.WATCH).name(ChatColor.YELLOW + "Time: " + ChatColor.GRAY + Time.toString(time * 1000, true))
                     .lore(ChatColor.GRAY + "Left-Click: " + ChatColor.RED + "-5 min " + ChatColor.DARK_RED + "" + ChatColor.ITALIC + "(Shift: -15 min)")
@@ -239,10 +239,10 @@ public class PunishmentMenus {
     public class PunishMenu extends GameInventory {
 
         public PunishMenu(Player player) {
-            super("Punish Menu", BattlegroundsCore.getGameProfiles().size(), 54, null);
+            super("Punish Menu", GameProfileManager.getGameProfiles().size(), 54, null);
 
             for (int i = 0; i < super.getItemCount() && i < 36; i++) {
-                GameProfile gameProfile = BattlegroundsCore.getGameProfiles().get(i);
+                GameProfile gameProfile = GameProfileManager.getGameProfiles().get(i);
                 if (!gameProfile.getUuid().equals(player.getUniqueId()))
                     addItem(InventoryItems.playerHead(gameProfile).clone().lore(" ")
                             .lore(new MessageBuilder(ChatColor.YELLOW).bold().italic().create()
@@ -359,9 +359,9 @@ public class PunishmentMenus {
                     .lore(ChatColor.YELLOW + "Click to pardon!")
                     .onClick(new ClickEvent(() -> {
                         if (punishment.getType() == Punishment.Type.MUTE)
-                            targetProfile.unmute(BattlegroundsCore.getInstance().getGameProfile(player.getUniqueId()), punishment);
+                            targetProfile.unmute(GameProfileManager.getGameProfile(player.getUniqueId()), punishment);
                         if (punishment.getType() == Punishment.Type.BAN || punishment.getType() == Punishment.Type.TEMP_BAN)
-                            targetProfile.unban(BattlegroundsCore.getInstance().getGameProfile(player.getUniqueId()), punishment);
+                            targetProfile.unban(GameProfileManager.getGameProfile(player.getUniqueId()), punishment);
                         player.closeInventory();
                         EventSound.playSound(player, EventSound.ACTION_SUCCESS);
                     })));

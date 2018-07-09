@@ -76,7 +76,7 @@ public class KitPvpData {
 
     public KitPvpData addKills(int amount) {
         setKills(getKills() + amount);
-        getGameProfile().getStatistics().updateKills(amount);
+        //getGameProfile().getStatistics().updateKills(amount);
         return this;
     }
 
@@ -87,7 +87,7 @@ public class KitPvpData {
 
     public KitPvpData addDeaths(int amount) {
         setDeaths(getDeaths() + amount);
-        getGameProfile().getStatistics().updateDeaths(amount);
+        //getGameProfile().getStatistics().updateDeaths(amount);
         return this;
     }
 
@@ -98,7 +98,7 @@ public class KitPvpData {
 
     public KitPvpData addSouls(int amount) {
         setSouls(getSouls() + amount);
-        getGameProfile().getStatistics().updateSouls(amount);
+        //getGameProfile().getStatistics().updateSouls(amount);
         return this;
     }
 
@@ -114,19 +114,19 @@ public class KitPvpData {
 
     public KitPvpData addDuplicateKit(int kitId) {
         duplicateKits.add(kitId);
-        getGameProfile().getStatistics().setAlltimeDuplicateKits(getGameProfile().getStatistics().getAlltimeDuplicateKits() + 1);
+        //getGameProfile().getStatistics().setAlltimeDuplicateKits(getGameProfile().getStatistics().getAlltimeDuplicateKits() + 1);
         return this;
     }
 
     public KitPvpData addKillstreakEnded() {
         setKillstreaksEnded(getKillstreaksEnded() + 1);
-        getGameProfile().getStatistics().updateKillstreaksEnded(1);
+        //getGameProfile().getStatistics().updateKillstreaksEnded(1);
         return this;
     }
 
     public KitPvpData addRevengeKill() {
         setRevengeKills(getRevengeKills() + 1);
-        getGameProfile().getStatistics().updateRevengeKills(1);
+        //getGameProfile().getStatistics().updateRevengeKills(1);
         return this;
     }
 

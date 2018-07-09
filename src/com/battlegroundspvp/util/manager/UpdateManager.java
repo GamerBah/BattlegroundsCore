@@ -1,4 +1,4 @@
-package com.battlegroundspvp.util;
+package com.battlegroundspvp.util.manager;
 /* Created by GamerBah on 7/1/2018 */
 
 import com.battlegroundspvp.BattleModule;
@@ -6,6 +6,7 @@ import com.battlegroundspvp.BattleModuleLoader;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.command.FreezeCommand;
 import com.battlegroundspvp.administration.data.GameProfile;
+import com.battlegroundspvp.util.PluginUtil;
 import com.battlegroundspvp.util.enums.EventSound;
 import com.battlegroundspvp.util.enums.Rank;
 import com.battlegroundspvp.util.message.MessageBuilder;
@@ -35,6 +36,9 @@ public final class UpdateManager {
     @Getter
     @Setter
     private static boolean developmentMode;
+    @Getter
+    @Setter
+    private static boolean awaitingUpdate;
 
     @Getter
     private static File updateFile;
@@ -47,7 +51,7 @@ public final class UpdateManager {
         if (preUpdate == null) {
             plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
                 try {
-                    BattlegroundsCore.syncGameProfiles();
+                    GameProfileManager.sync();
                     plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
                         try {
                             SessionManager.shutdown();
@@ -68,6 +72,7 @@ public final class UpdateManager {
                                         Files.move(Paths.get(updateFile.getPath()),
                                                 Paths.get(plugin.getServer().getUpdateFolderFile().getParentFile().getPath() + File.separator + "BattlegroundsCore.jar"),
                                                 StandardCopyOption.REPLACE_EXISTING);
+                                        setAwaitingUpdate(false);
                                     } catch (IOException exception) {
                                         sendLocalizedLog(Level.SEVERE, exception, "Unable to move update file!");
                                         result = deleteQueuedUpdate(updateFile);
@@ -141,11 +146,13 @@ public final class UpdateManager {
         try {
             plugin.getServer().getOnlinePlayers().forEach(player -> {
                 if (BattleCrateManager.isUsing(player)) {
-                    GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
-                    gameProfile.getCratesData().addCrate(BattleCrateManager.getPlayersUsing().get(player.getUniqueId()), 1);
-                    player.sendMessage(" ");
-                    player.sendMessage(ChatColor.GRAY + "The " + BattleCrateManager.getPlayersUsing().get(player.getUniqueId()).getName()
-                            + ChatColor.GRAY + " you were opening has been given back to you");
+                    GameProfile gameProfile = GameProfileManager.getGameProfile(player.getUniqueId());
+                    if (gameProfile != null) {
+                        gameProfile.getCratesData().addCrate(BattleCrateManager.getPlayersUsing().get(player.getUniqueId()), 1);
+                        player.sendMessage(" ");
+                        player.sendMessage(ChatColor.GRAY + "The " + BattleCrateManager.getPlayersUsing().get(player.getUniqueId()).getName()
+                                + ChatColor.GRAY + " you were opening has been given back to you");
+                    }
                 }
 
                 // Run Core pre-update
@@ -192,8 +199,8 @@ public final class UpdateManager {
 
     public static Result enterMaintenance() {
         plugin.getServer().getOnlinePlayers().forEach(player -> {
-            GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
-            if (!gameProfile.hasRank(Rank.HELPER)) {
+            GameProfile gameProfile = GameProfileManager.getGameProfile(player.getUniqueId());
+            if (gameProfile != null && !gameProfile.hasRank(Rank.HELPER)) {
                 player.kickPlayer(ChatColor.RED + "You were kicked because the server was put into\n" + new MessageBuilder(ChatColor.GOLD).bold().create()
                         + "MAINTENANCE MODE\n\n" + ChatColor.AQUA + "This means that we are fixing bugs, or found another issue we needed to take care of\n\n"
                         + ChatColor.GRAY + "We put the server into Maintenance Mode in order to reduce the risk of\n§7corrupting player data, etc. Check back soon!");
@@ -224,7 +231,7 @@ public final class UpdateManager {
 
     public static void sendLocalizedLog(final Level level, final Throwable throwable, final String... messages) {
         plugin.getLogger().log(level, "----------------------------------------");
-        plugin.getLogger().log(level, throwable.getLocalizedMessage());
+        plugin.getLogger().log(level, throwable.getCause().getLocalizedMessage());
         Arrays.asList(messages).forEach(message -> plugin.getLogger().log(level, message));
         plugin.getLogger().log(level, "----------------------------------------");
     }

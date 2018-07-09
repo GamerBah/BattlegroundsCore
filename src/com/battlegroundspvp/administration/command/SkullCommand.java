@@ -5,6 +5,7 @@ import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.util.enums.EventSound;
 import com.battlegroundspvp.util.enums.Rank;
+import com.battlegroundspvp.util.manager.GameProfileManager;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -30,44 +31,47 @@ public class SkullCommand implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
+        GameProfile gameProfile = GameProfileManager.getGameProfile(player.getUniqueId());
 
-        if (!gameProfile.hasRank(Rank.MODERATOR)) {
-            plugin.sendNoPermission(player);
+        if (gameProfile != null) {
+            if (!gameProfile.hasRank(Rank.MODERATOR)) {
+                plugin.sendNoPermission(player);
+                return true;
+            }
+
+            if (player.getGameMode() != GameMode.CREATIVE) {
+                player.sendMessage(ChatColor.RED + "You must be in Gamemode 1 to use this!");
+                EventSound.playSound(player, EventSound.ACTION_FAIL);
+                return true;
+            }
+
+            if (args.length == 0) {
+                ItemStack itemStack = new ItemStack(Material.SKULL_ITEM);
+                itemStack.setDurability((short) 3);
+                SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
+                meta.setOwningPlayer(player);
+                itemStack.setItemMeta(meta);
+
+                player.getInventory().addItem(itemStack);
+            }
+
+            if (args.length == 1) {
+                ItemStack itemStack = new ItemStack(Material.SKULL_ITEM);
+                itemStack.setDurability((short) 3);
+                SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
+                meta.setOwningPlayer(plugin.getServer().getPlayer(args[0]));
+                itemStack.setItemMeta(meta);
+
+                player.getInventory().addItem(itemStack);
+            }
+
+            if (args.length > 1) {
+                plugin.sendIncorrectUsage(player, "/skull [name]");
+                return true;
+            }
+
             return true;
         }
-
-        if (player.getGameMode() != GameMode.CREATIVE) {
-            player.sendMessage(ChatColor.RED + "You must be in Gamemode 1 to use this!");
-            EventSound.playSound(player, EventSound.ACTION_FAIL);
-            return true;
-        }
-
-        if (args.length == 0) {
-            ItemStack itemStack = new ItemStack(Material.SKULL_ITEM);
-            itemStack.setDurability((short) 3);
-            SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
-            meta.setOwningPlayer(player);
-            itemStack.setItemMeta(meta);
-
-            player.getInventory().addItem(itemStack);
-        }
-
-        if (args.length == 1) {
-            ItemStack itemStack = new ItemStack(Material.SKULL_ITEM);
-            itemStack.setDurability((short) 3);
-            SkullMeta meta = (SkullMeta) itemStack.getItemMeta();
-            meta.setOwningPlayer(plugin.getServer().getPlayer(args[0]));
-            itemStack.setItemMeta(meta);
-
-            player.getInventory().addItem(itemStack);
-        }
-
-        if (args.length > 1) {
-            plugin.sendIncorrectUsage(player, "/skull [name]");
-            return true;
-        }
-
         return false;
     }
 

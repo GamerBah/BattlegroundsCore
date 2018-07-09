@@ -6,6 +6,7 @@ import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.administration.donation.DonationMessages;
 import com.battlegroundspvp.administration.donation.Essence;
 import com.battlegroundspvp.util.enums.Rank;
+import com.battlegroundspvp.util.manager.GameProfileManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -38,7 +39,7 @@ public class DonationCommand implements CommandExecutor {
                 plugin.getLogger().severe("Error Processing Donation Request: \"Rank\" donation set incorrectly filled");
                 return true;
             }
-            GameProfile gameProfile = plugin.getGameProfile(UUID.fromString(args[1]));
+            GameProfile gameProfile = GameProfileManager.getGameProfile(UUID.fromString(args[1]));
             if (gameProfile == null) {
                 plugin.getLogger().severe("Error Processing Donation Request: Requested UUID not found in database!");
                 return true;
@@ -66,7 +67,7 @@ public class DonationCommand implements CommandExecutor {
                 plugin.getLogger().severe("Error Processing Donation Request: \"Essence\" donation set incorrectly filled");
                 return true;
             }
-            GameProfile gameProfile = plugin.getGameProfile(UUID.fromString(args[1]));
+            GameProfile gameProfile = GameProfileManager.getGameProfile(UUID.fromString(args[1]));
             if (gameProfile == null) {
                 plugin.getLogger().severe("Error Processing Donation Request: Requested UUID not found in database!");
                 return true;

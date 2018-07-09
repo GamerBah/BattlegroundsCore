@@ -2,7 +2,7 @@ package com.battlegroundspvp.event;
 /* Created by GamerBah on 10/6/2017 */
 
 import com.battlegroundspvp.administration.command.FreezeCommand;
-import com.battlegroundspvp.util.UpdateManager;
+import com.battlegroundspvp.util.manager.UpdateManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

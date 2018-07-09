@@ -2,7 +2,7 @@ package com.battlegroundspvp.listener;
 /* Created by GamerBah on 8/16/2016 */
 
 import com.battlegroundspvp.BattlegroundsCore;
-import com.battlegroundspvp.util.UpdateManager;
+import com.battlegroundspvp.util.manager.UpdateManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;

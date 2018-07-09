@@ -9,6 +9,7 @@ import com.battlegroundspvp.command.MessageCommand;
 import com.battlegroundspvp.runnable.timer.AFKRunnable;
 import com.battlegroundspvp.util.enums.EventSound;
 import com.battlegroundspvp.util.enums.Rank;
+import com.battlegroundspvp.util.manager.GameProfileManager;
 import com.battlegroundspvp.util.message.ChatFilter;
 import com.battlegroundspvp.util.message.MessageBuilder;
 import net.md_5.bungee.api.ChatColor;
@@ -35,63 +36,63 @@ public class PlayerChat implements Listener {
         event.setCancelled(true);
 
         if (StaffChatCommand.getToggled().contains(player.getUniqueId())) {
-            plugin.getServer().getOnlinePlayers().stream().filter(players ->
-                    plugin.getGameProfile(players.getUniqueId()).hasRank(Rank.HELPER))
-                    .forEach(players -> players.sendMessage(new MessageBuilder(ChatColor.YELLOW).bold().create() + "[STAFF] "
-                            + ChatColor.RED + player.getName() + ": " + event.getMessage()));
+            MessageBuilder.sendStaffMessage(new MessageBuilder(ChatColor.YELLOW).bold().create() + "[STAFF] "
+                    + ChatColor.RED + player.getName() + ": " + event.getMessage());
             return;
         }
 
-        GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
+        GameProfile gameProfile = GameProfileManager.getGameProfile(player.getUniqueId());
 
-        if (gameProfile.isMuted()) {
-            MessageCommand.sendErrorMessage(gameProfile);
-            return;
-        }
-
-        Rank rank = gameProfile.getRank();
-
-        if (AFKRunnable.getAfkTimer().containsKey(player))
-            AFKRunnable.getAfkTimer().put(player, 0);
-
-
-        if (ChatCommands.chatSilenced && !gameProfile.hasRank(Rank.HELPER))
-            return;
-
-        boolean hasRank = gameProfile.hasRank(Rank.WARRIOR);
-
-        if (!ChatFilter.isClean(event.getMessage())) {
-            event.setCancelled(true);
-            player.sendMessage(new MessageBuilder(ChatColor.RED).bold().create() + "Please refrain from using profane language!");
-            EventSound.playSound(player, EventSound.ACTION_FAIL);
-            if (!ChatFilter.getAttempts().containsKey(player)) {
-                if (!plugin.getGameProfile(player.getUniqueId()).hasRank(Rank.HELPER)) {
-                    ChatFilter.getAttempts().put(player, 1);
-                }
-            } else {
-                ChatFilter.getAttempts().put(player, ChatFilter.getAttempts().get(player) + 1);
-                if (ChatFilter.getAttempts().get(player) == 10) {
-                    ChatFilter.getAttempts().remove(player);
-                    //plugin.warnPlayer(null, gameProfile, Punishment.Reason.ATTEMPT_SWEARING);
-                }
+        if (gameProfile != null) {
+            if (gameProfile.isMuted()) {
+                MessageCommand.sendErrorMessage(gameProfile);
+                return;
             }
-            return;
-        }
 
-        plugin.getServer().getOnlinePlayers().forEach(p -> {
-            if (Pattern.compile(Pattern.quote("@" + p.getName()), Pattern.CASE_INSENSITIVE).matcher(event.getMessage()).find()) {
-                p.sendMessage(rank.getColor().create() + (hasRank ? rank.getName().toUpperCase() + ChatColor.RESET : "")
-                        + " " + player.getName() + ChatColor.GRAY + " \u00BB " + (hasRank ? ChatColor.WHITE : ChatColor.GRAY)
-                        + event.getMessage().replaceAll("@(?i)" + p.getName(), ChatColor.AQUA + "@" + p.getName() + (hasRank ? ChatColor.WHITE : ChatColor.GRAY)));
-                EventSound.playSound(p, EventSound.CHAT_TAGGED);
-            } else {
-                p.sendMessage(rank.getColor().create() + (hasRank ? rank.getName().toUpperCase() + ChatColor.RESET : "")
-                        + " " + player.getName() + ChatColor.GRAY + " \u00BB " + (hasRank ? ChatColor.WHITE : ChatColor.GRAY) + event.getMessage());
+            Rank rank = gameProfile.getRank();
+
+            if (AFKRunnable.getAfkTimer().containsKey(player))
+                AFKRunnable.getAfkTimer().put(player, 0);
+
+
+            if (ChatCommands.chatSilenced && !gameProfile.hasRank(Rank.HELPER))
+                return;
+
+            boolean hasRank = gameProfile.hasRank(Rank.WARRIOR);
+
+            if (!ChatFilter.isClean(event.getMessage())) {
+                event.setCancelled(true);
+                player.sendMessage(new MessageBuilder(ChatColor.RED).bold().create() + "Please refrain from using profane language!");
+                EventSound.playSound(player, EventSound.ACTION_FAIL);
+                if (!ChatFilter.getAttempts().containsKey(player)) {
+                    if (!gameProfile.hasRank(Rank.HELPER)) {
+                        ChatFilter.getAttempts().put(player, 1);
+                    }
+                } else {
+                    ChatFilter.getAttempts().put(player, ChatFilter.getAttempts().get(player) + 1);
+                    if (ChatFilter.getAttempts().get(player) == 10) {
+                        ChatFilter.getAttempts().remove(player);
+                        //plugin.warnPlayer(null, gameProfile, Punishment.Reason.ATTEMPT_SWEARING);
+                    }
+                }
+                return;
             }
-        });
-        Bukkit.getLogger().info(rank.getColor().create() + (hasRank ? rank.getName().toUpperCase() + ChatColor.RESET : "")
-                + " " + player.getName() + ChatColor.GRAY + " \u00BB " + (hasRank ? ChatColor.WHITE : ChatColor.GRAY)
-                + event.getMessage());
+
+            plugin.getServer().getOnlinePlayers().forEach(p -> {
+                if (Pattern.compile(Pattern.quote("@" + p.getName()), Pattern.CASE_INSENSITIVE).matcher(event.getMessage()).find()) {
+                    p.sendMessage(rank.getColor().create() + (hasRank ? rank.getName().toUpperCase() + ChatColor.RESET : "")
+                            + " " + player.getName() + ChatColor.GRAY + " \u00BB " + (hasRank ? ChatColor.WHITE : ChatColor.GRAY)
+                            + event.getMessage().replaceAll("@(?i)" + p.getName(), ChatColor.AQUA + "@" + p.getName() + (hasRank ? ChatColor.WHITE : ChatColor.GRAY)));
+                    EventSound.playSound(p, EventSound.CHAT_TAGGED);
+                } else {
+                    p.sendMessage(rank.getColor().create() + (hasRank ? rank.getName().toUpperCase() + ChatColor.RESET : "")
+                            + " " + player.getName() + ChatColor.GRAY + " \u00BB " + (hasRank ? ChatColor.WHITE : ChatColor.GRAY) + event.getMessage());
+                }
+            });
+            Bukkit.getLogger().info(rank.getColor().create() + (hasRank ? rank.getName().toUpperCase() + ChatColor.RESET : "")
+                    + " " + player.getName() + ChatColor.GRAY + " \u00BB " + (hasRank ? ChatColor.WHITE : ChatColor.GRAY)
+                    + event.getMessage());
+        }
     }
 
 }

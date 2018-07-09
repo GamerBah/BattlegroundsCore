@@ -5,17 +5,16 @@ import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.command.FreezeCommand;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.punishment.Punishment;
-import com.battlegroundspvp.runnable.game.RegisterRunnable;
 import com.battlegroundspvp.runnable.timer.DonationUpdater;
-import com.battlegroundspvp.util.SessionManager;
-import com.battlegroundspvp.util.UpdateManager;
+import com.battlegroundspvp.util.enums.EventSound;
 import com.battlegroundspvp.util.enums.Rank;
 import com.battlegroundspvp.util.enums.Rarity;
 import com.battlegroundspvp.util.enums.Time;
+import com.battlegroundspvp.util.manager.GameProfileManager;
+import com.battlegroundspvp.util.manager.UpdateManager;
 import com.battlegroundspvp.util.message.MessageBuilder;
 import de.Herbystar.TTA.TTA_Methods;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -35,48 +34,65 @@ public class PlayerJoin implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onLogin(AsyncPlayerPreLoginEvent event) {
         if (event.getLoginResult() == AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST) {
             event.setKickMessage(new MessageBuilder(ChatColor.RED).bold().create() + "You're not on the whitelist!\n\n"
-                    + ChatColor.GRAY + "Access to the Development Server is only given\n§7to donators with the " + Rank.WARLORD.getColor().create() + Rank.WARLORD.toString() + "§7 rank.\n\n"
+                    + ChatColor.GRAY + "Access to the Development Server is only given\n§7to donators with the "
+                    + Rank.WARLORD.getColor().create() + Rank.WARLORD.toString() + "§7 rank.\n\n"
                     + ChatColor.GRAY + "You can purchase the rank at our store!\n§e§lstore.battlegroundspvp.com");
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, event.getKickMessage());
         } else {
-            if (plugin.getGameProfile(event.getUniqueId()) == null) {
-                BattlegroundsCore.createNewGameProfile(event.getName(), event.getUniqueId());
+            GameProfile gameProfile;
+            if (GameProfileManager.getGameProfile(event.getUniqueId()) == null) {
+                gameProfile = BattlegroundsCore.createNewGameProfile(event.getName(), event.getUniqueId());
                 // TODO:
                 // plugin.getGlobalStats().setTotalUniqueJoins(plugin.getGlobalStats().getTotalUniqueJoins() + 1);
+            } else {
+                gameProfile = GameProfileManager.getGameProfile(event.getUniqueId());
             }
 
-            GameProfile gameProfile = plugin.getGameProfile(event.getUniqueId());
-            BattlegroundsCore.getGameProfiles().add(gameProfile);
+            if (gameProfile == null) {
+                event.setKickMessage(new MessageBuilder(ChatColor.RED).bold().create() + "Unable to join!\n\n"
+                        + new MessageBuilder(ChatColor.GRAY).italic().create() + "\"For some reason, the hamsters decided to take the day off.\"\n\n"
+                        + ChatColor.GRAY + "In other words, something went wrong on our end, and we\n"
+                        + ChatColor.GRAY + "weren't able to create your server data correctly!\n\n"
+                        + ChatColor.GOLD + "Server admins have been notified of the issue!");
+                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, event.getKickMessage());
+                return;
+            }
+
+            GameProfileManager.getGameProfiles().add(gameProfile);
 
             for (Punishment punishment : gameProfile.getPunishmentData().getBans()) {
                 if (!punishment.isPardoned()) {
-                    GameProfile enforcerProfile = plugin.getGameProfile(punishment.getEnforcerId());
-                    event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, ChatColor.RED + "You were banned by " + ChatColor.GOLD + enforcerProfile.getName()
-                            + ChatColor.RED + " for " + ChatColor.GOLD + punishment.getReason().getName() + "\n" + ChatColor.AQUA
-                            + punishment.getDate().minusHours(9).format(DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a '(PST)'")) + "\n\n" + ChatColor.YELLOW
-                            + punishment.getReason().getMessage() + "\n\n" + ChatColor.GRAY + "Appeal your ban on the forums: forum.battlegroundspvp.com");
+                    GameProfile enforcerProfile = GameProfileManager.getGameProfile(punishment.getEnforcerId());
+                    if (enforcerProfile != null) {
+                        event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, ChatColor.RED + "You were banned by " + ChatColor.GOLD + enforcerProfile.getName()
+                                + ChatColor.RED + " for " + ChatColor.GOLD + punishment.getReason().getName() + "\n" + ChatColor.AQUA
+                                + punishment.getDate().minusHours(9).format(DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a '(PST)'")) + "\n\n" + ChatColor.YELLOW
+                                + punishment.getReason().getMessage() + "\n\n" + ChatColor.GRAY + "Appeal your ban on the forums: forum.battlegroundspvp.com");
+                    }
                     return;
                 }
             }
             for (Punishment punishment : gameProfile.getPunishmentData().getTempBans()) {
                 if (!punishment.isPardoned()) {
-                    GameProfile enforcerProfile = plugin.getGameProfile(punishment.getEnforcerId());
-                    event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, ChatColor.RED + "You were temporarily banned by " + ChatColor.GOLD + enforcerProfile.getName()
-                            + ChatColor.RED + " for " + ChatColor.GOLD + punishment.getReason().getName() + "\n" + ChatColor.AQUA
-                            + punishment.getDate().minusHours(9).format(DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a '(PST)'")) + "\n\n"
-                            + ChatColor.GRAY + "Time Remaining in Ban: " + ChatColor.RED + Time.toString(Time.punishmentTimeRemaining(punishment.getExpiration()), true) + "\n" + ChatColor.YELLOW
-                            + punishment.getReason().getMessage() + "\n\n" + ChatColor.GRAY + "You can appeal your ban on the forums: forum.battlegroundspvp.com");
+                    GameProfile enforcerProfile = GameProfileManager.getGameProfile(punishment.getEnforcerId());
+                    if (enforcerProfile != null) {
+                        event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, ChatColor.RED + "You were temporarily banned by " + ChatColor.GOLD + enforcerProfile.getName()
+                                + ChatColor.RED + " for " + ChatColor.GOLD + punishment.getReason().getName() + "\n" + ChatColor.AQUA
+                                + punishment.getDate().minusHours(9).format(DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a '(PST)'")) + "\n\n"
+                                + ChatColor.GRAY + "Time Remaining in Ban: " + ChatColor.RED + Time.toString(Time.punishmentTimeRemaining(punishment.getExpiration()), true) + "\n" + ChatColor.YELLOW
+                                + punishment.getReason().getMessage() + "\n\n" + ChatColor.GRAY + "You can appeal your ban on the forums: forum.battlegroundspvp.com");
+                    }
                     return;
                 }
 
             }
 
             if (plugin.getConfig().getBoolean("developmentMode")) {
-                if (plugin.getGameProfile(event.getUniqueId()) == null || !plugin.getGameProfile(event.getUniqueId()).hasRank(Rank.HELPER)) {
+                if (!gameProfile.hasRank(Rank.HELPER)) {
                     event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, ChatColor.RED + "You were not able to join the server because it is in\n" + new MessageBuilder(ChatColor.GOLD).bold().underline().create()
                             + "MAINTENANCE MODE\n\n" + ChatColor.AQUA + "This means that we are fixing bugs, or found another issue we needed to take care of\n\n"
                             + ChatColor.GRAY + "We put the server into Maintenance Mode in order to reduce the risk of\n§7corrupting player data, etc. The server should be open shortly!");
@@ -94,10 +110,10 @@ public class PlayerJoin implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
-        gameProfile.setOnline(true);
+        GameProfile gameProfile = GameProfileManager.getGameProfile(player.getUniqueId());
 
-        if (gameProfile.getPassword() == null || gameProfile.getPassword().isEmpty()) {
+        if (gameProfile != null) {
+        /*if (gameProfile.getPassword() == null || gameProfile.getPassword().isEmpty()) {
             event.setJoinMessage(null);
             plugin.respawn(player, (Location) plugin.getConfig().get("locations.afk"));
             player.setWalkSpeed(0F);
@@ -110,15 +126,13 @@ public class PlayerJoin implements Listener {
             BattlegroundsCore.sendRegisterMessage(player);
             plugin.getAwaitingRegistration().add(player);
             SessionManager.getService().execute(new RegisterRunnable(plugin, player));
-        } else {
+        } else {*/
             plugin.respawn(player);
             BattlegroundsCore.getHolograms().forEach(hologram -> hologram.displayNMS(player));
             if (gameProfile.getPlayerSettings().isStealthyJoin()) {
                 event.setJoinMessage(null);
-                plugin.getServer().getOnlinePlayers().stream().filter(staff ->
-                        plugin.getGameProfile(staff.getUniqueId()).hasRank(Rank.ADMIN)).forEach(staff ->
-                        staff.sendMessage(new MessageBuilder(ChatColor.DARK_GRAY).bold().create() + "[" + new MessageBuilder(ChatColor.GREEN).bold().create() + "+"
-                                + new MessageBuilder(ChatColor.DARK_GRAY).bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GRAY + " (Stealth Join)"));
+                MessageBuilder.sendStaffMessage(Rank.ADMIN, new MessageBuilder(ChatColor.DARK_GRAY).bold().create() + "[" + new MessageBuilder(ChatColor.GREEN).bold().create() + "+"
+                        + new MessageBuilder(ChatColor.DARK_GRAY).bold().create() + "] " + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GRAY + " (Stealth Join)");
             } else {
                 if (!event.getJoinMessage().startsWith(new MessageBuilder(ChatColor.GOLD).bold().create() + "New! ")) {
                     if (!gameProfile.getName().equals(player.getName())) {
@@ -139,6 +153,7 @@ public class PlayerJoin implements Listener {
                     if (chance <= Math.pow(rarity.getChance(), 2) && chance >= Math.pow(rarity.getMinChance(Rarity.COMMON), 2))
                         reward = rarity;
                 gameProfile.getCratesData().addCrate(reward, 1);
+                gameProfile.playSound(EventSound.ACTION_SUCCESS);
                 player.sendMessage(reward.getColor() + "\u00BB " + ChatColor.GRAY + "You found a " + reward.getCrateName() + ChatColor.GRAY + "!");
             }
 
@@ -154,12 +169,13 @@ public class PlayerJoin implements Listener {
             if (DonationUpdater.essenceBar != null)
                 if (!DonationUpdater.essenceBar.getPlayers().contains(player))
                     DonationUpdater.essenceBar.addPlayer(player);
+            //}
+
+            player.setPlayerListName((gameProfile.hasRank(Rank.WARRIOR) ? gameProfile.getRank().getColor().create() + "" + ChatColor.BOLD + gameProfile.getRank().getName().toUpperCase() + " " : "")
+                    + (gameProfile.hasRank(Rank.WARRIOR) ? ChatColor.WHITE : ChatColor.GRAY) + player.getName());
+
+            TTA_Methods.sendTablist(player, ChatColor.AQUA + "   You're playing on " + new MessageBuilder(ChatColor.GOLD).bold().create() + "BATTLEGROUNDS   ",
+                    ChatColor.YELLOW + "Visit our store! store.battlegroundspvp.com");
         }
-
-        player.setPlayerListName((gameProfile.hasRank(Rank.WARRIOR) ? gameProfile.getRank().getColor().create() + "" + ChatColor.BOLD + gameProfile.getRank().getName().toUpperCase() + " " : "")
-                + (gameProfile.hasRank(Rank.WARRIOR) ? ChatColor.WHITE : ChatColor.GRAY) + player.getName());
-
-        TTA_Methods.sendTablist(player, ChatColor.AQUA + "   You're playing on " + new MessageBuilder(ChatColor.GOLD).bold().create() + "BATTLEGROUNDS   ",
-                ChatColor.YELLOW + "Visit our store! store.battlegroundspvp.com");
     }
 }

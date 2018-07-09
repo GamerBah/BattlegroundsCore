@@ -3,6 +3,8 @@ package com.battlegroundspvp.util;
 
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
+import com.battlegroundspvp.util.manager.BattleCrateManager;
+import com.battlegroundspvp.util.manager.GameProfileManager;
 import com.battlegroundspvp.util.message.MessageBuilder;
 import com.battlegroundspvp.util.nms.Hologram;
 import com.battlegroundspvp.util.nms.HologramData;
@@ -109,10 +111,13 @@ public class BattleCrate implements HologramData {
 
     @Override
     public String getData(final Player player) {
-        GameProfile gameProfile = BattlegroundsCore.getInstance().getGameProfile(player.getUniqueId());
-        if (gameProfile.getCratesData().getTotal() == 0)
-            return "";
-        return new MessageBuilder(ChatColor.AQUA).bold().create() + gameProfile.getCratesData().getTotal() + " AVAILABLE!";
+        GameProfile gameProfile = GameProfileManager.getGameProfile(player.getUniqueId());
+        if (gameProfile != null) {
+            if (gameProfile.getCratesData().getTotal() == 0)
+                return "";
+            return new MessageBuilder(ChatColor.AQUA).bold().create() + gameProfile.getCratesData().getTotal() + " AVAILABLE!";
+        }
+        return "";
     }
 
 }

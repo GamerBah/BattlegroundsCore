@@ -60,8 +60,8 @@ public class GameProfilesEntity {
     private EssencesEntity essences;
     @OneToOne(fetch = FetchType.EAGER, mappedBy = "gameProfile", cascade = CascadeType.ALL)
     private CratesEntity crates;
-    @OneToOne(fetch = FetchType.EAGER, mappedBy = "gameProfile", cascade = CascadeType.ALL)
-    private GameProfileStatisticsEntity gameProfileStatistics = new GameProfileStatisticsEntity();
+    //@OneToOne(fetch = FetchType.EAGER, mappedBy = "gameProfile", cascade = CascadeType.ALL)
+    //private GameProfileStatisticsEntity gameProfileStatistics;
 
     @Override
     public int hashCode() {

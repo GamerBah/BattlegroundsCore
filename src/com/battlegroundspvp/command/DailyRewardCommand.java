@@ -4,6 +4,7 @@ package com.battlegroundspvp.command;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.util.enums.EventSound;
+import com.battlegroundspvp.util.manager.GameProfileManager;
 import com.battlegroundspvp.util.message.MessageBuilder;
 import de.Herbystar.TTA.TTA_Methods;
 import net.md_5.bungee.api.ChatColor;
@@ -36,24 +37,27 @@ public class DailyRewardCommand implements CommandExecutor {
             return true;
         }
 
-        GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
+        GameProfile gameProfile = GameProfileManager.getGameProfile(player.getUniqueId());
 
-        if (gameProfile.isDailyReward()) {
-            player.sendMessage(ChatColor.RED + "You've already claimed your reward! Come back tomorrow for another one!");
-            EventSound.playSound(player, EventSound.ACTION_FAIL);
-            return true;
-        }
+        if (gameProfile != null) {
+            if (gameProfile.isDailyReward()) {
+                player.sendMessage(ChatColor.RED + "You've already claimed your reward! Come back tomorrow for another one!");
+                EventSound.playSound(player, EventSound.ACTION_FAIL);
+                return true;
+            }
 
-        gameProfile.setDailyReward(true);
-        gameProfile.setDailyRewardLast(LocalDateTime.now());
+            gameProfile.setDailyReward(true);
+            gameProfile.setDailyRewardLast(LocalDateTime.now());
         /*ScoreboardListener scoreboardListener = new ScoreboardListener(plugin);
         scoreboardListener.updateScoreboardSouls(player, 50);
         scoreboardListener.updateScoreboardCoins(player, 10);*/
 
-        TTA_Methods.sendTitle(player, new MessageBuilder(ChatColor.GREEN).bold().create() + "Daily Reward Claimed!", 5, 60, 20,
-                ChatColor.AQUA + "+50 Souls   " + ChatColor.LIGHT_PURPLE + "+10 Battle Coins", 5, 60, 20);
-        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.2F, 1F);
+            TTA_Methods.sendTitle(player, new MessageBuilder(ChatColor.GREEN).bold().create() + "Daily Reward Claimed!", 5, 60, 20,
+                    ChatColor.AQUA + "+50 Souls   " + ChatColor.LIGHT_PURPLE + "+10 Battle Coins", 5, 60, 20);
+            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.2F, 1F);
 
+            return true;
+        }
         return false;
     }
 

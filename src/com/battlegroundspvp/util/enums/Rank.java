@@ -12,9 +12,9 @@ import java.util.Arrays;
 @AllArgsConstructor
 public enum Rank {
     OWNER(9, "Owner", new MessageBuilder(ChatColor.RED).bold(), 100),
-    DEVELOPER(8, "Dev", new MessageBuilder(ChatColor.GOLD).bold(), 75),
-    ADMIN(7, "Admin", new MessageBuilder(ChatColor.RED).bold(), 50),
-    MODERATOR(6, "Mod", new MessageBuilder(ChatColor.DARK_AQUA).bold(), 25),
+    ADMIN(8, "Admin", new MessageBuilder(ChatColor.RED).bold(), 50),
+    MODERATOR(7, "Mod", new MessageBuilder(ChatColor.DARK_AQUA).bold(), 25),
+    BUILDER(6, "Builder", new MessageBuilder(ChatColor.GOLD).bold(), 20),
     HELPER(5, "Helper", new MessageBuilder(ChatColor.GREEN).bold(), 15),
     WARLORD(4, "Warlord", new MessageBuilder(ChatColor.AQUA).bold(), 10),
     CONQUEROR(3, "Conqueror", new MessageBuilder(ChatColor.YELLOW).bold(), 8),

@@ -1,7 +1,8 @@
-package com.battlegroundspvp.util;
+package com.battlegroundspvp.util.manager;
 /* Created by GamerBah on 6/10/2018 */
 
 import com.battlegroundspvp.BattlegroundsCore;
+import com.battlegroundspvp.util.BattleCrate;
 import com.battlegroundspvp.util.enums.Rarity;
 import lombok.Getter;
 import net.minecraft.server.v1_12_R1.BlockPosition;
@@ -51,14 +52,13 @@ public final class BattleCrateManager {
     }
 
     public static int open(final BattleCrate crate) {
-        int task = BattlegroundsCore.getInstance().getServer().getScheduler().scheduleSyncRepeatingTask(BattlegroundsCore.getInstance(), () -> {
+        return BattlegroundsCore.getInstance().getServer().getScheduler().scheduleSyncRepeatingTask(BattlegroundsCore.getInstance(), () -> {
             for (Player players : Bukkit.getOnlinePlayers()) {
                 PacketPlayOutBlockAction packet = new PacketPlayOutBlockAction(new BlockPosition(crate.getLocation().getX(),
                         crate.getLocation().getY(), crate.getLocation().getZ()), CraftMagicNumbers.getBlock(crate.getLocation().getBlock()), 1, 1);
                 ((CraftPlayer) players).getHandle().playerConnection.sendPacket(packet);
             }
         }, 0L, 1L);
-        return task;
     }
 
     public static boolean isUsing(final Player player) {

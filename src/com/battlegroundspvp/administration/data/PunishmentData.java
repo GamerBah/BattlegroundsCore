@@ -6,6 +6,7 @@ import com.battlegroundspvp.administration.data.sql.GameProfilesEntity;
 import com.battlegroundspvp.administration.data.sql.PunishmentsEntity;
 import com.battlegroundspvp.punishment.Punishment;
 import com.battlegroundspvp.util.enums.Rank;
+import com.battlegroundspvp.util.manager.GameProfileManager;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -98,17 +99,20 @@ public class PunishmentData {
             this.punishments.remove(punishment);
             this.removed.add(punishment);
         }
-        BaseComponent baseComponent = new TextComponent(ChatColor.RED + player.getName() + " deleted a " + punishment.getType().getName() + " from " + targetProfile.getName());
-        baseComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GRAY + "Punished by: "
-                + BattlegroundsCore.getInstance().getGameProfile(punishment.getEnforcerId()).getRank().getColor().create() + ""
-                + ChatColor.BOLD + BattlegroundsCore.getInstance().getGameProfile(punishment.getEnforcerId()).getRank().getName().toUpperCase()
-                + ChatColor.WHITE + " " + BattlegroundsCore.getInstance().getGameProfile(punishment.getEnforcerId()).getName() + "\n" + ChatColor.GRAY + "Reason: "
-                + ChatColor.GOLD + punishment.getReason().getName() + "\n"
-                + ChatColor.GRAY + "Date: " + ChatColor.AQUA + punishment.getDate().minusHours(9).format(DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a '(PST)'"))).create()));
+        GameProfile enforcerProfile = GameProfileManager.getGameProfile(punishment.getEnforcerId());
+        if (enforcerProfile != null) {
+            BaseComponent baseComponent = new TextComponent(ChatColor.RED + player.getName() + " deleted a " + punishment.getType().getName() + " from " + targetProfile.getName());
+            baseComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GRAY + "Punished by: "
+                    + enforcerProfile.getRank().getColor().create() + ""
+                    + ChatColor.BOLD + enforcerProfile.getRank().getName().toUpperCase()
+                    + ChatColor.WHITE + " " + enforcerProfile.getName() + "\n" + ChatColor.GRAY + "Reason: "
+                    + ChatColor.GOLD + punishment.getReason().getName() + "\n"
+                    + ChatColor.GRAY + "Date: " + ChatColor.AQUA + punishment.getDate().minusHours(9).format(DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a '(PST)'"))).create()));
 
-        BattlegroundsCore.getInstance().getServer().getOnlinePlayers().stream().filter(staff ->
-                BattlegroundsCore.getInstance().getGameProfile(staff.getUniqueId()).hasRank(Rank.HELPER)).forEach(staff ->
-                staff.spigot().sendMessage(baseComponent));
+            BattlegroundsCore.getInstance().getServer().getOnlinePlayers().stream().filter(staff ->
+                    GameProfileManager.getGameProfile(staff.getUniqueId()).hasRank(Rank.HELPER)).forEach(staff ->
+                    staff.spigot().sendMessage(baseComponent));
+        }
     }
 
     public ArrayList<Punishment> getMutes() {

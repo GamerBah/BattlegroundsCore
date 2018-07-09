@@ -20,12 +20,12 @@ public class WarnMenu {
     }
 
     /*public void openPlayersMenu(Player player, PunishmentMenus.SortType sortType, String searchTerm, int page) {
-        GameProfile pData = plugin.getGameProfile(player.getUniqueId());
+        GameProfile pData = GameProfileManager.getGameProfile(player.getUniqueId());
         Inventory inv = plugin.getServer().createInventory(null, 54, "Warn Menu");
 
         int a = 0;
-        for (int i = page * 45; i < plugin.getGameProfile().size() && i >= page * 45 && i < (page + 1) * 45; i++) {
-            Collections.sort(plugin.getGameProfile(), new Comparator<GameProfile>() {
+        for (int i = page * 45; i < GameProfileManager.getGameProfile().size() && i >= page * 45 && i < (page + 1) * 45; i++) {
+            Collections.sort(GameProfileManager.getGameProfile(), new Comparator<GameProfile>() {
                 @Override
                 public int compare(GameProfile p1, GameProfile p2) {
                     if (sortType.equals(PunishmentMenus.SortType.NAME_ZA)) {
@@ -39,7 +39,7 @@ public class WarnMenu {
                     }
                 }
             });
-            GameProfile gameProfile = plugin.getGameProfile().get(i);
+            GameProfile gameProfile = GameProfileManager.getGameProfile().get(i);
             if (gameProfile.getHash() != pData.getHash()) {
                 if (i < 45) {
                     if (sortType.equals(PunishmentMenus.SortType.ONLINE_ONLY)) {
@@ -77,7 +77,7 @@ public class WarnMenu {
                 }
             }
         }
-        if (plugin.getGameProfile().size() > (page + 1) * 45) {
+        if (GameProfileManager.getGameProfile().size() > (page + 1) * 45) {
             inv.setItem(53, new ItemBuilder(Material.ARROW).name(ChatColor.GRAY + "Next \u00BB"));
         }
         if (page > 0) {
@@ -91,7 +91,7 @@ public class WarnMenu {
     }
 
     public void openInventory(Player player, OfflinePlayer target, Punishment.Reason reason) {
-        GameProfile targetProfile = plugin.getGameProfile(target.getUniqueId());
+        GameProfile targetProfile = GameProfileManager.getGameProfile(target.getUniqueId());
         Inventory inv = plugin.getServer().createInventory(null, 36, "Warning: " + targetProfile.getName());
 
         int i = 10;

@@ -43,7 +43,7 @@ public enum Rarity {
     }
 
     public String getCrateName() {
-        return getName() + (this == EPIC || this == LEGENDARY ? " BATTLE CRATE" : " Battle BattleCrate");
+        return getName() + (this == EPIC || this == LEGENDARY ? " BATTLE CRATE" : " Battle Crate");
     }
 
     public boolean hasRarity(Rarity rarity) {

@@ -3,6 +3,7 @@ package com.battlegroundspvp.command;
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.util.enums.EventSound;
+import com.battlegroundspvp.util.manager.GameProfileManager;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.Command;
@@ -35,42 +36,45 @@ public class ReportCommand implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        GameProfile gameProfile = BattlegroundsCore.getInstance().getGameProfile(player.getUniqueId());
+        GameProfile gameProfile = GameProfileManager.getGameProfile(player.getUniqueId());
 
-        if (gameProfile.isMuted()) {
-            MessageCommand.sendErrorMessage(gameProfile);
+        if (gameProfile != null) {
+            if (gameProfile.isMuted()) {
+                MessageCommand.sendErrorMessage(gameProfile);
+                return true;
+            }
+
+            if (args.length != 1) {
+                plugin.sendIncorrectUsage(player, "/report <player>");
+                return true;
+            }
+
+            Player reported = plugin.getServer().getPlayerExact(args[0]);
+
+            if (reported == null) {
+                player.sendMessage(ChatColor.RED + "That player isn't online!");
+                EventSound.playSound(player, EventSound.ACTION_FAIL);
+                return true;
+            }
+
+            if (reported == player) {
+                player.sendMessage(ChatColor.RED + "You can't report yourself! Unless you have something to tell us.... *gives suspicious look*");
+                EventSound.playSound(player, EventSound.ACTION_FAIL);
+                return true;
+            }
+
+            if (!cooldown.containsKey(player.getUniqueId())) {
+                //ReportMenu reportMenu = new ReportMenu(player);
+                reportBuilders.put(player.getUniqueId(), null);
+                reportArray.put(player.getUniqueId(), new ArrayList<>());
+                //reportMenu.openInventory(player, reported);
+            } else {
+                EventSound.playSound(player, EventSound.ACTION_FAIL);
+                player.sendMessage(ChatColor.RED + "You must wait " + ChatColor.YELLOW
+                        + cooldown.get(player.getUniqueId()) + " seconds " + ChatColor.RED + "before you report another player!");
+                return false;
+            }
             return true;
-        }
-
-        if (args.length != 1) {
-            plugin.sendIncorrectUsage(player, "/report <player>");
-            return true;
-        }
-
-        Player reported = plugin.getServer().getPlayerExact(args[0]);
-
-        if (reported == null) {
-            player.sendMessage(ChatColor.RED + "That player isn't online!");
-            EventSound.playSound(player, EventSound.ACTION_FAIL);
-            return true;
-        }
-
-        if (reported == player) {
-            player.sendMessage(ChatColor.RED + "You can't report yourself! Unless you have something to tell us.... *gives suspicious look*");
-            EventSound.playSound(player, EventSound.ACTION_FAIL);
-            return true;
-        }
-
-        if (!cooldown.containsKey(player.getUniqueId())) {
-            //ReportMenu reportMenu = new ReportMenu(player);
-            reportBuilders.put(player.getUniqueId(), null);
-            reportArray.put(player.getUniqueId(), new ArrayList<>());
-            //reportMenu.openInventory(player, reported);
-        } else {
-            EventSound.playSound(player, EventSound.ACTION_FAIL);
-            player.sendMessage(ChatColor.RED + "You must wait " + ChatColor.YELLOW
-                    + cooldown.get(player.getUniqueId()) + " seconds " + ChatColor.RED + "before you report another player!");
-            return false;
         }
         return false;
     }

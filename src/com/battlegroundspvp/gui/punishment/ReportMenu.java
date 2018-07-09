@@ -5,6 +5,7 @@ import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.command.ReportCommand;
 import com.battlegroundspvp.util.enums.EventSound;
 import com.battlegroundspvp.util.enums.Rank;
+import com.battlegroundspvp.util.manager.GameProfileManager;
 import com.battlegroundspvp.util.message.MessageBuilder;
 import com.gamerbah.inventorytoolkit.GameInventory;
 import com.gamerbah.inventorytoolkit.ItemBuilder;
@@ -150,12 +151,13 @@ public class ReportMenu extends GameInventory {
         player.sendMessage(ChatColor.GREEN + "You have successfully reported "
                 + ChatColor.DARK_AQUA + targetProfile.getName() + ChatColor.GREEN + "!");
 
-        plugin.getServer().getOnlinePlayers().stream().filter(staff -> plugin.getGameProfile(staff.getUniqueId())
-                .hasRank(Rank.HELPER)).forEach(staff -> staff.sendMessage(ChatColor.RED + player.getName()
-                + " has reported " + ChatColor.BOLD + targetProfile.getName() + ChatColor.RED + " for: " + message + "!"));
+        MessageBuilder.sendStaffMessage(ChatColor.RED + player.getName()
+                + " has reported " + ChatColor.BOLD + targetProfile.getName() + ChatColor.RED + " for: " + message + "!");
 
-        plugin.getServer().getOnlinePlayers().stream().filter(staff -> plugin.getGameProfile(staff.getUniqueId())
-                .hasRank(Rank.HELPER)).forEach(staff -> staff.playSound(staff.getLocation(), Sound.BLOCK_NOTE_HARP, 2, 2));
+        plugin.getServer().getOnlinePlayers().stream().filter(staff -> {
+            GameProfile gameProfile = GameProfileManager.getGameProfile(staff.getUniqueId());
+            return gameProfile != null && gameProfile.hasRank(Rank.HELPER);
+        }).forEach(staff -> staff.playSound(staff.getLocation(), Sound.BLOCK_NOTE_HARP, 2, 2));
 
         //plugin.slackReports.displayNMS(new SlackMessage(">>>*" + player.getName() + "* _has reported_ *" + targetProfile.getName() + "* _for:_ " + message));
 

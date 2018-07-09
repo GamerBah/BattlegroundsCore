@@ -3,8 +3,8 @@ package com.battlegroundspvp.runnable.timer;
 
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.donation.Essence;
-import com.battlegroundspvp.util.UpdateManager;
 import com.battlegroundspvp.util.enums.Time;
+import com.battlegroundspvp.util.manager.UpdateManager;
 import com.battlegroundspvp.util.message.MessageBuilder;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Sound;

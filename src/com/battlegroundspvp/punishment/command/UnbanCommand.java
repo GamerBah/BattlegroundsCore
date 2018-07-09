@@ -5,6 +5,7 @@ import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.util.enums.EventSound;
 import com.battlegroundspvp.util.enums.Rank;
+import com.battlegroundspvp.util.manager.GameProfileManager;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -26,40 +27,43 @@ public class UnbanCommand implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
+        GameProfile gameProfile = GameProfileManager.getGameProfile(player.getUniqueId());
 
-        if (!gameProfile.hasRank(Rank.ADMIN)) {
-            plugin.sendNoPermission(player);
+        if (gameProfile != null) {
+            if (!gameProfile.hasRank(Rank.ADMIN)) {
+                plugin.sendNoPermission(player);
+                return true;
+            }
+
+            if (args.length != 1) {
+                player.sendMessage(ChatColor.RED + "/unban <player>");
+                EventSound.playSound(player, EventSound.ACTION_FAIL);
+                return true;
+            }
+
+            GameProfile targetProfile = GameProfileManager.getGameProfile(plugin.getServer().getOfflinePlayer(args[0]).getUniqueId());
+
+            if (targetProfile == null) {
+                player.sendMessage(ChatColor.RED + "That player is not online or doesn't exist!");
+                return true;
+            }
+
+            if (!targetProfile.isBanned()) {
+                player.sendMessage(ChatColor.RED + "That player isn't banned!");
+                EventSound.playSound(player, EventSound.ACTION_FAIL);
+                return true;
+            }
+
+            targetProfile.getCurrentBan().setPardoned(true);
+
+            //plugin.slackPunishments.displayNMS(new SlackMessage(">>> _*" + player.getName() + "* unbanned *" + targetProfile.getName() + "*_\n*Reason for Ban:* _"
+            //        + targetProfile.getCurrentBan().getReason().getName() + "_"));
+
+            plugin.getServer().getOnlinePlayers().stream().filter(staff -> GameProfileManager.getGameProfile(staff.getUniqueId()).hasRank(Rank.HELPER)).forEach(staff ->
+                    staff.sendMessage(ChatColor.RED + player.getName() + " unbanned " + targetProfile.getName()));
+
             return true;
         }
-
-        if (args.length != 1) {
-            player.sendMessage(ChatColor.RED + "/unban <player>");
-            EventSound.playSound(player, EventSound.ACTION_FAIL);
-            return true;
-        }
-
-        GameProfile targetProfile = plugin.getGameProfile(plugin.getServer().getOfflinePlayer(args[0]).getUniqueId());
-
-        if (targetProfile == null) {
-            player.sendMessage(ChatColor.RED + "That player is not online or doesn't exist!");
-            return true;
-        }
-
-        if (!targetProfile.isBanned()) {
-            player.sendMessage(ChatColor.RED + "That player isn't banned!");
-            EventSound.playSound(player, EventSound.ACTION_FAIL);
-            return true;
-        }
-
-        targetProfile.getCurrentBan().setPardoned(true);
-
-        //plugin.slackPunishments.displayNMS(new SlackMessage(">>> _*" + player.getName() + "* unbanned *" + targetProfile.getName() + "*_\n*Reason for Ban:* _"
-        //        + targetProfile.getCurrentBan().getReason().getName() + "_"));
-
-        plugin.getServer().getOnlinePlayers().stream().filter(staff -> plugin.getGameProfile(staff.getUniqueId()).hasRank(Rank.HELPER)).forEach(staff ->
-                staff.sendMessage(ChatColor.RED + player.getName() + " unbanned " + targetProfile.getName()));
-
-        return true;
+        return false;
     }
 }

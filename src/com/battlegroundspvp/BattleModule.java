@@ -39,9 +39,9 @@ public class BattleModule<T extends JavaPlugin> {
     @Getter
     private final int hash;
     @Getter
-    private final String name;
-    @Getter
     private final T plugin;
+    @Getter
+    private final String name;
     @Getter
     @Setter
     private boolean awaitingUpdate = false;
@@ -118,7 +118,7 @@ public class BattleModule<T extends JavaPlugin> {
 
     // COMMANDS
     public HashMap<String, CommandExecutor> getCommands() {
-        return new HashMap<>();
+        return new HashMap<String, CommandExecutor>();
     }
 
     boolean onDailyRewardCommand() {

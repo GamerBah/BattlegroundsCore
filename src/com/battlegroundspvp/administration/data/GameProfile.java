@@ -9,11 +9,12 @@ import com.battlegroundspvp.administration.donation.Essence;
 import com.battlegroundspvp.punishment.Punishment;
 import com.battlegroundspvp.punishment.command.BanCommand;
 import com.battlegroundspvp.punishment.command.MuteCommand;
-import com.battlegroundspvp.util.SessionManager;
 import com.battlegroundspvp.util.enums.EventSound;
 import com.battlegroundspvp.util.enums.Rank;
 import com.battlegroundspvp.util.enums.Time;
+import com.battlegroundspvp.util.manager.SessionManager;
 import com.battlegroundspvp.util.message.FriendMessages;
+import com.battlegroundspvp.util.message.MessageBuilder;
 import com.google.common.base.Splitter;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +23,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.hibernate.Session;
 
@@ -41,7 +43,7 @@ public class GameProfile {
     private final UUID uuid;
     private String name;
     private Rank rank;
-    private boolean online;
+    //private boolean online;
     private int coins, playersRecruited;
     private int recruitedBy;
     private boolean dailyReward;
@@ -58,7 +60,7 @@ public class GameProfile {
     private final CratesData cratesData;
     private final PunishmentData punishmentData;
     private final BugReportData bugReportData;
-    private final Statistics statistics;
+    //private final Statistics statistics;
     public HashMap<GameProfile, Integer> friendRequestCooldowns = new HashMap<>();
 
     public GameProfile(GameProfilesEntity entity) {
@@ -67,7 +69,7 @@ public class GameProfile {
         this.uuid = UUID.fromString(entity.getUuid());
         this.name = entity.getName();
         this.rank = Rank.fromId(entity.getRank());
-        this.online = entity.isOnline();
+        //this.online = entity.isOnline();
         this.coins = entity.getCoins();
         this.playersRecruited = entity.getPlayersRecruited();
         this.recruitedBy = entity.getRecruitedBy();
@@ -82,7 +84,7 @@ public class GameProfile {
         this.cratesData = new CratesData(entity.getCrates());
         this.punishmentData = new PunishmentData(entity.getPunishments(), entity);
         this.bugReportData = new BugReportData(entity.getBugReports(), entity);
-        this.statistics = new Statistics(entity.getGameProfileStatistics());
+        //this.statistics = new Statistics(entity.getGameProfileStatistics());
         {
             ArrayList<Integer> list = new ArrayList<>();
             if (entity.getFriends() != null) {
@@ -120,7 +122,7 @@ public class GameProfile {
 
     public GameProfile addCoins(int amount) {
         setCoins(getCoins() + amount);
-        statistics.updateCoins(amount);
+        //statistics.updateCoins(amount);
         return this;
     }
 
@@ -155,12 +157,7 @@ public class GameProfile {
         BaseComponent baseComponent = new TextComponent(ChatColor.RED + enforcerProfile.getName() + " permanently banned " + ChatColor.RED + this.name);
         baseComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GRAY + "Reason: "
                 + ChatColor.GOLD + reason.getName()).create()));
-
-        BattlegroundsCore.getInstance().getServer().getOnlinePlayers().stream().filter(staff ->
-                BattlegroundsCore.getInstance().getGameProfile(staff.getUniqueId()).hasRank(Rank.HELPER)).forEach(staff -> {
-            staff.spigot().sendMessage(baseComponent);
-            EventSound.playSound(staff, EventSound.CLICK);
-        });
+        MessageBuilder.sendStaffMessage(baseComponent);
 
         if (isOnline())
             getPlayer().kickPlayer(ChatColor.RED + "You were permanently banned by " + ChatColor.GOLD + enforcerProfile.getName()
@@ -238,6 +235,10 @@ public class GameProfile {
         return false;
     }
 
+    public boolean isOnline() {
+        return Bukkit.getServer().getPlayer(name) != null && Bukkit.getServer().getPlayer(name).isOnline();
+    }
+
     public void kick(Punishment.Reason reason, GameProfile enforcerProfile) {
         if (!isOnline()) {
             enforcerProfile.sendMessage(ChatColor.RED + "That player isn't online!");
@@ -256,12 +257,7 @@ public class GameProfile {
 
         BaseComponent baseComponent = new TextComponent(ChatColor.RED + enforcerProfile.getName() + " kicked " + ChatColor.RED + this.name);
         baseComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GRAY + "Reason: " + ChatColor.WHITE + reason.getName()).create()));
-
-        BattlegroundsCore.getInstance().getServer().getOnlinePlayers().stream().filter(staff ->
-                BattlegroundsCore.getInstance().getGameProfile(staff.getUniqueId()).hasRank(Rank.HELPER)).forEach(staff -> {
-            staff.spigot().sendMessage(baseComponent);
-            EventSound.playSound(staff, EventSound.CLICK);
-        });
+        MessageBuilder.sendStaffMessage(baseComponent);
 
         getPlayer().kickPlayer(ChatColor.RED + "You were kicked by " + ChatColor.GOLD + enforcerProfile.getName() + ChatColor.RED + " for " + ChatColor.GOLD + reason.getName() + "\n"
                 + ChatColor.YELLOW + reason.getMessage() + "\n\n" + ChatColor.GRAY + "If you feel that staff abuse was an issue, please email support@battlegroundspvp.com");
@@ -285,12 +281,7 @@ public class GameProfile {
         BaseComponent baseComponent = new TextComponent(ChatColor.RED + enforcerProfile.getName() + " muted " + ChatColor.RED + this.name);
         baseComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GRAY + "Reason: "
                 + ChatColor.WHITE + reason.getName() + "\n" + ChatColor.GRAY + "Time: " + ChatColor.WHITE + Time.toString(duration * 1000, false)).create()));
-
-        BattlegroundsCore.getInstance().getServer().getOnlinePlayers().stream().filter(staff ->
-                BattlegroundsCore.getInstance().getGameProfile(staff.getUniqueId()).hasRank(Rank.HELPER)).forEach(staff -> {
-            staff.spigot().sendMessage(baseComponent);
-            EventSound.playSound(staff, EventSound.CLICK);
-        });
+        MessageBuilder.sendStaffMessage(baseComponent);
 
         if (isOnline())
             sendMessage(ChatColor.GOLD + enforcerProfile.getName() + ChatColor.RED + " muted you for " + ChatColor.GOLD + Time.toString(duration * 1000, true)
@@ -355,12 +346,7 @@ public class GameProfile {
         BaseComponent baseComponent = new TextComponent(ChatColor.RED + enforcerProfile.getName() + " temp-banned " + ChatColor.RED + this.name);
         baseComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GRAY + "Reason: "
                 + ChatColor.WHITE + reason.getName() + "\n" + ChatColor.GRAY + "Time: " + ChatColor.WHITE + Time.toString(duration * 1000, false)).create()));
-
-        BattlegroundsCore.getInstance().getServer().getOnlinePlayers().stream().filter(staff ->
-                BattlegroundsCore.getInstance().getGameProfile(staff.getUniqueId()).hasRank(Rank.HELPER)).forEach(staff -> {
-            staff.spigot().sendMessage(baseComponent);
-            EventSound.playSound(staff, EventSound.CLICK);
-        });
+        MessageBuilder.sendStaffMessage(baseComponent);
 
         if (isOnline())
             getPlayer().kickPlayer(ChatColor.RED + "You were temporarily banned by " + ChatColor.GOLD + enforcerProfile.getName()
@@ -377,9 +363,7 @@ public class GameProfile {
             return;
         }
 
-        BattlegroundsCore.getInstance().getServer().getOnlinePlayers().stream().filter(staff ->
-                BattlegroundsCore.getInstance().getGameProfile(staff.getUniqueId()).hasRank(Rank.HELPER)).forEach(staff ->
-                staff.sendMessage(ChatColor.RED + gameProfile.getName() + " unbanned " + this.name));
+        MessageBuilder.sendStaffMessage(ChatColor.RED + gameProfile.getName() + " unbanned " + this.name);
         punishment.setPardoned(true);
     }
 
@@ -390,9 +374,7 @@ public class GameProfile {
             return;
         }
 
-        BattlegroundsCore.getInstance().getServer().getOnlinePlayers().stream().filter(staff ->
-                BattlegroundsCore.getInstance().getGameProfile(staff.getUniqueId()).hasRank(Rank.HELPER)).forEach(staff ->
-                staff.sendMessage(ChatColor.RED + gameProfile.getName() + " unmuted " + this.name));
+        MessageBuilder.sendStaffMessage(ChatColor.RED + gameProfile.getName() + " unmuted " + this.name);
 
         sendMessage(ChatColor.RED + " \nYou were unmuted by " + ChatColor.GOLD + gameProfile.getName());
         sendMessage(ChatColor.GRAY + punishment.getReason().getMessage() + "\n ");
@@ -436,7 +418,7 @@ public class GameProfile {
             session.beginTransaction();
             entity.setName(this.name);
             entity.setRank(this.rank.getId());
-            entity.setOnline(this.online);
+            entity.setOnline(isOnline());
             entity.setCoins(this.coins);
             entity.setPlayersRecruited(this.playersRecruited);
             entity.setRecruitedBy(this.recruitedBy);
@@ -471,7 +453,7 @@ public class GameProfile {
             Session session = SessionManager.openSession();
             session.beginTransaction();
             entity.setRank(this.rank.getId());
-            entity.setOnline(this.online);
+            entity.setOnline(isOnline());
             entity.setCoins(this.coins);
             entity.setPlayersRecruited(this.playersRecruited);
             entity.setRecruitedBy(this.recruitedBy);

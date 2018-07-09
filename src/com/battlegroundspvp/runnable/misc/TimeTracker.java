@@ -21,7 +21,7 @@ public class TimeTracker implements Runnable {
             if (BattlegroundsCore.getYearSnapshot().getYear() < LocalDate.now().getYear())
                 BattlegroundsCore.setYearSnapshot(LocalDate.now());
             else BattlegroundsCore.setYearSnapshot(LocalDate.now());
-        BattlegroundsCore.getGameProfiles().forEach(gameProfile -> {
+        /*GameProfileManager.getGameProfiles().forEach(gameProfile -> {
             gameProfile.getStatistics().getDailyHours().put(BattlegroundsCore.getDaySnapshot(),
                     gameProfile.getStatistics().getDailyHours().getOrDefault(BattlegroundsCore.getDaySnapshot(), 0L) + 1L);
             gameProfile.getStatistics().getMonthlyHours().put(BattlegroundsCore.getMonthSnapshot(),
@@ -29,7 +29,7 @@ public class TimeTracker implements Runnable {
             gameProfile.getStatistics().getYearlyHours().put(BattlegroundsCore.getYearSnapshot(),
                     gameProfile.getStatistics().getYearlyHours().getOrDefault(BattlegroundsCore.getYearSnapshot(), 0L) + 1L);
             gameProfile.getStatistics().setAlltimeHours(gameProfile.getStatistics().getAlltimeHours() + 1L);
-        });
+        });*/
     }
 
 }

@@ -3,7 +3,7 @@ package com.battlegroundspvp.runnable.misc;
 
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.sql.ServerDataEntity;
-import com.battlegroundspvp.util.SessionManager;
+import com.battlegroundspvp.util.manager.SessionManager;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;

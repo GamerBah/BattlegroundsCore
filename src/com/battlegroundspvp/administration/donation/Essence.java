@@ -2,8 +2,10 @@ package com.battlegroundspvp.administration.donation;
 /* Created by GamerBah on 8/17/2016 */
 
 import com.battlegroundspvp.BattlegroundsCore;
+import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.runnable.timer.DonationUpdater;
 import com.battlegroundspvp.util.enums.Time;
+import com.battlegroundspvp.util.manager.GameProfileManager;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
@@ -34,7 +36,9 @@ public class Essence {
         plugin.getConfig().set("essence.owner", player.getName());
         plugin.getConfig().set("essence.timeRemaining", type.getDuration() * 60 * 60);
         plugin.saveConfig();
-        plugin.getGameProfile(player.getUniqueId()).getEssenceData().removeEssence(type);
+        GameProfile gameProfile = GameProfileManager.getGameProfile(player.getUniqueId());
+        if (gameProfile != null)
+            gameProfile.getEssenceData().removeEssence(type);
         // TODO:
         // plugin.getGlobalStats().setTotalUsedEssences(plugin.getGlobalStats().getTotalUsedEssences() + 1);
 

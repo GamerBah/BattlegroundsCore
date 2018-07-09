@@ -1,11 +1,11 @@
 package com.battlegroundspvp.gui.cosmetic;
 /* Created by GamerBah on 9/17/2016 */
 
-import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.util.enums.EventSound;
 import com.battlegroundspvp.util.enums.Rarity;
 import com.battlegroundspvp.util.gui.InventoryItems;
+import com.battlegroundspvp.util.manager.GameProfileManager;
 import com.battlegroundspvp.util.message.MessageBuilder;
 import com.gamerbah.inventorytoolkit.ClickEvent;
 import com.gamerbah.inventorytoolkit.GameInventory;
@@ -29,10 +29,10 @@ public class CrateMenu extends GameInventory {
     private final GameProfile gameProfile;
 
     public CrateMenu(Player player, Location location) {
-        super("Battle Crates", BattlegroundsCore.getInstance().getGameProfile(player.getUniqueId()).getCratesData().getTotal(), 54, null);
+        super("Battle Crates", GameProfileManager.getGameProfile(player.getUniqueId()).getCratesData().getTotal(), 54, null);
         setBackButton(false);
 
-        this.gameProfile = BattlegroundsCore.getInstance().getGameProfile(player.getUniqueId());
+        this.gameProfile = GameProfileManager.getGameProfile(player.getUniqueId());
         this.location = location;
 
         if (gameProfile.getCratesData().getTotal() > 0) {

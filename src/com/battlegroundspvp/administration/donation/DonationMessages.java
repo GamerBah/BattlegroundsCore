@@ -5,6 +5,7 @@ import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.util.enums.Rank;
 import com.battlegroundspvp.util.enums.Time;
+import com.battlegroundspvp.util.manager.GameProfileManager;
 import com.battlegroundspvp.util.message.MessageBuilder;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
@@ -70,32 +71,34 @@ public class DonationMessages {
     }
 
     public void sendActiveEssenceMessage(Player player) {
-        GameProfile gameProfile = plugin.getGameProfile(plugin.getConfig().getString("essenceOwner"));
-        TextComponent thanks = new TextComponent("    " + ChatColor.DARK_AQUA + "Click here to thank them!");
-        thanks.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.RED + "/thanks " + gameProfile.getName()).create()));
-        thanks.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/thanks " + gameProfile.getName()));
+        GameProfile gameProfile = GameProfileManager.getGameProfile(plugin.getConfig().getString("essenceOwner"));
+        if (gameProfile != null) {
+            TextComponent thanks = new TextComponent("    " + ChatColor.DARK_AQUA + "Click here to thank them!");
+            thanks.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.RED + "/thanks " + gameProfile.getName()).create()));
+            thanks.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/thanks " + gameProfile.getName()));
 
-        Essence.Type type = Essence.Type.ONE_HOUR_50_PERCENT;
-        for (Essence.Type essence : Essence.Type.values()) {
-            if (essence.getDuration() == plugin.getConfig().getInt("essenceTime") && essence.getPercent() == plugin.getConfig().getInt("essenceIncrease")) {
-                type = essence;
+            Essence.Type type = Essence.Type.ONE_HOUR_50_PERCENT;
+            for (Essence.Type essence : Essence.Type.values()) {
+                if (essence.getDuration() == plugin.getConfig().getInt("essenceTime") && essence.getPercent() == plugin.getConfig().getInt("essenceIncrease")) {
+                    type = essence;
+                }
             }
-        }
 
-        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 2, 1);
-        plugin.getServer().getScheduler().runTaskLater(plugin, () -> player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_SMALL_FALL, 0.75F, 0.2F), 10L);
-        player.sendMessage(type.getChatColor() + "\u00AB" + ChatColor.WHITE + "========================================" + type.getChatColor() + "\u00BB");
-        player.sendMessage(" ");
-        player.sendMessage("    " + new MessageBuilder(ChatColor.GOLD).bold().create() + (!player.getName().equals(plugin.getConfig().getString("essenceOwner"))
-                ? gameProfile.getName() + new MessageBuilder(ChatColor.YELLOW).bold().create() + " has an active Battle Essence!" : "Your " + plugin.getConfig().getInt("essenceIncrease") + "% Battle Essence is still active!"));
-        player.sendMessage(ChatColor.GRAY + "    All players receive " + type.getChatColor() + type.getPercent() + "% more " + ChatColor.GRAY + "Souls");
-        player.sendMessage(ChatColor.GRAY + "    and Battle Coins for " + ChatColor.RED + Time.toString(plugin.getConfig().getInt("essenceTimeRemaining") * 1000, true) + ChatColor.GRAY + "!");
-        player.sendMessage(" ");
-        if (!player.getName().equals(plugin.getConfig().getString("essenceOwner"))) {
-            player.spigot().sendMessage(thanks);
+            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 2, 1);
+            plugin.getServer().getScheduler().runTaskLater(plugin, () -> player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_SMALL_FALL, 0.75F, 0.2F), 10L);
+            player.sendMessage(type.getChatColor() + "\u00AB" + ChatColor.WHITE + "========================================" + type.getChatColor() + "\u00BB");
             player.sendMessage(" ");
+            player.sendMessage("    " + new MessageBuilder(ChatColor.GOLD).bold().create() + (!player.getName().equals(plugin.getConfig().getString("essenceOwner"))
+                    ? gameProfile.getName() + new MessageBuilder(ChatColor.YELLOW).bold().create() + " has an active Battle Essence!" : "Your " + plugin.getConfig().getInt("essenceIncrease") + "% Battle Essence is still active!"));
+            player.sendMessage(ChatColor.GRAY + "    All players receive " + type.getChatColor() + type.getPercent() + "% more " + ChatColor.GRAY + "Souls");
+            player.sendMessage(ChatColor.GRAY + "    and Battle Coins for " + ChatColor.RED + Time.toString(plugin.getConfig().getInt("essenceTimeRemaining") * 1000, true) + ChatColor.GRAY + "!");
+            player.sendMessage(" ");
+            if (!player.getName().equals(plugin.getConfig().getString("essenceOwner"))) {
+                player.spigot().sendMessage(thanks);
+                player.sendMessage(" ");
+            }
+            player.sendMessage(type.getChatColor() + "\u00AB" + ChatColor.WHITE + "========================================" + type.getChatColor() + "\u00BB");
         }
-        player.sendMessage(type.getChatColor() + "\u00AB" + ChatColor.WHITE + "========================================" + type.getChatColor() + "\u00BB");
     }
 
     public void sendRankPurchaseMessage(Player player, Rank rank) {

@@ -22,12 +22,14 @@ import com.battlegroundspvp.runnable.timer.AFKRunnable;
 import com.battlegroundspvp.runnable.timer.DonationUpdater;
 import com.battlegroundspvp.runnable.timer.PunishmentRunnable;
 import com.battlegroundspvp.util.BattleCrate;
-import com.battlegroundspvp.util.BattleCrateManager;
 import com.battlegroundspvp.util.Launcher;
-import com.battlegroundspvp.util.SessionManager;
 import com.battlegroundspvp.util.cosmetic.CosmeticManager;
 import com.battlegroundspvp.util.enums.EventSound;
 import com.battlegroundspvp.util.enums.Time;
+import com.battlegroundspvp.util.manager.BattleCrateManager;
+import com.battlegroundspvp.util.manager.GameProfileManager;
+import com.battlegroundspvp.util.manager.SessionManager;
+import com.battlegroundspvp.util.manager.UpdateManager;
 import com.battlegroundspvp.util.message.MessageBuilder;
 import com.battlegroundspvp.util.nms.Hologram;
 import com.comphenix.protocol.PacketType;
@@ -63,9 +65,11 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
 import java.io.File;
 import java.io.IOException;
@@ -78,6 +82,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
 
 public class BattlegroundsCore extends JavaPlugin {
 
@@ -99,8 +104,6 @@ public class BattlegroundsCore extends JavaPlugin {
     @Setter
     public static LocalDate yearSnapshot;
 
-    @Getter
-    private static List<GameProfile> gameProfiles = new ArrayList<>();
     @Getter
     private static List<Thread> activeThreads = new ArrayList<>();
     @Getter
@@ -137,8 +140,20 @@ public class BattlegroundsCore extends JavaPlugin {
         effectManager = new EffectManager(this);
 
         new SessionManager(this);
+        while (!SessionManager.isStarted()) ;
 
-        reloadGameProfiles();
+        new GameProfileManager(this);
+
+        SessionManager.getService().execute(() -> {
+            Session session = SessionManager.openSession();
+            session.beginTransaction();
+            if (!session.createQuery("from GameProfilesEntity", GameProfilesEntity.class).getResultList().isEmpty())
+                for (GameProfilesEntity entity : session.createQuery("from GameProfilesEntity", GameProfilesEntity.class).getResultList())
+                    if (entity.isOnline())
+                        GameProfileManager.addGameProfile(new GameProfile(entity));
+            session.getTransaction().commit();
+            SessionManager.closeSession(session);
+        });
         reloadSnapshots();
         getServer().getOnlinePlayers().forEach(p -> {
             respawn(p);
@@ -164,20 +179,6 @@ public class BattlegroundsCore extends JavaPlugin {
     }
 
     public void onDisable() {
-        Session session = SessionManager.openSession();
-        Transaction transaction;
-        try {
-            transaction = session.beginTransaction();
-            ServerDataEntity serverData = session.get(ServerDataEntity.class, 1);
-            serverData.setSnapshotDay(getDaySnapshot());
-            serverData.setSnapshotMonth(getMonthSnapshot());
-            serverData.setSnapshotYear(getYearSnapshot());
-            session.update(serverData);
-            transaction.commit();
-        } catch (HibernateException e) {
-            getLogger().warning(e.getLocalizedMessage());
-        }
-
         getConfig().set("launchers", "");
         launchers.forEach(launcher -> {
             getConfig().set("launchers." + launcher.getId() + ".type", launcher.getType().toString());
@@ -207,6 +208,23 @@ public class BattlegroundsCore extends JavaPlugin {
             DonationUpdater.essenceBar.removeAll();
             DonationUpdater.essenceBar.setVisible(false);
         }
+    }
+
+    public static SessionFactory setupSessionFactory() {
+        SessionFactory factory = null;
+        // sessionFactory SessionFactory is set up once for an application!
+        final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
+                .configure() // configures settings from hibernate.cfg.xml
+                .build();
+        try {
+            factory = new MetadataSources(registry).buildMetadata().buildSessionFactory();
+        } catch (Exception e) {
+            e.printStackTrace();
+            // The registry would be destroyed by the SessionFactory, but we had trouble building the SessionFactory
+            // so destroy it manually.
+            StandardServiceRegistryBuilder.destroy(registry);
+        }
+        return factory;
     }
 
     private void setUpPacketHandlers() {
@@ -349,163 +367,55 @@ public class BattlegroundsCore extends JavaPlugin {
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new PunishmentRunnable(this), 0, 20L);
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new WorldParticlesRunnable(this), 0, 2L);
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new MessageRunnable(this), 0, 6000L);
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, () -> gameProfiles.forEach(GameProfile::partialSync), 6000L, 6000L);
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, () -> GameProfileManager.getGameProfiles().forEach(GameProfile::partialSync), 6000L, 6000L);
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new TPSRunnable(), 0L, 0L);
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new TimeTracker(), 20L, 20L);
         Thread thread = new Thread(new PanelRunnables());
         thread.start();
     }
 
-    public GameProfile getGameProfile(UUID uuid) {
+    public static GameProfile createNewGameProfile(String name, UUID uuid) {
         Future<GameProfile> future = SessionManager.getService().submit(() -> {
-            Optional<GameProfile> gameProfileStream = gameProfiles.stream().filter(gameProfile ->
-                    gameProfile.getUuid().equals(uuid)).findFirst();
-
-            if (gameProfileStream.isPresent()) {
-                return gameProfileStream.get();
-            } else {
-                GameProfilesEntity dbGameProfile = null;
-                Session session = SessionManager.openSession();
-                session.beginTransaction();
-                if (!session.createQuery("from GameProfilesEntity where uuid = :uuid", GameProfilesEntity.class)
-                        .setParameter("uuid", uuid.toString()).getResultList().isEmpty())
-                    dbGameProfile = session.createQuery("from GameProfilesEntity where uuid = :uuid", GameProfilesEntity.class)
-                            .setParameter("uuid", uuid.toString()).getSingleResult();
-                session.getTransaction().commit();
-                SessionManager.closeSession(session);
-                if (dbGameProfile != null) {
-                    gameProfiles.add(new GameProfile(dbGameProfile));
-                    return getGameProfile(uuid);
-                } else {
-
-                    return null;
-                }
-            }
-        });
-        try {
-            return future.get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public GameProfile getGameProfile(String name) {
-        Future<GameProfile> future = SessionManager.getService().submit(() -> {
-            Optional<GameProfile> playerDataStream = gameProfiles.stream().filter(gameProfile ->
-                    gameProfile.getName().equalsIgnoreCase(name)).findFirst();
-
-            if (playerDataStream.isPresent()) {
-                return playerDataStream.get();
-            } else {
-                GameProfilesEntity dbGameProfile = null;
-                Session session = SessionManager.openSession();
-                session.beginTransaction();
-                if (!session.createQuery("from GameProfilesEntity where name = :name", GameProfilesEntity.class)
-                        .setParameter("name", name).getResultList().isEmpty())
-                    dbGameProfile = session.createQuery("from GameProfilesEntity where name = :name", GameProfilesEntity.class)
-                            .setParameter("name", name).getSingleResult();
-                session.getTransaction().commit();
-                SessionManager.closeSession(session);
-                if (dbGameProfile != null) {
-                    gameProfiles.add(new GameProfile(dbGameProfile));
-                    return getGameProfile(name);
-                } else {
-                    return null;
-                }
-            }
-        });
-        try {
-            return future.get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public GameProfile getGameProfile(int id) {
-        Future<GameProfile> future = SessionManager.getService().submit(() -> {
-            Optional<GameProfile> playerDataStream = gameProfiles.stream().filter(gameProfile ->
-                    gameProfile.getId() == id).findFirst();
-
-            if (playerDataStream.isPresent()) {
-                return playerDataStream.get();
-            } else {
-                GameProfilesEntity dbGameProfile = null;
-                Session session = SessionManager.openSession();
-                session.beginTransaction();
-                if (!session.createQuery("from GameProfilesEntity where id = :id", GameProfilesEntity.class)
-                        .setParameter("id", id).getResultList().isEmpty())
-                    dbGameProfile = session.createQuery("from GameProfilesEntity where id = :id", GameProfilesEntity.class)
-                            .setParameter("id", id).getSingleResult();
-                session.getTransaction().commit();
-                SessionManager.closeSession(session);
-                if (dbGameProfile != null) {
-                    gameProfiles.add(new GameProfile(dbGameProfile));
-                    return getGameProfile(id);
-                } else {
-                    return null;
-                }
-            }
-        });
-        try {
-            return future.get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private void reloadGameProfiles() {
-        SessionManager.getService().execute(() -> {
-            Session session = SessionManager.openSession();
-            session.beginTransaction();
-            if (!session.createQuery("from GameProfilesEntity", GameProfilesEntity.class).getResultList().isEmpty())
-                for (GameProfilesEntity entity : session.createQuery("from GameProfilesEntity", GameProfilesEntity.class).getResultList())
-                    if (entity.isOnline())
-                        gameProfiles.add(new GameProfile(entity));
-            session.getTransaction().commit();
-            SessionManager.closeSession(session);
-        });
-    }
-
-    public static void syncGameProfiles() {
-        for (GameProfile gameProfile : gameProfiles)
-            gameProfile.fullSync();
-    }
-
-    public static void createNewGameProfile(String name, UUID uuid) {
-        SessionManager.getService().execute(() -> {
             Session session = SessionManager.openSession();
 
-            GameProfilesEntity gameProfilesEntity = new GameProfilesEntity();
-            gameProfilesEntity.setName(name);
-            gameProfilesEntity.setUuid(uuid.toString());
-            gameProfilesEntity.setDailyRewardLast(LocalDateTime.now());
+            GameProfilesEntity entity = new GameProfilesEntity();
+            entity.setName(name);
+            entity.setUuid(uuid.toString());
+            entity.setDailyRewardLast(LocalDateTime.now());
 
-            SettingsEntity settingsEntity = new SettingsEntity();
-            KitPvpDataEntity kitPvpDataEntity = new KitPvpDataEntity();
-            EssencesEntity essencesEntity = new EssencesEntity();
-            CratesEntity cratesEntity = new CratesEntity();
+            SettingsEntity settings = new SettingsEntity();
+            KitPvpDataEntity kitPvpData = new KitPvpDataEntity();
+            EssencesEntity essences = new EssencesEntity();
+            CratesEntity crates = new CratesEntity();
+            //GameProfileStatisticsEntity statistics = new GameProfileStatisticsEntity();
 
-            gameProfilesEntity.setSettings(settingsEntity);
-            gameProfilesEntity.setKitPvpData(kitPvpDataEntity);
-            gameProfilesEntity.setEssences(essencesEntity);
-            gameProfilesEntity.setCrates(cratesEntity);
-            settingsEntity.setGameProfile(gameProfilesEntity);
-            kitPvpDataEntity.setGameProfile(gameProfilesEntity);
-            essencesEntity.setGameProfile(gameProfilesEntity);
-            cratesEntity.setGameProfile(gameProfilesEntity);
+            entity.setSettings(settings);
+            entity.setKitPvpData(kitPvpData);
+            entity.setEssences(essences);
+            entity.setCrates(crates);
+            //entity.setGameProfileStatistics(statistics);
+            settings.setGameProfile(entity);
+            kitPvpData.setGameProfile(entity);
+            essences.setGameProfile(entity);
+            crates.setGameProfile(entity);
+            //statistics.setGameProfile(entity);
 
             session.beginTransaction();
-            session.saveOrUpdate(gameProfilesEntity);
+            session.saveOrUpdate(entity);
             session.getTransaction().commit();
             SessionManager.closeSession(session);
 
-
-            gameProfiles.add(new GameProfile(gameProfilesEntity));
+            return new GameProfile(entity);
         });
-        BattlegroundsCore.getInstance().getServer().getLogger().info("New GameProfile created for user " + name);
+        GameProfile gameProfile = null;
+        try {
+            gameProfile = future.get();
+        } catch (InterruptedException | ExecutionException ex) {
+            UpdateManager.sendLocalizedLog(Level.WARNING, ex, "Unable to create new GameProfile", "Username: " + name, "UUID: " + uuid.toString());
+        }
+        if (gameProfile != null)
+            BattlegroundsCore.getInstance().getServer().getLogger().info("GameProfile created for user " + name + " with UUID " + uuid.toString());
+        return gameProfile;
     }
 
     public void sendNoPermission(Player player) {
@@ -542,34 +452,36 @@ public class BattlegroundsCore extends JavaPlugin {
     }
 
     public static void sendRegisterMessage(Player player) {
-        GameProfile gameProfile = BattlegroundsCore.getInstance().getGameProfile(player.getUniqueId());
-        player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1.2F);
-        player.sendMessage(" ");
-        player.sendMessage(ChatColor.GRAY + "You need a " + ChatColor.GOLD + "Battlegrounds Panel " + ChatColor.GRAY + "account!");
-        player.sendMessage(" ");
-        player.sendMessage(ChatColor.AQUA + "The Battlegrounds Panel is used for");
-        player.sendMessage(ChatColor.WHITE + "  \u00BB " + ChatColor.GRAY + "Checking leaderboards and your personal stats");
-        player.sendMessage(ChatColor.WHITE + "  \u00BB " + ChatColor.GRAY + "Seeing what kits and cosmetics you own");
-        player.sendMessage(ChatColor.WHITE + "  \u00BB " + ChatColor.GRAY + "Opening Battle Crates and buying random kits");
-        player.sendMessage(ChatColor.WHITE + "  \u00BB " + ChatColor.GRAY + "Creating & managing clans and friends");
-        player.sendMessage(ChatColor.WHITE + "  \u00BB " + ChatColor.GRAY + "So much more!");
+        GameProfile gameProfile = GameProfileManager.getGameProfile(player.getUniqueId());
+        if (gameProfile != null) {
+            player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1.2F);
+            player.sendMessage(" ");
+            player.sendMessage(ChatColor.GRAY + "You need a " + ChatColor.GOLD + "Battlegrounds Panel " + ChatColor.GRAY + "account!");
+            player.sendMessage(" ");
+            player.sendMessage(ChatColor.AQUA + "The Battlegrounds Panel is used for");
+            player.sendMessage(ChatColor.WHITE + "  \u00BB " + ChatColor.GRAY + "Checking leaderboards and your personal stats");
+            player.sendMessage(ChatColor.WHITE + "  \u00BB " + ChatColor.GRAY + "Seeing what kits and cosmetics you own");
+            player.sendMessage(ChatColor.WHITE + "  \u00BB " + ChatColor.GRAY + "Opening Battle Crates and buying random kits");
+            player.sendMessage(ChatColor.WHITE + "  \u00BB " + ChatColor.GRAY + "Creating & managing clans and friends");
+            player.sendMessage(ChatColor.WHITE + "  \u00BB " + ChatColor.GRAY + "So much more!");
 
-        player.sendMessage(" ");
-        TextComponent component = new TextComponent(ChatColor.RED + "\u00BB " + ChatColor.YELLOW + "Click here to register an account!" + ChatColor.RED + " \u00AB");
-        BaseComponent[] hoverText = {
-                new TextComponent(ChatColor.GRAY + "Registration is" + ChatColor.GREEN + " free" + ChatColor.GRAY + "! No need to pay!\n"),
-                new TextComponent(ChatColor.GRAY + "In order to register, you'll need to provide: \n"),
-                new TextComponent(ChatColor.WHITE + "  \u00BB " + ChatColor.YELLOW + "A valid email " + ChatColor.GRAY + "(for account recovery)\n"),
-                new TextComponent(ChatColor.WHITE + "  \u00BB " + ChatColor.YELLOW + "A secure password " + ChatColor.GRAY + "(which we'll encrypt for you!)\n"),
-                new TextComponent("\n"),
-                new TextComponent(ChatColor.GRAY + "This link provided is unique to " + ChatColor.ITALIC + "your account" + ChatColor.GRAY + ". Awesome, right?")
-        };
-        component.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://dashboard.battlegroundspvp.com/register.php?token=" + gameProfile.getToken()));
-        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverText));
-        player.spigot().sendMessage(component);
-        player.sendMessage(" ");
-        player.sendMessage(ChatColor.GRAY + "You can always type " + ChatColor.RED + "/panel register" + ChatColor.GRAY + " if you lose the link above!");
-        player.sendMessage(" ");
+            player.sendMessage(" ");
+            TextComponent component = new TextComponent(ChatColor.RED + "\u00BB " + ChatColor.YELLOW + "Click here to register an account!" + ChatColor.RED + " \u00AB");
+            BaseComponent[] hoverText = {
+                    new TextComponent(ChatColor.GRAY + "Registration is" + ChatColor.GREEN + " free" + ChatColor.GRAY + "! No need to pay!\n"),
+                    new TextComponent(ChatColor.GRAY + "In order to register, you'll need to provide: \n"),
+                    new TextComponent(ChatColor.WHITE + "  \u00BB " + ChatColor.YELLOW + "A valid email " + ChatColor.GRAY + "(for account recovery)\n"),
+                    new TextComponent(ChatColor.WHITE + "  \u00BB " + ChatColor.YELLOW + "A secure password " + ChatColor.GRAY + "(which we encrypt for you!)\n"),
+                    new TextComponent("\n"),
+                    new TextComponent(ChatColor.GRAY + "This link provided is unique to " + ChatColor.ITALIC + "your account" + ChatColor.GRAY + ". Awesome, right?")
+            };
+            component.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://dashboard.battlegroundspvp.com/register.php?token=" + gameProfile.getToken()));
+            component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverText));
+            player.spigot().sendMessage(component);
+            player.sendMessage(" ");
+            player.sendMessage(ChatColor.GRAY + "You can always type " + ChatColor.RED + "/panel register" + ChatColor.GRAY + " if you lose the link above!");
+            player.sendMessage(" ");
+        }
     }
 
     private static void reloadSnapshots() {
@@ -585,33 +497,27 @@ public class BattlegroundsCore extends JavaPlugin {
 
     private static PluginCommand getReflectCommand(String name, Plugin plugin) {
         PluginCommand command = null;
-
         try {
             Constructor<PluginCommand> c = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
             c.setAccessible(true);
-
             command = c.newInstance(name, plugin);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return command;
     }
 
     private static CommandMap getCommandMap() {
         CommandMap commandMap = null;
-
         try {
             if (Bukkit.getPluginManager() instanceof SimplePluginManager) {
                 Field f = SimplePluginManager.class.getDeclaredField("commandMap");
                 f.setAccessible(true);
-
                 commandMap = (CommandMap) f.get(Bukkit.getPluginManager());
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return commandMap;
     }
 

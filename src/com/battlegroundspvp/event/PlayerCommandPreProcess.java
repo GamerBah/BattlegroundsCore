@@ -3,11 +3,10 @@ package com.battlegroundspvp.event;
 
 import com.battlegroundspvp.BattlegroundsCore;
 import com.battlegroundspvp.administration.command.FreezeCommand;
-import com.battlegroundspvp.administration.data.GameProfile;
 import com.battlegroundspvp.runnable.timer.AFKRunnable;
-import com.battlegroundspvp.util.UpdateManager;
 import com.battlegroundspvp.util.enums.EventSound;
-import com.battlegroundspvp.util.enums.Rank;
+import com.battlegroundspvp.util.manager.UpdateManager;
+import com.battlegroundspvp.util.message.MessageBuilder;
 import de.Herbystar.TTA.TTA_Methods;
 import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.StringUtils;
@@ -28,7 +27,6 @@ public class PlayerCommandPreProcess implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
-        GameProfile gameProfile = plugin.getGameProfile(player.getUniqueId());
         String command = event.getMessage();
 
         if (UpdateManager.isUpdating() || FreezeCommand.reloadFreeze) {
@@ -125,9 +123,7 @@ public class PlayerCommandPreProcess implements Listener {
             AFKRunnable.getAfkTimer().put(player, 0);
         }
 
-        plugin.getServer().getOnlinePlayers().stream().filter(players ->
-                plugin.getGameProfile(players.getUniqueId()).hasRank(Rank.HELPER) && BattlegroundsCore.getCmdspies().contains(players.getUniqueId()))
-                .forEach(players -> players.sendMessage(ChatColor.GRAY + "" + ChatColor.BOLD + "" + ChatColor.DARK_GRAY + player.getName() + ": " + ChatColor.GRAY + command));
+        MessageBuilder.sendStaffMessage(ChatColor.GRAY + "" + ChatColor.BOLD + "" + ChatColor.DARK_GRAY + player.getName() + ": " + ChatColor.GRAY + command);
     }
 
 }
